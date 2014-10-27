@@ -54,19 +54,19 @@ for s = status.section:length(sec_nums)
     sec.xy_matches = match_xy(sec, 'xy', xy_params.matching);
     
     % Setup the error log
-    sec.error_log = []
+    sec.error_log = [];
     
     % Flag bad matching
     if sec.xy_matches.meta.avg_error > xy_params.max_match_error
         disp('<strong>FLAG</strong>XY matches distance beyond threshold');
-        error_log{end+1} = sprintf('%s: sec.xy_matches.meta.avg_error > xy_params.max_match_error', sec.name);
-        % msg = sprintf('[%s]: Error after matching is very large. This may be due to bad rough alignment or match filtering.', sec.name);
-        % id = 'XY:LargeMatchError';
-        % if xy_params.ignore_error; warning(id, msg); else error(id, msg); end
+        sec.error_log{end+1} = sprintf('%s: sec.xy_matches.meta.avg_error > xy_params.max_match_error', sec.name);
+        msg = sprintf('[%s]: Error after matching is very large. This may be due to bad rough alignment or match filtering.', sec.name);
+        id = 'XY:LargeMatchError';
+        if xy_params.ignore_error; warning(id, msg); else error(id, msg); end
     end
     if ~isempty(find_orphan_tiles(sec, 'xy'))
         disp('<strong>FLAG</strong>XY orphan tiles');
-        error_log{end+1} = sprintf('%s: orphan tiles', sec.name);
+        sec.error_log{end+1} = sprintf('%s: orphan tiles', sec.name);
         % msg = sprintf('[%s]: There are tiles with no matches to any other tiles.\n\tOrphan tiles: %s\n', sec.name, vec2str(find_orphan_tiles(sec, 'xy')));
         % id = 'XY:OrphanTiles';
         % if xy_params.ignore_error; warning(id, msg); else error(id, msg); end
@@ -78,7 +78,7 @@ for s = status.section:length(sec_nums)
     % Flag bad alignment
     if sec.alignments.xy.meta.avg_post_error > xy_params.max_aligned_error
         disp('<strong>FLAG</strong>XY overall alignment error beyond threshold');
-        error_log{end+1} = sprintf('%s: sec.alignments.xy.meta.avg_post_error > xy_params.max_aligned_error', sec.name);
+        sec.error_log{end+1} = sprintf('%s: sec.alignments.xy.meta.avg_post_error > xy_params.max_aligned_error', sec.name);
         % msg = sprintf('[%s]: Error after alignment is very large. This may be due to bad matching.', sec.name);
         % id = 'XY:LargeAlignmentError';
         % if xy_params.ignore_error; warning(id, msg); else error(id, msg); end

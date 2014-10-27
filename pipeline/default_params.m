@@ -21,7 +21,7 @@ defaults.xy.matching.NNR.MatchThreshold = 1.0;
 % [match_xy] Matching: Outlier filtering
 defaults.xy.matching.filter_method = 'geomedian'; % 'geomedian', 'gmm' or 'none'
 defaults.xy.matching.filter_fallback = 'none';
-defaults.xy.matching.keep_outliers = false;
+defaults.xy.matching.keep_outliers = true;
 defaults.xy.matching.geomedian.cutoff = '1.25x';
 defaults.xy.matching.GMM.inlier_cluster = 'smallest_var';
 defaults.xy.matching.GMM.warning = 'error';
