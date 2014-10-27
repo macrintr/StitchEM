@@ -11,14 +11,15 @@
 addpath(pwd);
 addpath(genpath(fullfile(pwd, 'functions')));
 addpath(genpath(fullfile(pwd, 'pipeline')));
+addpath(genpath(fullfile(pwd, 'debug')));
+addpath(genpath(fullfile(pwd, 'cache')));
 
-% Set paths to data folders
 cachepath(fullfile(pwd, 'cache'));
 renderspath(fullfile(pwd, 'renders'));
 
 % Set the current wafer path
-%waferpath('/data/home/talmo/EMdata/W002');
-waferpath('/data/home/talmo/EMdata/S2-W003');
+% waferpath('/data/home/talmo/EMdata/W002');
+% waferpath('/data/home/talmo/EMdata/S2-W003');
 
 clear ans
 %% Development

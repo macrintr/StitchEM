@@ -1,6 +1,7 @@
 %% Rough & XY Alignment
 if ~exist('params', 'var'); error('The ''params'' variable does not exist. Load parameters before doing alignment.'); end
 if ~exist('secs', 'var'); secs = cell(length(sec_nums), 1); end
+if ~exist('error_log', 'var'); error_log = {}; end
 if ~exist('status', 'var'); status = struct(); end
 if ~isfield(status, 'step'); status.step = 'xy'; end
 if ~isfield(status, 'section'); status.section = 1; end
@@ -52,25 +53,35 @@ for s = status.section:length(sec_nums)
     % Match XY features
     sec.xy_matches = match_xy(sec, 'xy', xy_params.matching);
     
-    % Check for bad matching
+    % Setup the error log
+    sec.error_log = []
+    
+    % Flag bad matching
     if sec.xy_matches.meta.avg_error > xy_params.max_match_error
-        msg = sprintf('[%s]: Error after matching is very large. This may be due to bad rough alignment or match filtering.', sec.name);
-        id = 'XY:LargeMatchError';
-        if xy_params.ignore_error; warning(id, msg); else error(id, msg); end
-    elseif ~isempty(find_orphan_tiles(sec, 'xy'))
-        msg = sprintf('[%s]: There are tiles with no matches to any other tiles.\n\tOrphan tiles: %s\n', sec.name, vec2str(find_orphan_tiles(sec, 'xy')));
-        id = 'XY:OrphanTiles';
-        if xy_params.ignore_error; warning(id, msg); else error(id, msg); end
+        disp('<strong>FLAG</strong>XY matches distance beyond threshold');
+        error_log{end+1} = sprintf('%s: sec.xy_matches.meta.avg_error > xy_params.max_match_error', sec.name);
+        % msg = sprintf('[%s]: Error after matching is very large. This may be due to bad rough alignment or match filtering.', sec.name);
+        % id = 'XY:LargeMatchError';
+        % if xy_params.ignore_error; warning(id, msg); else error(id, msg); end
+    end
+    if ~isempty(find_orphan_tiles(sec, 'xy'))
+        disp('<strong>FLAG</strong>XY orphan tiles');
+        error_log{end+1} = sprintf('%s: orphan tiles', sec.name);
+        % msg = sprintf('[%s]: There are tiles with no matches to any other tiles.\n\tOrphan tiles: %s\n', sec.name, vec2str(find_orphan_tiles(sec, 'xy')));
+        % id = 'XY:OrphanTiles';
+        % if xy_params.ignore_error; warning(id, msg); else error(id, msg); end
     end
     
     % Align XY
     sec.alignments.xy = align_xy(sec, xy_params.align);
     
-    % Check for bad alignment
+    % Flag bad alignment
     if sec.alignments.xy.meta.avg_post_error > xy_params.max_aligned_error
-        msg = sprintf('[%s]: Error after alignment is very large. This may be due to bad matching.', sec.name);
-        id = 'XY:LargeAlignmentError';
-        if xy_params.ignore_error; warning(id, msg); else error(id, msg); end
+        disp('<strong>FLAG</strong>XY overall alignment error beyond threshold');
+        error_log{end+1} = sprintf('%s: sec.alignments.xy.meta.avg_post_error > xy_params.max_aligned_error', sec.name);
+        % msg = sprintf('[%s]: Error after alignment is very large. This may be due to bad matching.', sec.name);
+        % id = 'XY:LargeAlignmentError';
+        % if xy_params.ignore_error; warning(id, msg); else error(id, msg); end
     end
     
     % Clear images and XY features to save memory
