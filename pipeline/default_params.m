@@ -33,7 +33,7 @@ defaults.xy.align.fixed_tile = 1;
 % Quality control checks
 defaults.xy.max_match_error = 100; % avg error after matching
 defaults.xy.max_aligned_error = 5; % avg error after alignment
-defaults.xy.ignore_error = false; % still throws warning if true
+defaults.xy.ignore_error = true; % still throws warning if true
 
 %% Defaults: Z alignment
 % General

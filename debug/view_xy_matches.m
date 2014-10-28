@@ -28,6 +28,8 @@ outliers = sec.xy_matches.outliers;
 match_inliers = [inliers.A.local_points inliers.A.tile inliers.B.local_points inliers.B.tile];
 match_outliers= [outliers.A.local_points outliers.A.tile outliers.B.local_points outliers.B.tile];
 
+sec.tiles.full.img = imload_section_tiles(sec, 1.0);
+
 for n = 1:size(pairs,1)
     A_idx = pairs(n, 1)
     B_idx = pairs(n, 2)
@@ -65,11 +67,10 @@ for n = 1:size(pairs,1)
     inlier_shapeInserter = vision.ShapeInserter('Shape', 'Lines', 'BorderColor', 'Custom', 'CustomBorderColor', green);
     outlier_shapeInserter = vision.ShapeInserter('Shape', 'Lines', 'BorderColor', 'Custom', 'CustomBorderColor', red);
     lined_tiles = step(inlier_shapeInserter, paired, inlier_lines);
-    lined_tiles = step(out
-    lier_shapeInserter, lined_tiles, outlier_lines);
+    lined_tiles = step(outlier_shapeInserter, lined_tiles, outlier_lines);
     
     % save annotated tile pair images
-    filename = sprintf('%s_xy_matches_%d_%d.tif', sec.name, A_idx, B_idx);
+    filename = sprintf('%s/%s_xy_matches_%d_%d.tif', sec.name, sec.name, A_idx, B_idx);
     imwrite(lined_tiles, fullfile(cachepath, filename));
 end
 

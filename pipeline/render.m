@@ -1,10 +1,11 @@
 % Stack
 %secs = secs(sec_nums);
 %secs = {secA, secB};
-alignment = 'blockcorr';
+alignment = 'xy';
 
+last_cell = sum(~cellfun('isempty',secs));
 % Output folder
-folder_name = sprintf('%s_Secs%d-%d_%s', secs{1}.wafer, secs{1}.num, secs{end}.num, alignment);
+folder_name = sprintf('%s_Secs%d-%d_%s', secs{1}.wafer, secs{1}.num, secs{last_cell}.num, alignment);
 render_path = create_folder(fullfile(renderpath, folder_name));
 
 % Clear any loaded images to save memory
