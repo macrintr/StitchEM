@@ -1,7 +1,7 @@
 %% Configuration
 % Wafer and sections
-%waferpath('/mnt/data0/ashwin/07122012/S2-W003')
-waferpath('/data/home/talmo/EMdata/S2-W003')
+waferpath('/mnt/data0/ashwin/07122012/S2-W003')
+% waferpath('/data/home/talmo/EMdata/S2-W003')
 info = get_path_info(waferpath);
 wafer = info.wafer;
 sec_nums = info.sec_nums;

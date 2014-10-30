@@ -13,6 +13,10 @@ if params.verbosity > 0; fprintf('== Aligning section %d in XY\n', sec.num); end
 %matches = merge_match_sets(sec.xy_matches);
 
 matches = sec.xy_matches;
+if isfield(sec.xy_matches, 'user_adjusted')
+    matches.A = [matches.A; sec.xy_matches.user_adjusted.A];
+    matches.B = [matches.B; sec.xy_matches.user_adjusted.B];
+end
 
 % Add section column
 if ~instr('section', matches.A.Properties.VariableNames)

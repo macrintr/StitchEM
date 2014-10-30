@@ -9,4 +9,5 @@ figure
 plot(n, post_error, '-og', n, pre_error, '-or')
 legend('post', 'pre')
 ylabel('XY Error (pixels)')
-xlabel('Sections on W001')
+x_name = sprintf('Sections within %s', secs{1}.name);
+xlabel(x_name)

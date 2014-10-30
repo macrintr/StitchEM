@@ -60,16 +60,10 @@ for s = status.section:length(sec_nums)
     if sec.xy_matches.meta.avg_error > xy_params.max_match_error
         disp('<strong>FLAG</strong> XY matches distance beyond threshold');
         sec.error_log{end+1} = sprintf('%s: sec.xy_matches.meta.avg_error > xy_params.max_match_error', sec.name);
-        % msg = sprintf('[%s]: Error after matching is very large. This may be due to bad rough alignment or match filtering.', sec.name);
-        % id = 'XY:LargeMatchError';
-        % if xy_params.ignore_error; warning(id, msg); else error(id, msg); end
     end
     if ~isempty(find_orphan_tiles(sec, 'xy'))
         disp('<strong>FLAG</strong> XY orphan tiles');
         sec.error_log{end+1} = sprintf('%s: orphan tiles', sec.name);
-        % msg = sprintf('[%s]: There are tiles with no matches to any other tiles.\n\tOrphan tiles: %s\n', sec.name, vec2str(find_orphan_tiles(sec, 'xy')));
-        % id = 'XY:OrphanTiles';
-        % if xy_params.ignore_error; warning(id, msg); else error(id, msg); end
     end
     
     % Align XY
@@ -77,7 +71,7 @@ for s = status.section:length(sec_nums)
     
     % Flag bad alignment
     if sec.alignments.xy.meta.avg_post_error > xy_params.max_aligned_error
-        disp('<strong>FLAG</strong> XY overall alignment error beyond threshold');
+        disp('<strong>STOP</strong> XY overall alignment error beyond threshold');
         sec.error_log{end+1} = sprintf('%s: sec.alignments.xy.meta.avg_post_error > xy_params.max_aligned_error', sec.name);
         % msg = sprintf('[%s]: Error after alignment is very large. This may be due to bad matching.', sec.name);
         % id = 'XY:LargeAlignmentError';
@@ -94,15 +88,16 @@ for s = status.section:length(sec_nums)
     sec.runtime.xy.timestamp = datestr(now);
     secs{s} = sec;
     clear sec
+    
+    % Save to cache
+    last_cell = sum(~cellfun('isempty',secs));
+    disp('=== Saving sections to disk.'); 
+    save_timer = tic;
+    filename = sprintf('%s_xy_aligned.mat', secs{1}.wafer);
+    save(get_new_path(fullfile(cachepath, filename)), 'secs', 'status', '-v7.3')
+    fprintf('Saved to: %s [%.2fs]\n', fullfile(cachepath, filename), toc(save_timer))
 end
 status.step = 'finished_xy';
-
-% Save to cache
-last_cell = sum(~cellfun('isempty',secs));
-disp('=== Saving sections to disk.'); save_timer = tic;
-filename = sprintf('%s_Secs%d-%d_xy_aligned.mat', secs{1}.wafer, secs{1}.num, secs{last_cell}.num);
-save(get_new_path(fullfile(cachepath, filename)), 'secs', 'status', '-v7.3')
-fprintf('Saved to: %s [%.2fs]\n', fullfile(cachepath, filename), toc(save_timer))
 
 total_xy_time = sum(cellfun(@(sec) sec.runtime.xy.time_elapsed, secs));
 fprintf('==== <strong>Finished XY alignment in %.2fs (%.2fs / section)</strong>.\n\n', total_xy_time, total_xy_time / length(secs));

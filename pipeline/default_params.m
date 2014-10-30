@@ -1,6 +1,6 @@
 %% Defaults: XY alignment
 % General
-defaults.xy.overwrite = false; % throws error if section is already XY aligned
+defaults.xy.overwrite = true; % throws error if section is already XY aligned
 defaults.xy.skip_tiles = [];
 
 % [rough_align_xy] Rough alignment
