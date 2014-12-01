@@ -1,4 +1,4 @@
-function [tform, fixed_inliers, moving_inliers, mean_registration_error] = surf_register(fixed_img, moving_img, varargin)
+function [tform, stats] = surf_register(fixed_img, moving_img, varargin)
 %SURF_REGISTER Estimates a transformation to register two images.
 % Usage:
 %   tform = surf_register(fixed_img, moving_img)
@@ -26,58 +26,61 @@ match_indices = matchFeatures(fixed_desc, moving_desc, ...
     'MaxRatio', params.NNR_MaxRatio);
 
 % Get the points corresponding to the matched features
-fixed_matching_pts = fixed_pts(match_indices(:, 1), :);
-moving_matching_pts = moving_pts(match_indices(:, 2), :);
+stats.fixed_matching_pts = fixed_pts(match_indices(:, 1), :);
+stats.moving_matching_pts = moving_pts(match_indices(:, 2), :);
 NNR_time = toc;
-num_potential_matches = size(fixed_matching_pts, 1);
+stats.num_potential_matches = size(stats.fixed_matching_pts, 1);
 
 if params.verbosity > 0
-    fprintf('Found %d potentially matching features. [%.2fs]\n', num_potential_matches, NNR_time)
+    fprintf('Found %d potentially matching features. [%.2fs]\n', stats.num_potential_matches, NNR_time)
 end
 
 % Check for too few potential matches
-if num_potential_matches < params.min_potential_matches
-    msg_id = 'surf_register:notEnoughPotentialMatches';
-    msg = sprintf('Less than %d potential matches were detected. The registration may not be reliable.\n', ...
-        params.min_potential_matches);
-    
-    if params.suppress_few_potential_matches_error
-        if params.verbosity > 0
-            warning(msg_id, msg);
-        end
-    else
-        error(msg_id, msg);
-    end
+if stats.num_potential_matches < params.min_potential_matches
+
+    disp('<strong>FLAG</strong> surf_register:notEnoughPotentialMatches');
+%     msg_id = 'surf_register:notEnoughPotentialMatches';
+%     msg = sprintf('Less than %d potential matches were detected. The registration may not be reliable.\n', ...
+%         params.min_potential_matches);
+%     
+%     if params.suppress_few_potential_matches_error
+%         if params.verbosity > 0
+%             warning(msg_id, msg);
+%         end
+%     else
+%         error(msg_id, msg);
+%     end
 end
 
 %% Transform estimation
 % Find inliers and calculate transform
 tic;
-[tform, moving_inliers, fixed_inliers] = estimateGeometricTransform(moving_matching_pts, fixed_matching_pts, ...
+[tform, stats.moving_inliers, stats.fixed_inliers] = estimateGeometricTransform(stats.moving_matching_pts, stats.fixed_matching_pts, ...
     params.MSAC_transformType, 'MaxNumTrials', params.MSAC_MaxNumTrials, 'Confidence', params.MSAC_Confidence, 'MaxDistance', params.MSAC_MaxDistance);
 tform_estimation_time = toc;
-num_inliers = size(fixed_inliers, 1);
+stats.num_inliers = size(stats.fixed_inliers, 1);
 
 % Calculate error
-mean_registration_error = rownorm2(tform.transformPointsForward(moving_inliers) - fixed_inliers);
+stats.mean_registration_error = rownorm2(tform.transformPointsForward(stats.moving_inliers) - stats.fixed_inliers);
 
 if params.verbosity > 0
-    fprintf('Found %d inliers within matches and estimated registration transform. [%.2fs]\n', num_inliers, tform_estimation_time)
+    fprintf('Found %d inliers within matches and estimated registration transform. [%.2fs]\n', stats.num_inliers, tform_estimation_time)
     fprintf('Registration error: %.2fpx\n', mean_registration_error);
 end
 
 % Check for too few inliers
-if size(fixed_inliers, 1) < params.min_inliers
+if stats.num_inliers < params.min_inliers
     [scale, rotation, translation] = estimate_tform_params(tform);
-    msg_id = 'surf_register:notEnoughInliers';
-    msg = sprintf(['Less than %d inliers were detected. The registration may not be reliable.\n' ...
-        '\tComputed transform: Scale = %f | Rotation = %f | Translation = [%f %f]'], params.min_inliers, scale, rotation, translation(1), translation(2));
-    
-    if params.suppress_few_inliers_error
-        warning(msg_id, msg);
-    else
-        error(msg_id, msg);
-    end
+    disp('<strong>FLAG</strong> surf_register:notEnoughInliers');
+%     msg_id = 'surf_register:notEnoughInliers';
+%     msg = sprintf(['Less than %d inliers were detected. The registration may not be reliable.\n' ...
+%         '\tComputed transform: Scale = %f | Rotation = %f | Translation = [%f %f]'], params.min_inliers, scale, rotation, translation(1), translation(2));
+%     
+%     if params.suppress_few_inliers_error
+%         warning(msg_id, msg);
+%     else
+%         error(msg_id, msg);
+%     end
 end
 
 end

@@ -138,33 +138,33 @@ params = rmfield(p.Results, {'sec', 'tile_imgs', 'tforms'});
 % Section structure was passed in (structure created in load_sec())
 if isstruct(sec)
     sec_num = sec.num;
-    if params.verbosity > 1; fprintf('Using pre-loaded structure for section %d.\n', sec_num); end
-    
-    % Transforms
-    if isempty(tforms) || (ischar(tforms) && strcmp(tforms, 'rough'))
-        tforms = sec.rough_tforms;
-        if params.verbosity > 1; disp('Using rough alignments to display tiles.'); end
-    elseif ischar(tforms) && strcmp(tforms, 'fine')
-        tforms = sec.fine_tforms;
-        if params.verbosity > 1; disp('Using fine alignments to display tiles.'); end
-    end
-    
-    % Tile images
-    if ~isempty(sec.img) && ~isempty(sec.img.rough_tiles) && sec.tile_rough_scale >= params.display_scale
-        tile_imgs = sec.img.rough_tiles;
-        params.pre_scale = sec.tile_rough_scale;
-        if params.verbosity > 1; fprintf('Using rough tiles to render (%sx).\n', num2str(sec.tile_rough_scale)); end
-        
-    elseif ~isempty(sec.img) && ~isempty(sec.img.z_tiles) && sec.tile_z_scale >= params.display_scale
-        tile_imgs = sec.img.z_tiles;
-        params.pre_scale = sec.tile_z_scale;
-        if params.verbosity > 1; fprintf('Using Z tiles to render (%sx).\n', num2str(sec.tile_z_scale)); end
-        
-    elseif ~isempty(sec.img) && ~isempty(sec.img.xy_tiles)
-        tile_imgs = sec.img.xy_tiles;
-        params.pre_scale = sec.tile_xy_scale;
-        if params.verbosity > 1; fprintf('Using XY tiles to render (%sx).\n', num2str(sec.tile_xy_scale)); end
-    end
+%     if params.verbosity > 1; fprintf('Using pre-loaded structure for section %d.\n', sec_num); end
+%     
+%     % Transforms
+%     if isempty(tforms) || (ischar(tforms) && strcmp(tforms, 'rough'))
+%         tforms = sec.rough_tforms;
+%         if params.verbosity > 1; disp('Using rough alignments to display tiles.'); end
+%     elseif ischar(tforms) && strcmp(tforms, 'fine')
+%         tforms = sec.fine_tforms;
+%         if params.verbosity > 1; disp('Using fine alignments to display tiles.'); end
+%     end
+%     
+%     % Tile images
+%     if ~isempty(sec.img) && ~isempty(sec.img.rough_tiles) && sec.tile_rough_scale >= params.display_scale
+%         tile_imgs = sec.img.rough_tiles;
+%         params.pre_scale = sec.tile_rough_scale;
+%         if params.verbosity > 1; fprintf('Using rough tiles to render (%sx).\n', num2str(sec.tile_rough_scale)); end
+%         
+%     elseif ~isempty(sec.img) && ~isempty(sec.img.z_tiles) && sec.tile_z_scale >= params.display_scale
+%         tile_imgs = sec.img.z_tiles;
+%         params.pre_scale = sec.tile_z_scale;
+%         if params.verbosity > 1; fprintf('Using Z tiles to render (%sx).\n', num2str(sec.tile_z_scale)); end
+%         
+%     elseif ~isempty(sec.img) && ~isempty(sec.img.xy_tiles)
+%         tile_imgs = sec.img.xy_tiles;
+%         params.pre_scale = sec.tile_xy_scale;
+%         if params.verbosity > 1; fprintf('Using XY tiles to render (%sx).\n', num2str(sec.tile_xy_scale)); end
+%     end
 else
     sec_num = sec;
 end
@@ -177,7 +177,7 @@ if isempty(tile_imgs)
     if params.verbosity > 0; load_tiles_time = tic; fprintf('Loading tile images for section %d...', sec_num); end
     
     % Load
-    tile_imgs = imload_section_tiles(sec_num, params.display_scale);
+    tile_imgs = imload_section_tiles(sec, params.display_scale);
     
     % Adjust the pre_scale parameter
     params.pre_scale = params.display_scale;

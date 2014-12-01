@@ -90,7 +90,6 @@ for s = status.section:length(sec_nums)
     clear sec
     
     % Save to cache
-    last_cell = sum(~cellfun('isempty',secs));
     disp('=== Saving sections to disk.'); 
     save_timer = tic;
     filename = sprintf('%s_xy_aligned.mat', secs{1}.wafer);

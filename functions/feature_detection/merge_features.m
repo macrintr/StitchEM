@@ -31,7 +31,7 @@ if isstruct(tile_features)
     tile_features = features_struct.tiles;
 end
 
-validateattributes(tile_features, {'cell'}, {'nonempty'}, mfilename)
+% validateattributes(tile_features, {'cell'}, {'nonempty'}, mfilename)
 
 % Find the number of features in all tiles that have any features
 nonempty_tiles = find(~areempty(tile_features));

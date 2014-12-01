@@ -28,19 +28,19 @@ params(1).xy.matching.filter_method = 'gmm';
 params(1).xy.matching.filter_fallback = 'geomedian';
 
 % Z
-params(2).z = z_presets.manual_matching;
-params(14).z = z_presets.rel_to_2previous;
-params(17).z = z_presets.manual_matching;
-params(18).z = z_presets.manual_matching;
-params(20).z = z_presets.manual_matching;
-params(71).z = z_presets.manual_matching;
-params(72).z = z_presets.rel_to_2previous;
-params(87).z = z_presets.low_res;
-params(88).z = z_presets.manual_matching;
-params(89).z = z_presets.rel_to_2previous;
-params(134).z = z_presets.large_trans;
-params(135).z = z_presets.large_trans;
-params(136).z = z_presets.large_trans;
+% params(2).z = z_presets.manual_matching;
+% params(14).z = z_presets.rel_to_2previous;
+% params(17).z = z_presets.manual_matching;
+% params(18).z = z_presets.manual_matching;
+% params(20).z = z_presets.manual_matching;
+% params(71).z = z_presets.manual_matching;
+% params(72).z = z_presets.rel_to_2previous;
+% params(87).z = z_presets.low_res;
+% params(88).z = z_presets.manual_matching;
+% params(89).z = z_presets.rel_to_2previous;
+% params(134).z = z_presets.large_trans;
+% params(135).z = z_presets.large_trans;
+% params(136).z = z_presets.large_trans;
 
 %% Run alignment
 try

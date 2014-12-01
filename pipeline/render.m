@@ -1,7 +1,7 @@
 % Stack
 %secs = secs(sec_nums);
 %secs = {secA, secB};
-alignment = 'xy';
+alignment = 'z';
 
 last_cell = sum(~cellfun('isempty',secs));
 % Output folder
@@ -23,7 +23,7 @@ for s = 1:length(secs)
     initial_Rs = cellfun(@imref2d, sec.tile_sizes, 'UniformOutput', false);
     
     % Estimate spatial references after alignment
-    tile_Rs{s} = cellfun(@tform_spatial_ref, initial_Rs, tforms, 'UniformOutput', false);
+    tile_Rs{s} = cellfun(@tform_spatial_ref, initial_Rs', tforms, 'UniformOutput', false);
 end
 
 % Merge all tile references to find stack reference

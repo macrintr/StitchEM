@@ -22,7 +22,7 @@ for s = 1:length(secs)
     initial_Rs = cellfun(@(R) scale_ref(R, scale), initial_Rs, 'UniformOutput', false);
     
     % Estimate spatial references after alignment
-    Rs{s} = cellfun(@tform_spatial_ref, initial_Rs, tforms, 'UniformOutput', false);
+    Rs{s} = cellfun(@tform_spatial_ref, initial_Rs', tforms, 'UniformOutput', false);
 end
 
 % Flatten and merge spatial refs

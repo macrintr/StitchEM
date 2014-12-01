@@ -7,6 +7,7 @@ figure
 plot_section(secA, 'z', 'r0.1')
 plot_section(secB, 'prev_z', 'g0.1')
 plot_matches(secB.z_matches)
+axis off;
 
 end
 

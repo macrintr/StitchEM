@@ -8,15 +8,16 @@ sec.xy_matches.user_adjusted.B = table;
 % # 1
 % NEED TO DELETE FEATURES IN THESE PAIRS
 % 11/12 (second feature from bottom)
-row_ids = 299;
+% 0.6412    6.7070
+row_ids = [297];
 sec.xy_matches.A(row_ids, :) = [];
 sec.xy_matches.B(row_ids, :) = [];
 
 % Staple the borders on these tile pairs
-sec = staple_border(sec, 3, 4);
-sec = staple_border(sec, 9, 10);
-sec = staple_border(sec, 7, 8);
-sec = staple_border(sec, 14, 15);
+% sec = staple_border(sec, 3, 4);
+% sec = staple_border(sec, 9, 10);
+% sec = staple_border(sec, 7, 8);
+% sec = staple_border(sec, 14, 15);
 
 % Add points to the barren border between 2&6
 A_idx = 2;
@@ -35,7 +36,7 @@ user_table_B = table(user_locals_B, user_globals_B, B_idx, 'VariableNames', {'lo
 sec.xy_matches.A = [sec.xy_matches.A; user_table_A];
 sec.xy_matches.B = [sec.xy_matches.B; user_table_B];
 
-sec = staple_border(sec, 2, 6);
+% sec = staple_border(sec, 2, 6);
 
 
 % RERUN ALIGNMENT
@@ -62,6 +63,10 @@ if sec.alignments.xy.meta.avg_post_error > xy_params.max_aligned_error
     % if xy_params.ignore_error; warning(id, msg); else error(id, msg); end
 end
 
-tforms_rend = sec.alignments.xy.tforms;
-section = render_section(sec, tforms_rend);
-imshow(section)
+alignment = 'xy';
+tforms = sec.alignments.(alignment).tforms;
+section = render_section(sec, tforms, 'scale', 0.08);
+filename = sprintf('%s/%s_xy_rendered.tif', sec.wafer, sec.name);
+imwrite(section, fullfile(cachepath, filename));
+
+secs{15} = sec;

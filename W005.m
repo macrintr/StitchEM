@@ -29,31 +29,31 @@ default_params
 
 % S2-W005
 % XY
-params(35).xy = xy_presets.grid_align;
-params(56).xy.max_match_error = inf;
-
-% Z
-params(4).z.max_match_error = inf;
-params(5).z.max_match_error = inf;
-params(8).z.max_match_error = inf;
-params(9).z.max_match_error = inf;
-params(10).z.max_match_error = inf;
-params(11).z.max_match_error = inf;
-params(15).z.max_match_error = inf;
-params(20).z.max_match_error = inf;
-params(21).z.max_match_error = inf;
-params(25).z.max_match_error = inf;
-params(26).z.max_match_error = inf;
-params(27).z.max_match_error = inf;
-params(28).z.max_match_error = inf;
-params(29).z.max_match_error = inf;
-params(32).z.max_match_error = inf;
-for s=33:length(params); params(s).z.max_match_error = inf; end
+% params(35).xy = xy_presets.grid_align;
+% params(56).xy.max_match_error = inf;
+% 
+% % Z
+% params(4).z.max_match_error = inf;
+% params(5).z.max_match_error = inf;
+% params(8).z.max_match_error = inf;
+% params(9).z.max_match_error = inf;
+% params(10).z.max_match_error = inf;
+% params(11).z.max_match_error = inf;
+% params(15).z.max_match_error = inf;
+% params(20).z.max_match_error = inf;
+% params(21).z.max_match_error = inf;
+% params(25).z.max_match_error = inf;
+% params(26).z.max_match_error = inf;
+% params(27).z.max_match_error = inf;
+% params(28).z.max_match_error = inf;
+% params(29).z.max_match_error = inf;
+% params(32).z.max_match_error = inf;
+% for s=33:length(params); params(s).z.max_match_error = inf; end
 
 %% Run alignment
-try
+% try
     align_stack_xy
-    align_stack_z
-catch alignment_error
-    troubleshoot
-end
+%     align_stack_z
+% catch alignment_error
+%     troubleshoot
+% end

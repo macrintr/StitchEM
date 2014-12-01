@@ -61,7 +61,7 @@ match_setsB = cell(secA.num_tiles * secB.num_tiles, 1);
 for tA = 1:secA.num_tiles
     % Get tile features
     tile_featsA = featuresA.tiles{tA};
-    
+  
     % Match with each tile it overlaps with in secB
     overlapping_tiles = featuresA.overlap_with{tA};
     for tB = overlapping_tiles

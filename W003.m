@@ -22,17 +22,17 @@ default_params
 %       Or:
 %   for s=10:15; params(s).z.max_match_error = 2000; end
 
-% S2-W003:
-%Section 72 is rotated by quite a bit, but 73 goes back to normal
-params(72).z = z_presets.large_trans;
-params(73).z = z_presets.rel_to_2previous;
-params(140).z = z_presets.ignore_z_error;
-params(141).z = z_presets.rel_to_2previous;
+% % S2-W003:
+% %Section 72 is rotated by quite a bit, but 73 goes back to normal
+% params(72).z = z_presets.large_trans;
+% params(73).z = z_presets.rel_to_2previous;
+% params(140).z = z_presets.ignore_z_error;
+% params(141).z = z_presets.rel_to_2previous;
 
 %% Run alignment
-try
+% try
     align_stack_xy
-    align_stack_z
-catch alignment_error
-    troubleshoot
-end
+%     align_stack_z
+% catch alignment_error
+%     troubleshoot
+% end

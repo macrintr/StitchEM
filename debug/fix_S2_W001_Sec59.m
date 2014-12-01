@@ -52,6 +52,10 @@ if sec.alignments.xy.meta.avg_post_error > xy_params.max_aligned_error
     % if xy_params.ignore_error; warning(id, msg); else error(id, msg); end
 end
 
-tforms_rend = sec.alignments.xy.tforms;
-section = render_section(sec, tforms_rend);
-imshow(section)
+alignment = 'xy';
+tforms = sec.alignments.(alignment).tforms;
+section = render_section(sec, tforms, 'scale', 0.08);
+filename = sprintf('%s/%s_xy_rendered.tif', sec.wafer, sec.name);
+imwrite(section, fullfile(cachepath, filename));
+
+secs{59} = sec;

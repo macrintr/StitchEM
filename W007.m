@@ -29,18 +29,18 @@ default_params
 
 % S2-W007
 % XY
-params(2).xy = xy_presets.grid_align;
-params(9).xy = xy_presets.grid_align;
-params(10).xy = xy_presets.grid_align;
-params(10).xy.matching.filter_method = 'gmm';
-params(10).xy.matching.filter_fallback = 'geomedian';
-for s=11:length(params); params(s).xy = xy_presets.grid_align; end
-params(12).xy.matching.filter_method = 'gmm';
-params(12).xy.matching.filter_fallback = 'geomedian';
+% params(2).xy = xy_presets.grid_align;
+% params(9).xy = xy_presets.grid_align;
+% params(10).xy = xy_presets.grid_align;
+% params(10).xy.matching.filter_method = 'gmm';
+% params(10).xy.matching.filter_fallback = 'geomedian';
+% for s=11:length(params); params(s).xy = xy_presets.grid_align; end
+% params(12).xy.matching.filter_method = 'gmm';
+% params(12).xy.matching.filter_fallback = 'geomedian';
 %% Run alignment
-try
+% try
     align_stack_xy
-    align_stack_z
-catch alignment_error
-    troubleshoot
-end
+%     align_stack_z
+% catch alignment_error
+%     troubleshoot
+% end

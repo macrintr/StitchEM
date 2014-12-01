@@ -1,13 +1,18 @@
-function z_matches = select_z_matches(secA, secB)
+function z_matches = select_z_matches(secA, secB, stack)
 %SELECT_Z_MATCHES Manually select Z matches.
 
-alignmentA = 'z';
-alignmentB = 'prev_z';
+if nargin < 3
+    alignmentA = 'z';
+    alignmentB = 'prev_z';
+else
+    alignmentA = 'stack_z';
+    alignmentB = 'prev_stack_z';   
+end
 
 scale = 0.025;
 
-[A, R_A] = imshow_section(secA.num, 'tforms', secA.alignments.(alignmentA).tforms, 'suppress_display', true, 'display_scale', scale);
-[B, R_B] = imshow_section(secB.num, 'tforms', secB.alignments.(alignmentB).tforms, 'suppress_display', true, 'display_scale', scale);
+[A, R_A] = imshow_section(secA, 'tforms', secA.alignments.(alignmentA).tforms, 'suppress_display', true, 'display_scale', scale);
+[B, R_B] = imshow_section(secB, 'tforms', secB.alignments.(alignmentB).tforms, 'suppress_display', true, 'display_scale', scale);
 
 ptsAin = [];
 ptsBin = [];
@@ -36,7 +41,7 @@ z_matches.secB = secB.name;
 z_matches.alignmentA = alignmentA;
 z_matches.alignmentB = alignmentB;
 z_matches.match_type = 'z';
-z_matches.meta.method = 'manual';
+z_matches.meta.method = 'select_z_matches';
 z_matches.meta.avg_error = rownorm2(z_matches.B.global_points - z_matches.A.global_points);
 
 end

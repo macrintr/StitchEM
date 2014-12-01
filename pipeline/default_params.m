@@ -37,8 +37,10 @@ defaults.xy.ignore_error = true; % still throws warning if true
 
 %% Defaults: Z alignment
 % General
-defaults.z.overwrite = false; % throws error if section is already Z aligned
+defaults.z.overwrite = true; % throws error if section is already Z aligned
 defaults.z.rel_to = -1; % relative section to align to
+defaults.z.scale = 0.125;
+defaults.z.SURF.MetricThreshold = 2000;
 
 % [detect_features] Feature detection (0.125x)
 defaults.z.features.scale = 0.125;
@@ -66,7 +68,7 @@ defaults.z.alignment_method = 'cpd'; % 'lsq', 'cpd' or 'fixed'
 % Quality control checks
 defaults.z.max_match_error = 1000; % avg error after matching
 defaults.z.max_aligned_error = 50; % avg error after alignment
-defaults.z.ignore_error = false; % only throws warning if true
+defaults.z.ignore_error = true; % only throws warning if true
 
 %% Initialize parameters with defaults
 params = repmat(defaults, max(sec_nums), 1);
@@ -93,7 +95,7 @@ z_presets.large_trans = defaults.z;
 z_presets.large_trans.max_match_error = inf;
 z_presets.large_trans.matching.inlier_cluster = 'smallest_var';
 z_presets.manual_matching = defaults.z;
-z_presets.manual_matching.matching_mode = 'manual';
+z_presets.manual_matching.matching_mode = 'auto'; % or 'manual'
 z_presets.manual_matching.max_aligned_error = 250;
 z_presets.low_res = defaults.z;
 z_presets.low_res.features.scale = 0.075;
