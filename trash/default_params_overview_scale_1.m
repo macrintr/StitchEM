@@ -1,14 +1,13 @@
 %% Defaults: XY alignment
 % General
 defaults.xy.overwrite = true; % throws error if section is already XY aligned
-defaults.xy.skip_tiles = [];
+defaults.xy.skip_tiles = [4];
 
 % [rough_align_xy] Rough alignment
 defaults.xy.rough.align_to_overview = true;
-defaults.xy.rough.overview_registration.tile_scale = 0.07 * 0.78;
-defaults.xy.rough.overview_registration.overview_scale = 0.78;
+defaults.xy.rough.overview_registration.tile_scale = 0.07 * 1.0;
+defaults.xy.rough.overview_registration.overview_scale = 1;
 defaults.xy.rough.overview_registration.overview_crop_ratio = 0.5;
-defaults.xy.rough.overview_registration.overview_cropping = [0.25 0.25 0.5 0.5];
 
 % [detect_features] Feature detection
 defaults.xy.features.detection_scale = 1.0;

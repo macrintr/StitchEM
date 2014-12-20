@@ -107,7 +107,7 @@ p.addParameter('alignment', alignments{end}, @(x) iscell(x) || (ischar(x) && val
 
 % Regions
 p.addParameter('regions', {});
-p.addParameter('min_overlap_area', 0.05);
+p.addParameter('min_overlap_area', 0.03);
 
 % Detection scale
 p.addParameter('detection_scale', 1.0);

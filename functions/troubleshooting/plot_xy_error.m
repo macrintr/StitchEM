@@ -1,3 +1,11 @@
+function plot_xy_error(secs)
+% Display the pre and post xy alignment error between matches
+%
+% Inputs:
+%   secs: a cell array containing the section structs for a wafer
+% Outputs:
+%   None
+
 pre_error = [];
 post_error = [];
 for n=1:sum(~cellfun('isempty',secs))

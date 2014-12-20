@@ -6,13 +6,14 @@ if ~exist('status', 'var'); status = struct(); end
 if ~isfield(status, 'step'); status.step = 'xy'; end
 if ~isfield(status, 'section'); status.section = 1; end
 if ~strcmp(status.step, 'xy'); disp('<strong>Skipping XY alignment.</strong> Clear ''status'' to reset.'), return; end
+error_log = {};
 
 if status.section == 1
     disp('==== <strong>Started XY alignment</strong>.')
 else
     fprintf('==== <strong>Resuming XY alignment on section %d/%d.</strong> Clear ''status'' to reset.\n', status.section, length(sec_nums))
 end
-for s = status.section:length(sec_nums)
+for s = start:finish
     status.section = s;
     sec_timer = tic;
     
@@ -65,17 +66,22 @@ for s = status.section:length(sec_nums)
         disp('<strong>FLAG</strong> XY orphan tiles');
         sec.error_log{end+1} = sprintf('%s: orphan tiles', sec.name);
     end
-    
-    % Align XY
-    sec.alignments.xy = align_xy(sec, xy_params.align);
-    
-    % Flag bad alignment
-    if sec.alignments.xy.meta.avg_post_error > xy_params.max_aligned_error
-        disp('<strong>STOP</strong> XY overall alignment error beyond threshold');
-        sec.error_log{end+1} = sprintf('%s: sec.alignments.xy.meta.avg_post_error > xy_params.max_aligned_error', sec.name);
-        % msg = sprintf('[%s]: Error after alignment is very large. This may be due to bad matching.', sec.name);
-        % id = 'XY:LargeAlignmentError';
-        % if xy_params.ignore_error; warning(id, msg); else error(id, msg); end
+
+    try
+        % Align XY
+        sec.alignments.xy = align_xy(sec, xy_params.align);
+        
+        % Flag bad alignment
+        if sec.alignments.xy.meta.avg_post_error > xy_params.max_aligned_error
+            disp('<strong>STOP</strong> XY overall alignment error beyond threshold');
+            sec.error_log{end+1} = sprintf('%s: sec.alignments.xy.meta.avg_post_error > xy_params.max_aligned_error', sec.name);
+            % msg = sprintf('[%s]: Error after alignment is very large. This may be due to bad matching.', sec.name);
+            % id = 'XY:LargeAlignmentError';
+            % if xy_params.ignore_error; warning(id, msg); else error(id, msg); end
+        end
+    catch
+        message = sprintf('Failed xy alignment for %s_Sec%d', sec.wafer, sec.num);
+        error_log{end + 1} = message;
     end
     
     % Clear images and XY features to save memory
@@ -88,15 +94,17 @@ for s = status.section:length(sec_nums)
     sec.runtime.xy.timestamp = datestr(now);
     secs{s} = sec;
     clear sec
-    
-    % Save to cache
-    disp('=== Saving sections to disk.'); 
-    save_timer = tic;
-    filename = sprintf('%s_xy_aligned.mat', secs{1}.wafer);
-    save(get_new_path(fullfile(cachepath, filename)), 'secs', 'status', '-v7.3')
-    fprintf('Saved to: %s [%.2fs]\n', fullfile(cachepath, filename), toc(save_timer))
 end
+
+% Save to cache
+% disp('=== Saving sections to disk.');
+% save_timer = tic;
+% filename = sprintf('%s_xy_aligned.mat', secs{1}.wafer);
+% save(filename, 'secs', 'error_log', '-v7.3')
+% fprintf('Saved to: %s [%.2fs]\n', fullfile(cachepath, filename), toc(save_timer))
+
 status.step = 'finished_xy';
 
-total_xy_time = sum(cellfun(@(sec) sec.runtime.xy.time_elapsed, secs));
-fprintf('==== <strong>Finished XY alignment in %.2fs (%.2fs / section)</strong>.\n\n', total_xy_time, total_xy_time / length(secs));
+% total_xy_time = sum(cellfun(@(sec) sec.runtime.xy.time_elapsed, secs));
+% fprintf('==== <strong>Finished XY alignment in %.2fs (%.2fs / section)</strong>.\n\n', total_xy_time, total_xy_time / length(secs));
+disp('=== <strong>Finished XY alignemnt</strong> ====');

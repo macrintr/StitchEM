@@ -1,5 +1,12 @@
-function [drawn_outlier_lines, secA, secB] = draw_rough_z_matches(secs, moving_sec_num)
-% Produce matrix of paird section overviews
+function drawn_overview_pairs = draw_rough_z_matches(secA, secB)
+% Build image of paired section overviews showing matches
+%
+% Inputs:
+%   secs: the cell array of a wafer's section structs
+%   moving_sec_num: the index of the section that's moved in alignment
+% Outputs:
+%   drawn_overview_pairs: side-by-side overviews with matches identified
+%   (this image is also saved to the cache directory)
 
 blue = uint8([0 0 255]);
 green = uint8([0 255 0]);
@@ -8,8 +15,8 @@ red = uint8([255 0 0]);
 % A is the fixed section
 % B is the flexible section
 % B also stores the correspondences pairs for both sections
-secA = load_overview(secs{moving_sec_num-1}, secs{moving_sec_num}.overview.scale);
-secB = load_overview(secs{moving_sec_num}, secs{moving_sec_num-1}.overview.scale);
+% secA = load_overview(secs{moving_sec_num-1}, secs{moving_sec_num}.overview.scale);
+% secB = load_overview(secs{moving_sec_num}, secs{moving_sec_num-1}.overview.scale);
 
 outliersB = secB.alignments.rough_z.meta.stats.moving_matching_pts;
 outliersA = secB.alignments.rough_z.meta.stats.fixed_matching_pts;
@@ -50,7 +57,6 @@ outlier_shapeInserter = vision.ShapeInserter('Shape', 'Lines', 'BorderColor', 'C
 inlier_shapeInserter = vision.ShapeInserter('Shape', 'Lines', 'BorderColor', 'Custom', 'CustomBorderColor', green);
 drawn_outlier_lines = step(outlier_shapeInserter, paired, outlier_lines);
 drawn_overview_pairs = step(inlier_shapeInserter, drawn_outlier_lines, inlier_lines);
-
 
 filename = sprintf('%s_z_overview_matches.tif', secB.name);
 imwrite(drawn_overview_pairs, fullfile(cachepath, filename));

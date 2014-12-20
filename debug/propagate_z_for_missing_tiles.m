@@ -7,14 +7,17 @@ function secB = propagate_z_for_missing_tiles(secA, secB)
 %
 % After discovering an improperly propagated z alignment because of a
 % missing tile, you run this repair script, with secB as the section that
-% needs to be repaired. Then you restarted the fine z alignment at the
+% needs to be repaired. Then you restart the fine z alignment at the
 % section immediately following secB.
 
 missing_tile_numbers = find(~secA.grid);
 index_of_missing_tile = secB.grid(missing_tile_numbers);
 
-prev_z_align_secB = secB.alignments.prev_z.rel_tforms{1};
-z_align_secB = secB.alignments.z.rel_tforms{1};
+% Need to propagate from a non-missing tile
+[r, c] = find(secA.grid, 1);
+first_non_missing = secA.grid(r, c); 
+prev_z_align_secB = secB.alignments.prev_z.rel_tforms{first_non_missing};
+z_align_secB = secB.alignments.z.rel_tforms{first_non_missing};
 
 for i=index_of_missing_tile
     rough_z_align_secB = secB.alignments.rough_z_xy.tforms{i};
@@ -29,4 +32,4 @@ for i=index_of_missing_tile
     secB.alignments.z.repairs = 'propagate_z_for_missing_tiles';    
 end
 
-render_section_pairs(secA, secB, 1);
+% render_section_pairs(secA, secB, 1);

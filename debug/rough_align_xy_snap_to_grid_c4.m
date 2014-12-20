@@ -31,19 +31,25 @@ if params.align_to_overview
     % Estimate alignments
     intermediate_tforms = cell(sec.num_tiles, 1);
     tform_warnings('off');
+
+    % Skip last column
+    list_of_tiles_to_snap_to_grid = [sec.grid(1,4) sec.grid(2,4) sec.grid(3,4) sec.grid(4,4)];
     
     parfor t = 1:sec.num_tiles
         registration_time = tic;
-        try
-            % reg_params are the parameters specified by this function
-            % p are additional parameters needed by estimate_tile_alignments
-            [registration_tforms{t}, intermediate_tforms{t}] = ...
-                estimate_tile_alignment(tiles{t}, overview, reg_params, p);
-        catch
-            if params.verbosity > 2; printf('Failed to register tile %d to overview. [%.2fs]\n', t, toc(registration_time)); end
-            continue
+        if ~any(list_of_tiles_to_snap_to_grid == t)
+            try
+                % reg_params are the parameters specified by this function
+                % p are additional parameters needed by estimate_tile_alignments
+                [registration_tforms{t}, intermediate_tforms{t}] = ...
+                    estimate_tile_alignment(tiles{t}, overview, reg_params, p);
+            catch
+                if params.verbosity > 2; printf('Failed to register tile %d to overview. [%.2fs]\n', t, toc(registration_time)); end
+                continue
+            end
+            if params.verbosity > 2; fprintf('Estimated rough alignment for section %d -> tile %d. [%.2fs]\n', tile_num, toc(registration_time)); end
         end
-        if params.verbosity > 2; fprintf('Estimated rough alignment for section %d -> tile %d. [%.2fs]\n', tile_num, toc(registration_time)); end
+        
     end
     tform_warnings('off');
     
@@ -92,7 +98,6 @@ p.addParameter('align_to_overview', true);
 reg_defaults.tile_scale = 0.07 * 0.78;
 reg_defaults.overview_scale = 0.78;
 reg_defaults.overview_crop_ratio = 0.5;
-reg_defaults.overview_cropping = [0.25 0.25 0.5 0.5];
 p = params_struct(p, 'overview_registration', reg_defaults);
 
 % Grid alignment

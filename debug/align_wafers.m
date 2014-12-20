@@ -1,7 +1,4 @@
 %% Configuration
-waferA = '/home/tmacrina/StitchEM/results/S2-W001_z_aligned.mat';
-waferB = '/home/tmacrina/StitchEM/results/S2-W002_z_aligned.mat';
-
 % Load data
 cache = load(waferA, 'secs');
 secsA = cache.secs;
@@ -39,9 +36,29 @@ for w = 1:length(wafers)
     % Compose with previous
     secB.alignments.prev_stack_z = compose_alignments(secA, {'prev_z', 'z'}, secB, 'z');
     
-    % Align
-    secB.stack_z_matches = select_z_matches(secA, secB, 'stack');
-    secB.alignments.stack_z = align_z_pair_cpd(secB, secB.stack_z_matches, 'prev_stack_z');
+    % Automatically detect features
+    secA.features.base_z = detect_features(secA, 'regions', sec_bb(secB, 'prev_stack_z'), 'alignment', 'stack_z', 'detection_scale', z_params.scale, z_params.SURF);
+    secB.features.z = detect_features(secB, 'regions', sec_bb(secA, 'stack_z'), 'alignment', 'prev_stack_z', 'detection_scale', z_params.scale, z_params.SURF);
+    secB.z_matches = match_z(secA, secB, 'base_z', 'stack_z', z_params.matching);
+    
+    % Align those auto matches
+    secB.alignments.stack_z = align_z_pair_cpd(secB, secB.stack_z_matches, 'prev_stack_z');  
+    
+    % Construct a questdlg with three options
+    choice = questdlg('Is this alignment acceptable? If no, you will be prompted to select matches manually.', ...
+        'Alignment Acceptance', ...
+        'Yes','No','Yes');
+    % Handle response
+    switch choice
+        case 'Yes'
+            continue
+        case 'No'
+            % Manually select matches
+            secB.stack_z_matches = select_z_matches(secA, secB, 'stack');
+            % Align those manual matches
+            secB.alignments.stack_z = align_z_pair_cpd(secB, secB.stack_z_matches, 'prev_stack_z');
+    end
+    
     secsB{1} = secB;
     
     % Propagate to the rest of the wafer

@@ -1,6 +1,6 @@
 function render_section_pairs(secA, secB, display_rendering)
 % Create aligned & stitched section from section cell series index
-alignment = 'stack_z';
+alignment = 'z';
 
 tformsA = secA.alignments.(alignment).tforms;
 [sA sA_R] = render_section(secA, tformsA, 'scale', 0.05);

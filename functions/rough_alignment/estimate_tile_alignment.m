@@ -88,7 +88,13 @@ if params.overview_prescale ~= params.overview_scale
 end
 
 % Crop to center
-overview_img = imcrop(overview_img, [size(overview_img, 2) * (params.overview_crop_ratio / 2), size(overview_img, 1) * (params.overview_crop_ratio / 2), size(overview_img, 2) * params.overview_crop_ratio, size(overview_img, 1) * params.overview_crop_ratio]);
+% overview_img = imcrop(overview_img, [size(overview_img, 2) * (params.overview_crop_ratio / 2), size(overview_img, 1) * (params.overview_crop_ratio / 2), size(overview_img, 2) * params.overview_crop_ratio, size(overview_img, 1) * params.overview_crop_ratio]);
+% Crop to the offset from W007 Sec51 through all W008
+% First cropping adjustment 141209
+% overview_img = imcrop(overview_img, [size(overview_img, 2) * 0.342, size(overview_img, 1) * 0.171, size(overview_img, 2) * 0.537, size(overview_img, 1) * 0.537]);
+% Second cropping adjustment 141210
+% overview_img = imcrop(overview_img, [size(overview_img, 2) * 0.33, size(overview_img, 1) * 0.16, size(overview_img, 2) * 0.57, size(overview_img, 1) * 0.57]);
+overview_img = imcrop(overview_img, [size(overview_img, 2) * params.overview_cropping(1), size(overview_img, 1) * params.overview_cropping(2), size(overview_img, 2) * params.overview_cropping(3), size(overview_img, 1) * params.overview_cropping(4)]);
 
 end
 
@@ -135,6 +141,7 @@ p.addParameter('overview_tform', affine2d());
 p.addParameter('overview_prescale', 1.0);
 p.addParameter('overview_scale', 0.78);
 p.addParameter('overview_crop_ratio', 0.5);
+p.addParameter('overview_cropping', [0.25 0.25 0.5 0.5]);
 
 % Tile
 p.addParameter('tile_prescale', 1.0);

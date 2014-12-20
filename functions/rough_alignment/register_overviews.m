@@ -52,7 +52,7 @@ end
     [merge, merge_spatial_ref] = imfuse(fixed, fixed_spatial_ref, moving, moving_spatial_ref);
 
     filename = sprintf('%s/%s_rough_align_z_xy_%d_%d.tif', secA.wafer, secB.wafer, secA.num, secB.num);
-    imwrite(merge, fullfile(cachepath, filename));
+    imwrite(imresize(merge, 0.10), fullfile(cachepath, filename));
 %     figure();
 %     imshow(merge, merge_spatial_ref);
     

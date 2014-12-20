@@ -8,11 +8,11 @@ for s=start:finish
         secs{s}.overview.rough_align_z = z_alignment;
         
         secs{s}.alignments.rough_z_xy = fixed_alignment(secs{s}, 'xy');
+        secs{s} = load_overview(secs{s}, secs{s}.overview.scale);
         
     else
-        secs{s-1}, secs{s} = rough_align_z_section_pair(secs{s-1}, secs{s});
+        [secs{s-1}, secs{s}] = rough_align_z_section_pair(secs{s-1}, secs{s});
     end
 end
 
-filename = sprintf('%s_rough_z_aligned.mat', secs{1}.wafer);
-save(get_new_path(fullfile(filename)), 'secs', '-v7.3');
+secs{end}.overview.img = [];

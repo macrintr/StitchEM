@@ -53,7 +53,7 @@ for s = start:finish
         continue
     end
     
-    try
+    if ~isfield(secB, 'z_matches')
         % Match features
         switch z_params.matching_mode
             case 'auto'
@@ -81,6 +81,10 @@ for s = start:finish
                 error('Z:LargeMatchError', msg)
             end
         end
+    else
+        disp('Existing z_matches. Recomputing transform of global_points.');
+        secB.z_matches = transform_matches(secB.z_matches, secA.alignments.z.tforms, secB.alignments.prev_z.tforms);
+    end
         
         % Align
         switch z_params.alignment_method
@@ -102,11 +106,20 @@ for s = start:finish
                 error('Z:LargeAlignmentError', msg)
             end
         end
-    catch
-        secB.alignments.z = fixed_alignment(secB, 'xy');
+    
+    % Cover up any propagation errors caused by missing tiles
+    % TO DO: Need to evaluate if this can handle back-to-back missing tiles
+    % (141212 T Macrina)
+    missing_tile_numbers = find(~secA.grid);
+    index_of_missing_tile = secB.grid(missing_tile_numbers);
+    if index_of_missing_tile
+        fprintf('Missing tile % ', index_of_missing_tile)
+        secB = propagate_z_for_missing_tiles(secA, secB);
+        display_rendering = 1;
     end
+    
     % Save merged image
-    render_section_pairs(secA, secB, display_rendering);
+    % render_section_pairs(secA, secB, 1);
     
     % Clear tile images and features to save memory
     secA = imclear_sec(secA, 'tiles');
@@ -124,14 +137,14 @@ for s = start:finish
 end
 
 % Save to cache
-disp('=== Saving sections to disk.');
-save_timer = tic;
-filename = sprintf('%s_z_aligned.mat', secs{1}.wafer);
-save(get_new_path(fullfile(cachepath, filename)), 'secs', 'status', '-v7.3')
-fprintf('Saved to: %s [%.2fs]\n', fullfile(cachepath, filename), toc(save_timer))
-
-secs{end} = imclear_sec(secs{end});
-status.step = 'finished_z';
+% disp('=== Saving sections to disk.');
+% save_timer = tic;
+% filename = sprintf('results/%s_z_aligned.mat', secs{1}.wafer);
+% save(filename, 'secs', 'status', '-v7.3')
+% fprintf('Saved to: %s [%.2fs]\n', fullfile(cachepath, filename), toc(save_timer))
+% 
+% secs{end} = imclear_sec(secs{end});
+% status.step = 'finished_z';
 % 
 % total_z_time = sum(cellfun(@(sec) sec.runtime.z.time_elapsed, secs));
 % fprintf('==== <strong>Finished Z alignment in %.2fs (%.2fs / section)</strong>.\n\n', total_z_time, total_z_time / length(secs));

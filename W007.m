@@ -27,20 +27,22 @@ default_params
 %       Or:
 %   for s=10:15; params(s).z.max_match_error = 2000; end
 
-% S2-W007
-% XY
-% params(2).xy = xy_presets.grid_align;
-% params(9).xy = xy_presets.grid_align;
-% params(10).xy = xy_presets.grid_align;
-% params(10).xy.matching.filter_method = 'gmm';
-% params(10).xy.matching.filter_fallback = 'geomedian';
-% for s=11:length(params); params(s).xy = xy_presets.grid_align; end
-% params(12).xy.matching.filter_method = 'gmm';
-% params(12).xy.matching.filter_fallback = 'geomedian';
-%% Run alignment
-% try
-    align_stack_xy
-%     align_stack_z
-% catch alignment_error
-%     troubleshoot
-% end
+params(27).xy.skip_tiles = [15];
+params(47).xy.skip_tiles = [4];
+
+% Shift the cropping window of the overview in rough_xy alignment
+for s=51:length(sec_nums); params(s).xy.rough.overview_registration.overview_cropping = [0.3300 0.1600 0.5700 0.5700]; end
+params(51).xy.skip_tiles = [5];
+params(66).xy.skip_tiles = [13];
+params(68).xy.skip_tiles = [13];
+params(117).xy.skip_tiles = [16];
+
+params(50).z.matching_mode = 'manual';
+params(51).z.matching_mode = 'manual';
+
+% Fix W007 Sec51 (tile 5 is white)
+% Fix W007 Sec55 (rough_xy failure - tile 1 & 14; nothing obvious)
+% Fix W007 Sec66 (tile 13 no matches - blurry)
+% Fix W007 Sec68 (tile 13 no matches - blurry)
+% Fix W007 Sec70 (tile 1 no matches - small overlap)
+% Fix W007 Sec117 (tile 16 is white)

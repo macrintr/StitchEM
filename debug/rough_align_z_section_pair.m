@@ -1,4 +1,4 @@
-function secB = rough_align_z_section_pair(secA, secB)
+function [secA, secB] = rough_align_z_section_pair(secA, secB)
 % Align the overviews of two sections & create tile specific transforms
 %
 % Inputs:
@@ -9,7 +9,9 @@ overview_to_tile_ratio = 0.07;
 
 % Load overview for the sections
 secB = load_overview(secB, secB.overview.scale);
-secA = load_overview(secA, secA.overview.scale);
+if isempty(secA.overview.img)
+    secA = load_overview(secA, secA.overview.scale);
+end
 
 % Set the relative transform
 rel_tforms_z = affine2d();
