@@ -5,11 +5,11 @@ alignment = 'z';
 scale = 1;
 CLAHE = true;
 
-output_folder = fullfile(renderspath, sprintf('S2-W001-W002_jitter_1_2_z_%sx', num2str(scale)));
+output_folder = fullfile(renderspath, sprintf('S2-W001-W002_clean_matches_1_2_Stitch_Align_%sx', num2str(scale)));
 
 %% Stack ref
 Rs = cell(length(secs), 1);
-for s = 1:50
+for s = 1:2
     % For convenience
     sec = secs{s};
     sizes = sec.tile_sizes;
@@ -52,8 +52,9 @@ for s = 1:2
         folder_path = create_folder(output_folder);
     end
     
+%     imwrite(rendered, fullfile(output_folder, [secs{s}.name '_four_tiles_one_stage_sp_lsq.tif']));
     for i=1:length(crop_starts)
-        imwrite(rendered(crop_starts(i, 1):crop_starts(i, 1)+1000, crop_starts(i, 2):crop_starts(i, 2)+1000), fullfile(output_folder, [num2str(i) 'C_' secs{s}.name '.tif']))
+        imwrite(rendered(crop_starts(i, 1):crop_starts(i, 1)+1000, crop_starts(i, 2):crop_starts(i, 2)+1000), fullfile(output_folder, [num2str(i) 'B_' secs{s}.name '.tif']))    
     end
 end
 clear rendered

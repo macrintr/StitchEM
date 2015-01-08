@@ -48,4 +48,4 @@ stats.dx = stats.tformsB(:, 1) - stats.tformsA(:, 1);
 stats.dy = stats.tformsB(:, 2) - stats.tformsA(:, 2);
 % Calculate the 2-norm distance & orientation
 stats.dist = sqrt(stats.dy.^2 + stats.dx.^2);
-stats.ang = atan(stats.dy ./ stats.dx);
+stats.ang = atan2(stats.dy, stats.dx);
