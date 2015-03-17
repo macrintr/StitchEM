@@ -4,11 +4,12 @@ function mov = imshow_matches(secA, secB, matches, scale)
 % Input:
 %   secA: sec struct for the first tile
 %   secB: sec struct for the second tile (sould be the same as secA if xy)
-%   alignment: matches struct of a section (sec.xy_matches or sec.z_matches)
-%   id_list: vector of ints corresponding to id of match pair to display
+%   matches: matches struct of a section (sec.xy_matches or sec.z_matches)
+%   scale: resolution of the image surrounding the image (1x: full
+%   resolution)
 %
 % Output:
-%   none - side-by-side images will be displayed as frames in a movie
+%   mov: movie object - can be played with implay(mov, 1)
 
 % Load the two tiles, if not loaded already
 secA = smart_load_tile(secA, scale);
@@ -114,7 +115,7 @@ for i=1:length(matches)
     mov = cat(4, mov, img);
 end
 
-implay(mov, 1);
+% implay(mov, 1);
 
 function sec = smart_load_tile(sec, scale)
 % Load tile images if they haven't been loaded, yet
@@ -139,11 +140,11 @@ if rect(2) < 0
     top = ones(max_size - size(tile_cropped, 1), size(tile_cropped, 2), 3);
     tile_cropped = cat(1, top, tile_cropped);
 end
-if rect(1) + rect(3) > max_size
+if rect(1) + rect(3) > size(tile_cropped, 2)
     right = ones(size(tile_cropped, 1), max_size - size(tile_cropped, 2), 3);
     tile_cropped = cat(2, tile_cropped, right);
 end
-if rect(2) + rect(4) > max_size
+if rect(2) + rect(4) > size(tile_cropped, 1)
     bottom = ones(max_size - size(tile_cropped, 1), size(tile_cropped, 2), 3);
     tile_cropped = cat(1, tile_cropped, bottom);
 end

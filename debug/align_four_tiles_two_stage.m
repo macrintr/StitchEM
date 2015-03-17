@@ -55,7 +55,7 @@ m = stats;
 [s, i] = sort(m.dist, 'descend');
 id_list = m.id(i);
 
-mov = imshow_matches(secs{1}, secs{2}, m(i, :), 'z', 0.5);
+mov = imshow_matches(secs{1}, secs{2}, m(i, :), 0.5);
 
 % Remove outliers
 % Save secs

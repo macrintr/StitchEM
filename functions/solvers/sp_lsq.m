@@ -19,6 +19,8 @@ C = B - A;
 j = 3 * fixed_tile - 2:3 * fixed_tile; % columns of fixed tile
 F = -C(:, j); % fixed tile block column
 D = C(:, setdiff(1:size(C, 2), j)); % C without F
+% figure
+% imagesc(D)
 
 % Solve with mldivide
 T = D \ F;

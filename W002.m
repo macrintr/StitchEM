@@ -43,9 +43,9 @@ params(1).xy.matching.filter_fallback = 'geomedian';
 % params(136).z = z_presets.large_trans;
 
 %% Run alignment
-try
-    align_stack_xy
-    align_stack_z
-catch alignment_error
-    troubleshoot
-end
+% try
+%     align_stack_xy
+%     align_stack_z
+% catch alignment_error
+%     troubleshoot
+% end

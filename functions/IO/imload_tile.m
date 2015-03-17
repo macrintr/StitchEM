@@ -18,8 +18,13 @@ function tile_img = imload_tile(sec, tile_num, scale, wafer_path)
 % See also: load_section
 
 % Defaults
-if nargin < 3; scale = 1.0; end
-if nargin < 4; wafer_path = waferpath(); end
+if nargin < 3
+    scale = 1.0;
+end
+if nargin < 4
+    % wafer_path = waferpath;
+    wafer_path = waferpath('/mnt/data0/ashwin/07122012/S2-W001');
+end
 
 % Get tile path
 tile_path = get_tile_path(sec, tile_num, wafer_path);

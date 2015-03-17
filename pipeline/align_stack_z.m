@@ -42,7 +42,7 @@ for s = start:finish
         rel_alignments = 'z'; % fixed sections have no previous Z alignment
     end
     
-    secB.alignments.prev_z = compose_alignments(secA, rel_alignments, secB, 'rough_z_xy');
+%     secB.alignments.prev_z = compose_alignments(secA, rel_alignments, secB, 'rough_z_xy');
     
     % Keep fixed
     if strcmp(z_params.alignment_method, 'fixed')
@@ -53,7 +53,7 @@ for s = start:finish
         continue
     end
     
-    if ~isfield(secB, 'z_matches')
+    if ~isfield(secB, 'r_matches')
         % Match features
         switch z_params.matching_mode
             case 'auto'
@@ -67,8 +67,16 @@ for s = start:finish
                 
                 % Match
                 secB.z_matches = match_z(secA, secB, 'base_z', 'z', z_params.matching);
+                
+                if height(secB.z_matches.A) == 0
+                    secB.z_matches = select_z_matches(secA, secB);
+                    secB.z_matches = transform_z_matches_inverse({secA, secB}, 2);
+                    display_rendering = 1;
+                end
+                
             case 'manual'
                 secB.z_matches = select_z_matches(secA, secB);
+                secB.z_matches = transform_z_matches_inverse({secA, secB}, 2);
                 display_rendering = 1;
         end
         
@@ -85,27 +93,29 @@ for s = start:finish
         disp('Existing z_matches. Recomputing transform of global_points.');
         secB.z_matches = transform_matches(secB.z_matches, secA.alignments.z.tforms, secB.alignments.prev_z.tforms);
     end
-        
-        % Align
-        switch z_params.alignment_method
-            case 'lsq'
-                % Least Squares
-                secB.alignments.z = align_z_pair_lsq(secB);
-                
-            case 'cpd'
-                % Coherent Point Drift
-                secB.alignments.z = align_z_pair_cpd(secB);
-        end
-        
-        % Check for bad alignment
-        if secB.alignments.z.meta.avg_post_error > z_params.max_aligned_error
-            msg = sprintf('[%s]: Error after alignment is very large. This may be because the two sections are misaligned by a large rotation/translation or due to bad matching.', secB.name);
-            if z_params.ignore_error
-                warning('Z:LargeAlignmentError', msg)
-            else
-                error('Z:LargeAlignmentError', msg)
-            end
-        end
+
+    secB.alignments.z = align_z_pair_lsq(secB);
+    
+%     % Align
+%     switch z_params.alignment_method
+%         case 'lsq'
+%             % Least Squares
+%             secB.alignments.z = align_z_pair_lsq(secB);
+%             
+%         case 'cpd'
+%             % Coherent Point Drift
+%             secB.alignments.z = align_z_pair_cpd(secB);
+%     end
+%     
+%     % Check for bad alignment
+%     if secB.alignments.z.meta.avg_post_error > z_params.max_aligned_error
+%         msg = sprintf('[%s]: Error after alignment is very large. This may be because the two sections are misaligned by a large rotation/translation or due to bad matching.', secB.name);
+%         if z_params.ignore_error
+%             warning('Z:LargeAlignmentError', msg)
+%         else
+%             error('Z:LargeAlignmentError', msg)
+%         end
+%     end
     
     % Cover up any propagation errors caused by missing tiles
     % TO DO: Need to evaluate if this can handle back-to-back missing tiles
@@ -119,7 +129,7 @@ for s = start:finish
     end
     
     % Save merged image
-    % render_section_pairs(secA, secB, 1);
+%     render_section_pairs(secA, secB, 1);
     
     % Clear tile images and features to save memory
     secA = imclear_sec(secA, 'tiles');

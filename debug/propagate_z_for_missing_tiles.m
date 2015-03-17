@@ -10,7 +10,7 @@ function secB = propagate_z_for_missing_tiles(secA, secB)
 % needs to be repaired. Then you restart the fine z alignment at the
 % section immediately following secB.
 
-missing_tile_numbers = find(~secA.grid);
+missing_tile_numbers = find(~secA.grid)';
 index_of_missing_tile = secB.grid(missing_tile_numbers);
 
 % Need to propagate from a non-missing tile

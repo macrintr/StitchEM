@@ -5,11 +5,11 @@ alignment = 'z';
 scale = 1;
 CLAHE = true;
 
-output_folder = fullfile(renderspath, sprintf('S2-W001-W002_clean_matches_1_2_Stitch_Align_%sx', num2str(scale)));
+output_folder = fullfile(renderspath, sprintf('S2-W001_clean_matches_1_10_tiles', num2str(scale)));
 
 %% Stack ref
 Rs = cell(length(secs), 1);
-for s = 1:2
+for s = 1:length(secs)
     % For convenience
     sec = secs{s};
     sizes = sec.tile_sizes;
@@ -22,7 +22,7 @@ for s = 1:2
     initial_Rs = cellfun(@(R) scale_ref(R, scale), initial_Rs, 'UniformOutput', false);
     
     % Estimate spatial references after alignment
-    Rs{s} = cellfun(@tform_spatial_ref, initial_Rs', tforms, 'UniformOutput', false);
+    Rs{s} = cellfun(@tform_spatial_ref, initial_Rs, tforms, 'UniformOutput', false);
 end
 
 % Flatten and merge spatial refs
@@ -38,7 +38,7 @@ crop_starts = [int64(stack_R.ImageSize(1)/2 - 500) int64(stack_R.ImageSize(2)/2 
                 int64(stack_R.ImageSize(1)*2/3) int64(stack_R.ImageSize(2)*2/3)];
 
 %% Render sections
-for s = 1:2
+for s = 1:length(secs)
     % Render
     rendered = render_section(secs{s}, alignment, stack_R, 'scale', scale);
     
@@ -52,9 +52,9 @@ for s = 1:2
         folder_path = create_folder(output_folder);
     end
     
-%     imwrite(rendered, fullfile(output_folder, [secs{s}.name '_four_tiles_one_stage_sp_lsq.tif']));
+    imwrite(rendered, fullfile(output_folder, [secs{s}.name '_clean_matches_1_10.tif']));
     for i=1:length(crop_starts)
-        imwrite(rendered(crop_starts(i, 1):crop_starts(i, 1)+1000, crop_starts(i, 2):crop_starts(i, 2)+1000), fullfile(output_folder, [num2str(i) 'B_' secs{s}.name '.tif']))    
+        imwrite(rendered(crop_starts(i, 1):crop_starts(i, 1)+1000, crop_starts(i, 2):crop_starts(i, 2)+1000), fullfile(output_folder, [num2str(i) 'A_' secs{s}.name '.tif']))    
     end
 end
 clear rendered

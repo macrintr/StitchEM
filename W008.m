@@ -25,32 +25,32 @@ default_params
 % Shift the cropping window of the overview in rough_xy alignment
 for s=1:length(sec_nums); params(s).xy.rough.overview_registration.overview_cropping = [0.3300 0.1600 0.5700 0.5700]; end
 
-params(31).xy.skip_tiles = [14];
-params(32).xy.skip_tiles = [14];
-params(33).xy.skip_tiles = [14];
-params(40).xy.skip_tiles = [14];
-params(44).xy.skip_tiles = [14];
-params(45).xy.skip_tiles = [9];
-params(47).xy.skip_tiles = [14];
-params(64).xy.skip_tiles = [14];
-params(66).xy.skip_tiles = [3];
-params(78).xy.skip_tiles = [3];
-params(80).xy.skip_tiles = [16];
-params(82).xy.skip_tiles = [11];
-params(88).xy.skip_tiles = [3];
-params(89).xy.skip_tiles = [3];
-params(90).xy.skip_tiles = [3];
-params(97).xy.skip_tiles = [3];
-params(102).xy.skip_tiles = [3];
-params(121).xy.skip_tiles = [3];
-params(125).xy.skip_tiles = [1 6];
-params(145).xy.skip_tiles = [2];
-params(148).xy.skip_tiles = [14];
-params(155).xy.skip_tiles = [2 3];
-params(156).xy.skip_tiles = [3];
-params(158).xy.skip_tiles = [3];
-params(166).xy.skip_tiles = [3];
-params(169).xy.skip_tiles = [3];
+% params(31).xy.skip_tiles = [14];
+% params(32).xy.skip_tiles = [14];
+% params(33).xy.skip_tiles = [14];
+% params(40).xy.skip_tiles = [14];
+% params(44).xy.skip_tiles = [14];
+% params(45).xy.skip_tiles = [9];
+% params(47).xy.skip_tiles = [14];
+% params(64).xy.skip_tiles = [14];
+% params(66).xy.skip_tiles = [3];
+% params(78).xy.skip_tiles = [3];
+% params(80).xy.skip_tiles = [16];
+% params(82).xy.skip_tiles = [11];
+% params(88).xy.skip_tiles = [3];
+% params(89).xy.skip_tiles = [3];
+% params(90).xy.skip_tiles = [3];
+% params(97).xy.skip_tiles = [3];
+% params(102).xy.skip_tiles = [3];
+% params(121).xy.skip_tiles = [3];
+% params(125).xy.skip_tiles = [1 6];
+% params(145).xy.skip_tiles = [2];
+% params(148).xy.skip_tiles = [14];
+% params(155).xy.skip_tiles = [2 3];
+% params(156).xy.skip_tiles = [3];
+% params(158).xy.skip_tiles = [3];
+% params(166).xy.skip_tiles = [3];
+% params(169).xy.skip_tiles = [3];
 
 % Fix W008 Sec3 (rough_xy failure - tile 15; nothing obvious - maybe lack of large features)
 % Fix W008 Sec14 (no features found in tiles - all tiles blurry from movement; skipping)

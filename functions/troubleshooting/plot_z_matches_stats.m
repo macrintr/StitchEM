@@ -2,7 +2,7 @@ function stats = plot_z_matches_stats(secs, sec_num)
 % Plot correspondence stats dataset for distributions
 
 % Inputs:
-%   sec: the section with xy matches & alignment
+%   sec: the section with z matches & alignment
 %
 % Outputs:
 %   stats: dataset object containing the transformed points and the

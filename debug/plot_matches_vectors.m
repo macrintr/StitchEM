@@ -1,4 +1,4 @@
-function plot_matches_vcetors(ptsA, ptsB, scale, alt_colors)
+function plot_matches_vectors(ptsA, ptsB, scale, alt_colors)
 %PLOT_MATCHES Plots the pair of matching points.
 % Usage:
 %   plot_matches(ptsA, ptsB)
@@ -62,10 +62,16 @@ hold off
 
 figure
 compass(d(:, 1), -d(:, 2));
-% compass(sum(d(:, 1)), -sum(d(:, 2)), 'k');
 
 figure
 rose(theta);
+
+figure
+[n, norms] = rownorm2(d);
+hist(norms, 30);
+
+figure
+hist(theta, 30);
 
 end
 

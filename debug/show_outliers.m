@@ -1,13 +1,23 @@
-stats = plot_xy_matches_stats(secs{1});
-% m = stats(stats.tileA == 1 & stats.tileB == 1, :);
-[s, i] = sort(stats.dist, 'descend');
-% id_list = m.id(i);
-mov = imshow_matches(secs{1}, secs{1}, stats(i, :), 1);
+%% review xy matches
+sec_num = 10;
 
-stats = plot_xy_matches_stats(secs{2});
+stats = plot_xy_matches_stats(secs{sec_num});
 [s, i] = sort(stats.dist, 'descend');
-mov = imshow_matches(secs{2}, secs{2}, stats(i, :), 1);
+mov = imshow_matches(secs{sec_num}, secs{sec_num}, stats(i, :), 1);
 
-stats = plot_z_matches_stats(secs, 2);
+%% remove xy matches
+secs{sec_num}.xy_matches = remove_matches_by_id(secs{sec_num}.xy_matches, id_list);
+stats = plot_xy_matches_stats(secs{sec_num});
+
+%% review z matches
+stats = plot_z_matches_stats(secs, sec_num);
 [s, i] = sort(stats.dist, 'descend');
-mov = imshow_matches(secs{1}, secs{2}, stats(i, :), 0.2);
+mov = imshow_matches(secs{sec_num-1}, secs{sec_num}, stats(i, :), 0.3);
+
+%% remove matches
+secs{sec_num}.z_matches = remove_matches_by_id(secs{sec_num}.z_matches, id_list);
+stats = plot_z_matches_stats(secs, sec_num);
+
+%% save secs
+filename = sprintf('%s_clean_matches_1_10.mat', secs{1}.wafer);
+save(filename, 'secs', '-v7.3');

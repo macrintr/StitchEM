@@ -1,5 +1,5 @@
 function plot_xy_matches_global(secA)
-% Plots the z matches between a pair of sections in both z alignments.
+% Plots the xy matches between a pair of sections in both z alignments.
 
 figure
 plot_section(secA, 'z', 'g0.1')
@@ -8,7 +8,7 @@ matches.B = tform_z_matches(secA, secA.xy_matches.B);
 % outliers.A = tform_z_matches(secA, secB.xy_matches.outliers.A);
 % outliers.B = tform_z_matches(secB, secB.xy_matches.outliers.B);
 plot_matches(matches)
-plot_matches_vectors(matches)
+% plot_matches_vectors(matches)
 % plot_matches(outliers.A, outliers.B, 1.0, true)
 
 end

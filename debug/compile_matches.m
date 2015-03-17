@@ -1,4 +1,4 @@
-function [matchesA, matchesB] = compile_matches(secs)
+function [matchesA, matchesB] = compile_matches(secs, start, finish)
 % Compile all xy_matches and z_matches into two tables
 %
 % Inputs:
@@ -11,9 +11,14 @@ function [matchesA, matchesB] = compile_matches(secs)
 %
 % Both matches tables will have a section attribute added to them.
 
+if nargin < 2
+    start = 1;
+    finish = length(secs);
+end
+
 matchesA = table();
 matchesB = table();
-for i = 1:2
+for i = start:finish
     Axy = secs{i}.xy_matches.A;
     Bxy = secs{i}.xy_matches.B;
     Axy.section = i * ones(height(Axy), 1);

@@ -52,7 +52,7 @@ default_params
 
 %% Run alignment
 % try
-    align_stack_xy
+%     align_stack_xy
 %     align_stack_z
 % catch alignment_error
 %     troubleshoot

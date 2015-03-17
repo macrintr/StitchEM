@@ -67,7 +67,7 @@ imshow(merge, merge_spatial_ref)
 
 secB.overview.img = [];
 
-filename = sprintf('%s_z_aligned_Sec%d.mat', secB.wafer, secB.num);
-save(get_new_path(fullfile(filename)), 'secB', '-v7.3');
+% filename = sprintf('%s_z_aligned_Sec%d.mat', secB.wafer, secB.num);
+% save(get_new_path(fullfile(filename)), 'secB', '-v7.3');
 
 end

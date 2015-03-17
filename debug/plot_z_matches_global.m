@@ -6,10 +6,10 @@ plot_section(secA, 'z', 'r0.1')
 plot_section(secB, 'z', 'g0.1')
 matches.A = tform_z_matches(secA, secB.z_matches.A);
 matches.B = tform_z_matches(secB, secB.z_matches.B);
-outliers.A = tform_z_matches(secA, secB.z_matches.outliers.A);
-outliers.B = tform_z_matches(secB, secB.z_matches.outliers.B);
+% outliers.A = tform_z_matches(secA, secB.z_matches.outliers.A);
+% outliers.B = tform_z_matches(secB, secB.z_matches.outliers.B);
 plot_matches(matches)
-plot_matches_vectors(matches)
+% plot_matches_vectors(matches)
 % plot_matches(outliers.A, outliers.B, 1.0, true)
 
 end

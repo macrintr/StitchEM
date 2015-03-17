@@ -1,4 +1,4 @@
-function matches = remove_matches_by_id(matches, id_list)
+function [matches, outliers] = remove_matches_by_id(matches, id_list)
 % Remove all the match pairs with an id in the id_list
 %
 % Input:
@@ -11,9 +11,8 @@ function matches = remove_matches_by_id(matches, id_list)
 
 % Sort the id_list in descending order, so that our removals won't disrupt
 % the indices of the next pairs to remove.
-id_list = sort(id_list,'descend');
-
-for i=id_list
-    matches.A(i, :) = [];
-    matches.B(i, :) = [];
-end
+outliers.A = matches.A(id_list, :);
+outliers.B = matches.B(id_list, :);
+matches.A(id_list, :) = [];
+matches.B(id_list, :) = [];
+matches.num_matches = height(matches.A);

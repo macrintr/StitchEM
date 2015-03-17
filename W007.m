@@ -4,8 +4,8 @@ waferpath('/mnt/data0/ashwin/07122012/S2-W007')
 
 % Analyze path
 info = get_path_info(waferpath);
-status.wafer = info.wafer;
-status.pipeline_script = mfilename;
+% status.wafer = info.wafer;
+% status.pipeline_script = mfilename;
 sec_nums = info.sec_nums;
 
 % Skip sections
