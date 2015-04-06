@@ -10,12 +10,13 @@ function tiles = imload_section_tiles(sec, scale, wafer_path)
 if nargin < 2
     scale = 1.0;
 end
-if nargin < 3
+if nargin == 3
     wafer_path = waferpath;
+    tile_paths = get_tile_paths(sec, wafer_path);
 end
 
 % Get tile paths
-tile_paths = get_tile_paths(sec, wafer_path);
+tile_paths = get_tile_paths(sec);
 
 % Load tiles in parallel
 num_tiles = length(tile_paths);

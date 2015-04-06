@@ -42,7 +42,7 @@ for s = start:finish
         rel_alignments = 'z'; % fixed sections have no previous Z alignment
     end
     
-%     secB.alignments.prev_z = compose_alignments(secA, rel_alignments, secB, 'rough_z_xy');
+    secB.alignments.prev_z = compose_alignments(secA, rel_alignments, secB, 'rough_z_xy');
     
     % Keep fixed
     if strcmp(z_params.alignment_method, 'fixed')
