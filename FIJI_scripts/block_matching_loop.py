@@ -46,32 +46,54 @@ from script.imglib.algorithm import Scale2D
 
 MAX_CONCURRENT = 20
 
+class BlockMatcherParameters():
+	def __init__(self,
+			inputFolder = "/mnt/data0/tommy/150318_debug_block_matching/",
+			outputFolder = "/mnt/data0/tommy/150325_block_match_vector_plots_smoothness/",
+			exportPointRoi = True,
+			exportDisplacementVectors = True,
+			scale = 1.00,
+			searchRadius = 35,
+			blockRadius = 35,
+			meshResolution = 32,
+			minR = 0.6,
+			maxCurvatureR = 10,
+			rodR = 1,
+			useLocalSmoothnessFilter = True,
+			localModelIndex = 1,
+			localRegionSigma = 906,
+			maxLocalEpsilon = 6,
+			maxLocalTrust = 999999):
+		self.inputFolder = inputFolder
+		self.outputFolder = outputFolder
+
+		self.exportPointRoi = exportPointRoi
+		self.exportDisplacementVectors = exportDisplacementVectors
+
+		self.scale = scale
+		self.searchRadius = searchRadius
+		self.blockRadius = blockRadius
+		self.meshResolution = meshResolution
+		self.minR = minR
+		self.maxCurvatureR = maxCurvatureR
+		self.rodR = rodR
+		self.useLocalSmoothnessFilter = useLocalSmoothnessFilter
+		self.localModelIndex = localModelIndex # 0: Translation, 1: Rigid, 2: Similarity, 3: Affine
+		self.localRegionSigma = localRegionSigma
+		self.maxLocalEpsilon = maxLocalEpsilon
+		self.maxLocalTrust = maxLocalTrust
+
 class BlockMatcher(Callable):
-	def __init__(self, imgA, imgB):
+	def __init__(self, imgA, imgB, params, wf=None):
 		self.imgA = imgA
 		self.imgB = imgB
-
-		# Block matching parameters 
-		self.exportPointRoi = True
-		self.exportDisplacementVectors = True
-
-		self.scale = 1.00
-		self.searchRadius = 35
-		self.blockRadius = 35
-		self.meshResolution = 32
-		self.minR = 0.6
-		self.maxCurvatureR = 10
-		self.rodR = 1
-		self.useLocalSmoothnessFilter = True
-		self.localModelIndex = 1 # 0: Translation, 1: Rigid, 2: Similarity, 3: Affine
-		self.localRegionSigma = 210
-		self.maxLocalEpsilon = 6
-		self.maxLocalTrust = 999999
+		self.params = params
+		self.wf = wf
 
 		self.started = None
 		self.completed = None
 		self.thread_used = None
-		self.exception = None		
+		self.exception = None
 
 	# With help from
 	# http://albert.rierol.net/imagej_programming_tutorials.html#ImageJ%20programming%20basics
@@ -144,24 +166,31 @@ class BlockMatcher(Callable):
 				c.get().set(nnSearchMask.getSampler().get())
 		return timer.stop()
 
+	def writePointsFile(self, points, filename):
+		fn = open(filename, 'w')
+		for match in points:
+			x1 = match.getP1().getL()[0]
+			y1 = match.getP1().getL()[1]
+			x2 = match.getP2().getW()[0]
+			y2 = match.getP2().getW()[1]
+			fn.write(str(x1) + "\t" + str(y1) + "\t" + str(x2) + "\t" + str(y2) + "\n")		
+
 	def call(self):
 		self.thread_used = threading.currentThread().getName()
 		self.started = time.time()
 		try:
-			# folder = "/mnt/data0/tommy/150318_debug_block_matching/S2-W003/"
-			folder = "/home/seunglab/tommy/S2-W002/affine_renders_0175x/"
-			filenames = os.listdir(folder)
+			filenames = os.listdir(self.params.inputFolder)
 			filenames.sort()
 
-			imp1 = IJ.openImage(os.path.join(folder, filenames[self.imgA]))
-			imp2 = IJ.openImage(os.path.join(folder, filenames[self.imgB]))
+			imp1 = IJ.openImage(os.path.join(params.inputFolder, filenames[self.imgA]))
+			imp2 = IJ.openImage(os.path.join(self.params.inputFolder, filenames[self.imgB]))
 			IJ.log(time.asctime())
 			IJ.log(str(self.imgA) + ": " + str(imp1))
 			IJ.log(str(self.imgB) + ": " + str(imp2))			
 			print str(self.imgA) + ": " + str(imp1)
 			print str(self.imgB) + ": " + str(imp2)
 
-			mesh = SpringMesh(self.meshResolution, imp1.getWidth(), imp1.getHeight(), 1, 1000, 0.9)
+			mesh = SpringMesh(self.params.meshResolution, imp1.getWidth(), imp1.getHeight(), 1, 1000, 0.9)
 			vertices = mesh.getVertices()
 			maskSamples = RealPointSampleList(2)
 			for vertex in vertices:
@@ -182,30 +211,43 @@ class BlockMatcher(Callable):
 							ip2,
 							ip1Mask,
 							ip2Mask,
-							self.scale,
+							self.params.scale,
 							ct,
-							self.blockRadius,
-							self.blockRadius,
-							self.searchRadius,
-							self.searchRadius,
-							self.minR,
-							self.rodR,
-							self.maxCurvatureR,
+							self.params.blockRadius,
+							self.params.blockRadius,
+							self.params.searchRadius,
+							self.params.searchRadius,
+							self.params.minR,
+							self.params.rodR,
+							self.params.maxCurvatureR,
 							v1,
 							pm12,
 							ErrorStatistic(1))
 
-			IJ.log(time.asctime())
-			IJ.log(str(self.imgB) + "_" + str(self.imgA) + " Block matches: " + str(len(pm12)))
+			pre_smooth_block_matches = len(pm12)
+			pre_smooth_filename = self.params.outputFolder + str(imp2.getTitle())[:-4] + "_" + str(imp1.getTitle())[:-4] + "_pre_smooth_pts.txt"
+			self.writePointsFile(pm12, pre_smooth_filename)
 
-			if self.useLocalSmoothnessFilter:
-				model = Util.createModel(self.localModelIndex)
+			if self.params.useLocalSmoothnessFilter:
+				model = Util.createModel(self.params.localModelIndex)
 				try:
-					model.localSmoothnessFilter(pm12, pm12, self.localRegionSigma, self.maxLocalEpsilon, self.maxLocalTrust)
+					model.localSmoothnessFilter(pm12, pm12, self.params.localRegionSigma, self.params.maxLocalEpsilon, self.params.maxLocalTrust)
+					post_smooth_filename = self.params.outputFolder + str(imp2.getTitle())[:-4] + "_" + str(imp1.getTitle())[:-4] + "_post_smooth_pts.txt"
+					self.writePointsFile(pm12, post_smooth_filename)
 				except:
 					pm12.clear()
 
-			if self.exportPointRoi:
+			color_samples, max_displacement = self.matches2ColorSamples(pm12)
+			post_smooth_block_matches = len(pm12)
+				
+			print time.asctime()
+			print str(self.imgB) + "_" + str(self.imgA) + "\tblock_matches\t" + str(pre_smooth_block_matches) + "\tsmooth_matches\t" + str(post_smooth_block_matches) + "\tmax_displacement\t" + str(max_displacement) + "\trelaxed_length\t" + str(int(imp1.getWidth()/self.params.meshResolution))
+			IJ.log(time.asctime())
+			IJ.log(str(self.imgB) + "_" + str(self.imgA) + "\tblock_matches\t" + str(pre_smooth_block_matches) + "\tsmooth_matches\t" + str(post_smooth_block_matches) + "\tmax_displacement\t" + str(max_displacement))
+			if self.wf:
+				self.wf.write(str(self.imgB) + "\t" + str(self.imgA) + "\t" + str(imp2.getTitle())[:-4] + "\t" + str(imp1.getTitle())[:-4] + "\t" + str(pre_smooth_block_matches) + "\t" + str(post_smooth_block_matches) + "\t" + str(max_displacement) + "\t" + str(int(imp1.getWidth()/self.params.meshResolution)) + "\n")
+
+			if self.params.exportPointRoi:
 				pm12Sources = ArrayList()
 				pm12Targets = ArrayList()
 
@@ -218,7 +260,7 @@ class BlockMatcher(Callable):
 				imp1.setRoi(roi1)
 				imp2.setRoi(roi2)
 
-			if self.exportDisplacementVectors:
+			if self.params.exportDisplacementVectors:
 				pm12Targets = ArrayList()
 				PointMatch.targetPoints(pm12, pm12Targets)
 
@@ -226,11 +268,8 @@ class BlockMatcher(Callable):
 				for point in pm12Targets:
 					maskSamples2.add(RealPoint(point.getW()), ARGBType(-1))
 				factory = ImagePlusImgFactory()
-				kdtreeMatches, max_displacement = KDTree(self.matches2ColorSamples(pm12))
+				kdtreeMatches = KDTree(color_samples)
 				kdtreeMask = KDTree(maskSamples)
-
-				print time.asctime()
-				print str(self.imgB) + "_" + str(self.imgA) + " max_displacement " + str(max_displacement)
 				
 				img = factory.create([imp1.getWidth(), imp1.getHeight()], ARGBType())
 				self.drawNearestNeighbor(
@@ -238,20 +277,23 @@ class BlockMatcher(Callable):
 							NearestNeighborSearchOnKDTree(kdtreeMatches),
 							NearestNeighborSearchOnKDTree(kdtreeMask))
 				scaled_img = self.scaleIntImagePlus(img, 0.1)
-				scaled_img.show()
-				# fs = FileSaver(scaled_img)
-				# fs.saveAsTiff("/mnt/data0/tommy/150325_block_match_vector_plots_smoothness/S2-W003/" + filenames[self.imgB]
-				# print time.asctime()
-				# print str(self.imgB) + "_" + str(self.imgA) + " Saved " + filenames[self.imgB]
-				# IJ.log(time.asctime())
-				# IJ.log(str(self.imgB) + "_" + str(self.imgA) + " Saved " + filenames[self.imgB])
+				# scaled_img.show()
+				fs = FileSaver(scaled_img)
+				fs.saveAsTiff(self.params.outputFolder + str(imp2.getTitle())[:-4] + "_" + str(imp1.getTitle()))
+				print time.asctime()
+				print str(self.imgB) + "_" + str(self.imgA) + "\tsaved\t" + filenames[self.imgB]
+				IJ.log(time.asctime())
+				IJ.log(str(self.imgB) + "_" + str(self.imgA) + "\tsaved\t" + filenames[self.imgB])
 		except Exception, ex:
 			self.exception = ex
 			print str(ex)
 			IJ.log(str(ex))
+			if self.wf:
+				self.wf.write(str(ex) + "\n")
 		self.completed = time.time()
-		# return self
-		return pm12Sources, pm12Targets
+		return self
+		# return pm12, vertices, maskSamples
+		# return pm12Sources, pm12Targets
 
 
 def shutdown_and_await_termination(pool, timeout):
@@ -268,13 +310,36 @@ def shutdown_and_await_termination(pool, timeout):
 		Thread.currentThread().interrupt()
 
 # Cycle through images
-image_pairs = [(i-1, i) for i in range(1,149)]
+wafer_title = "S2-W003"
+inputFolder = "/mnt/data0/tommy/150318_debug_block_matching/" + wafer_title + "/"
+# inputFolder = "/home/seunglab/tommy/" + wafer_title + "/affine_renders_0175x/"
+outputFolder = "/mnt/data0/tommy/150325_block_match_vector_plots_smoothness/" + wafer_title + "/"
+# outputFolder = "/home/seunglab/tommy/" + wafer_title + "/150324_block_match_vector_plots/"
+start = 1
+finish = len(os.listdir(inputFolder))
+params = BlockMatcherParameters(inputFolder=inputFolder, outputFolder=outputFolder)
+
+# Log file
+t = time.localtime()
+ts = str(t[0]) + str(t[1]) + str(t[2]) + str(t[3]) + str(t[4]) + str(t[5])
+writefile = outputFolder + ts + "_block_matching_loop_log.txt"
+wf = open(writefile, 'w')
+wf.write(time.asctime() + "\n")
+wf.write(writefile + "\n")
+param_values = vars(params)
+for key in param_values:
+	wf.write(key + "\t" + str(param_values[key]) + "\n")
+wf.write("B_idx\tA_idx\tB_file\tA_file\tmatches\tsmooth\tmax_displacement\tdistance\n")
+
+image_pairs = [(i-1, i) for i in range(start,finish)]
 
 pool = Executors.newFixedThreadPool(MAX_CONCURRENT)
-block_matchers = [BlockMatcher(pair[0], pair[1]) for pair in image_pairs]
+block_matchers = [BlockMatcher(pair[0], pair[1], params, wf) for pair in image_pairs]
 futures = pool.invokeAll(block_matchers)
 
 for future in futures:
 	print future.get(5, TimeUnit.SECONDS)
 
+wf.write(time.asctime() + "\n")
+wf.close()
 shutdown_and_await_termination(pool, 5)
