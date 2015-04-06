@@ -61,7 +61,7 @@ class BlockMatcherParameters():
 			rodR = 1,
 			useLocalSmoothnessFilter = True,
 			localModelIndex = 1,
-			localRegionSigma = 210,
+			localRegionSigma = 906,
 			maxLocalEpsilon = 6,
 			maxLocalTrust = 999999):
 		self.inputFolder = inputFolder
@@ -166,6 +166,15 @@ class BlockMatcher(Callable):
 				c.get().set(nnSearchMask.getSampler().get())
 		return timer.stop()
 
+	def writePointsFile(self, points, filename):
+		fn = open(filename, 'w')
+		for match in points:
+			x1 = match.getP1().getL()[0]
+			y1 = match.getP1().getL()[1]
+			x2 = match.getP2().getW()[0]
+			y2 = match.getP2().getW()[1]
+			fn.write(str(x1) + "\t" + str(y1) + "\t" + str(x2) + "\t" + str(y2) + "\n")		
+
 	def call(self):
 		self.thread_used = threading.currentThread().getName()
 		self.started = time.time()
@@ -215,29 +224,28 @@ class BlockMatcher(Callable):
 							pm12,
 							ErrorStatistic(1))
 
-			color_samples, max_displacement = self.matches2ColorSamples(pm12)
-				
-			print time.asctime()
-			print str(self.imgB) + "_" + str(self.imgA) + "\tblock_matches\t" + str(len(pm12)) + "\tmax_displacement\t" + str(max_displacement)
-			IJ.log(time.asctime())
-			IJ.log(str(self.imgB) + "_" + str(self.imgA) + "\tblock_matches\t" + str(len(pm12)) + "\tmax_displacement\t" + str(max_displacement))
-			if self.wf:
-				self.wf.write(str(self.imgB) + "\t" + str(self.imgA) + "\t" + str(imp2.getTitle()) + "\t" + str(imp1.getTitle()) + "\t" + str(len(pm12)) + "\t" + str(max_displacement) + "\n")					
-			pointsfile = self.params.outputFolder + str(imp2.getTitle()) + "_" + str(imp1.getTitle()) + "_pts.txt"
-			pf = open(pointsfile, 'w')
-			for match in pm12:
-				x1 = match.getP1().getL()[0]
-				y1 = match.getP1().getL()[1]
-				x2 = match.getP2().getW()[0]
-				y2 = match.getP2().getW()[1]
-				pf.write(str(x1) + "\t" + str(y1) + "\t" + str(x2) + "\t" + str(y2))
+			pre_smooth_block_matches = len(pm12)
+			pre_smooth_filename = self.params.outputFolder + str(imp2.getTitle())[:-4] + "_" + str(imp1.getTitle())[:-4] + "_pre_smooth_pts.txt"
+			self.writePointsFile(pm12, pre_smooth_filename)
 
 			if self.params.useLocalSmoothnessFilter:
 				model = Util.createModel(self.params.localModelIndex)
 				try:
 					model.localSmoothnessFilter(pm12, pm12, self.params.localRegionSigma, self.params.maxLocalEpsilon, self.params.maxLocalTrust)
+					post_smooth_filename = self.params.outputFolder + str(imp2.getTitle())[:-4] + "_" + str(imp1.getTitle())[:-4] + "_post_smooth_pts.txt"
+					self.writePointsFile(pm12, post_smooth_filename)
 				except:
 					pm12.clear()
+
+			color_samples, max_displacement = self.matches2ColorSamples(pm12)
+			post_smooth_block_matches = len(pm12)
+				
+			print time.asctime()
+			print str(self.imgB) + "_" + str(self.imgA) + "\tblock_matches\t" + str(pre_smooth_block_matches) + "\tsmooth_matches\t" + str(post_smooth_block_matches) + "\tmax_displacement\t" + str(max_displacement) + "\trelaxed_length\t" + str(int(imp1.getWidth()/self.params.meshResolution))
+			IJ.log(time.asctime())
+			IJ.log(str(self.imgB) + "_" + str(self.imgA) + "\tblock_matches\t" + str(pre_smooth_block_matches) + "\tsmooth_matches\t" + str(post_smooth_block_matches) + "\tmax_displacement\t" + str(max_displacement))
+			if self.wf:
+				self.wf.write(str(self.imgB) + "\t" + str(self.imgA) + "\t" + str(imp2.getTitle())[:-4] + "\t" + str(imp1.getTitle())[:-4] + "\t" + str(pre_smooth_block_matches) + "\t" + str(post_smooth_block_matches) + "\t" + str(max_displacement) + "\t" + str(int(imp1.getWidth()/self.params.meshResolution)) + "\n")
 
 			if self.params.exportPointRoi:
 				pm12Sources = ArrayList()
@@ -271,7 +279,7 @@ class BlockMatcher(Callable):
 				scaled_img = self.scaleIntImagePlus(img, 0.1)
 				# scaled_img.show()
 				fs = FileSaver(scaled_img)
-				fs.saveAsTiff(self.params.outputFolder + filenames[self.imgB])
+				fs.saveAsTiff(self.params.outputFolder + str(imp2.getTitle())[:-4] + "_" + str(imp1.getTitle()))
 				print time.asctime()
 				print str(self.imgB) + "_" + str(self.imgA) + "\tsaved\t" + filenames[self.imgB]
 				IJ.log(time.asctime())
@@ -321,9 +329,9 @@ wf.write(writefile + "\n")
 param_values = vars(params)
 for key in param_values:
 	wf.write(key + "\t" + str(param_values[key]) + "\n")
-wf.write("B_idx\tA_idx\tB_file\tA_file\tmatches\tmax_displacement\n")
+wf.write("B_idx\tA_idx\tB_file\tA_file\tmatches\tsmooth\tmax_displacement\tdistance\n")
 
-image_pairs = [(i-1, i) for i in range(1,149)]
+image_pairs = [(i-1, i) for i in range(start,finish)]
 
 pool = Executors.newFixedThreadPool(MAX_CONCURRENT)
 block_matchers = [BlockMatcher(pair[0], pair[1], params, wf) for pair in image_pairs]
