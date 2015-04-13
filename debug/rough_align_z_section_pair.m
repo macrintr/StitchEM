@@ -16,23 +16,17 @@ end
 % Set the relative transform
 rel_tforms_z = affine2d();
 % Is the relative transform already set? (i.e. from manual selection)
-if isfield(secB.overview, 'rough_align_z')
-    rel_tforms_z = secB.overview.rough_align_z.rel_tforms;
-    disp('Copying manual rough alignment');
-else
-    % Register those overviews together
-    [tform_moving, stats] = register_overviews(secB, secA);
-    z_alignment.rel_to = 'None';
-    z_alignment.rel_to_sec = secA.num;
-    z_alignment.method = 'rough_align_z';
-    z_alignment.data = stats;
-    z_alignment.data.overview_scale = secB.overview.scale;
+[tform_moving, stats] = register_overviews(secB, secA);
+z_alignment.rel_to = 'None';
+z_alignment.rel_to_sec = secA.num;
+z_alignment.method = 'rough_align_z';
+z_alignment.data = stats;
+z_alignment.data.overview_scale = secB.overview.scale;
     
-    % Rescale for the overview scale factor & tile-to-overview ratio
-    scaling_factor = 1/(secB.overview.scale * overview_to_tile_ratio);
-    scaling_matrix = [scaling_factor 0 0; 0 scaling_factor 0; 0 0 1];
-    rel_tforms_z = affine2d(scaling_matrix^-1 * tform_moving.T * scaling_matrix);
-end
+% Rescale for the overview scale factor & tile-to-overview ratio
+scaling_factor = 1/(secB.overview.scale * overview_to_tile_ratio);
+scaling_matrix = [scaling_factor 0 0; 0 scaling_factor 0; 0 0 1];
+rel_tforms_z = affine2d(scaling_matrix^-1 * tform_moving.T * scaling_matrix);
 
 % Propagate the previous section's rough_z alignment
 tforms_z = compose_tforms(secA.overview.rough_align_z.tforms, rel_tforms_z);

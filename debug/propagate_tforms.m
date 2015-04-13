@@ -25,7 +25,7 @@ secs{sec_num}.alignments.rough_z_xy = z_xy_alignment;
 
 % Propagate through to the end of the secs
 for s = sec_num:length(secs)
-    if s == 1
+    if s == 0
         secs{s}.alignments.prev_z = fixed_alignment(secs{s}, 'rough_z_xy');
         secs{s}.alignments.z = fixed_alignment(secs{s}, 'rough_z_xy');
     else
