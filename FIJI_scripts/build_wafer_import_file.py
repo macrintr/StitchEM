@@ -1,9 +1,11 @@
 import os
 import re
 
-wafer = "S2-W007"
-writefile = "/mnt/bucket/labs/seung/research/tommy/S2-W002/import_files/S2-W002_import.txt"
-imagefolder = "/mnt/bucket/labs/seung/research/GABA/data/atlas/MasterUTSLdirectory/07122012S2/S2-W002/HighResImages_ROI1_W002_7nm_120apa/"
+wafer = "S2-W005"
+# writefile = "/mnt/bucket/labs/seung/research/tommy/S2-W002/import_files/S2-W002_import.txt"
+writefile = "/mnt/data0/tommy/" + wafer + "/" + wafer + "_import.txt"
+# imagefolder = "/mnt/bucket/labs/seung/research/GABA/data/atlas/MasterUTSLdirectory/07122012S2/S2-W002/HighResImages_ROI1_W002_7nm_120apa/"
+imagefolder = "/mnt/data0/ashwin/07122012/" + wafer + "/"
 
 wf = open(writefile, 'w')
 foldernames = os.listdir(imagefolder)

@@ -46,25 +46,28 @@ from script.imglib.algorithm import Scale2D
 
 class BlockMatcherParameters():
 	def __init__(self,
-			input_folder = "/mnt/data0/tommy/150318_debug_block_matching/",
-			output_folder = "/mnt/data0/tommy/150325_block_match_vector_plots_smoothness/",
+			wafer_title = "S2-W001",
 			export_point_roi = True,
 			export_displacement_vectors = True,
 			scale = 1.00,
 			search_radius = 35,
 			block_radius = 35,
-			mesh_resolution = 32,
-			min_R = 0.6,
+			min_R = 0.2,
 			max_curvature_R = 10,
-			rod_R = 1,
+			rod_R = 0.8,
 			use_local_smoothness_filter = True,
-			local_model_index = 1,
-			local_region_sigma = 360,
+			local_model_index = 3,
+			local_region_sigma = 240,
 			max_local_epsilon = 6,
 			max_local_trust = 999999,
-			num_points_in_smoothness = 6):
-		self.input_folder = input_folder
-		self.output_folder = output_folder
+			point_distance = 180,
+			save_data = True):
+		self.input_folder = "/mnt/data0/tommy/affine_renders_0175x/" + wafer_title + "/"
+		# input_folder = "/home/seunglab/tommy/" + wafer_title + "/affine_renders_0175x/"
+		# input_folder = "/mnt/data0/tommy/tests/150409_elastic_solver_sensitivity/elastic_images/"
+		self.output_folder = "/mnt/data0/tommy/affine_block_matching/" + wafer_title + "/"
+		# output_folder = "/home/seunglab/tommy/" + wafer_title + "/150324_block_match_vector_plots/"
+		# output_folder = "/mnt/data0/tommy/tests/150409_elastic_solver_sensitivity/elastic_block_matching/"	
 
 		self.export_point_roi = export_point_roi
 		self.export_displacement_vectors = export_displacement_vectors
@@ -72,7 +75,6 @@ class BlockMatcherParameters():
 		self.scale = scale
 		self.search_radius = search_radius
 		self.block_radius = block_radius
-		self.mesh_resolution = mesh_resolution
 		self.min_R = min_R
 		self.max_curvature_R = max_curvature_R
 		self.rod_R = rod_R
@@ -81,7 +83,9 @@ class BlockMatcherParameters():
 		self.local_region_sigma = local_region_sigma
 		self.max_local_epsilon = max_local_epsilon
 		self.max_local_trust = max_local_trust
-		self.num_points_in_smoothness = num_points_in_smoothness
+		self.point_distance = point_distance
+
+		self.save_data = save_data
 
 class BlockMatcher(Callable):
 	def __init__(self, imgA, imgB, params, wf=None):
@@ -175,7 +179,7 @@ class BlockMatcher(Callable):
 			y2 = match.getP2().getW()[1]
 			fn.write(str(x1) + "\t" + str(y1) + "\t" + str(x2) + "\t" + str(y2) + "\n")		
 
-	def call(self):
+	def call(self, save_images=False):
 		self.thread_used = threading.currentThread().getName()
 		self.started = time.time()
 		try:
@@ -190,20 +194,10 @@ class BlockMatcher(Callable):
 			print str(self.imgA) + ": " + str(imp1)
 			print str(self.imgB) + ": " + str(imp2)
 
-			# w_n = e^((num_points_in_smoothness*point_distance)^2 / (-2*local_region_sigma^2))
-			# point_distance = image_width / mesh_resolution
-			# We'll adjust the mesh_resolution to get the point_distance, so that the 
-			# nth point has a weight of at least 0.01
-			# Plug in values to above equation and solve for point_distance
-			# (num_points_in_smoothness*point_distance)^2 / local_region_sigma^2 = -2*ln(w_n)
-			# point_distance = local_region_sigma * (-2*ln(0.01))^(1/2) / num_points_in_smoothness
-			# (-2*ln(0.01))^(1/2) ~= 3
-			point_distance = self.params.local_region_sigma * 3 / self.params.num_points_in_smoothness
-			self.params.mesh_resolution = int(imp1.getWidth() / point_distance)
-			effective_point_distance = imp1.getWidth() / self.params.mesh_resolution
-			effective_local_region_sigma =  effective_point_distance * self.params.num_points_in_smoothness / 3
+			mesh_resolution = int(imp1.getWidth() / self.params.point_distance)
+			effective_point_distance = imp1.getWidth() / mesh_resolution
 
-			mesh = SpringMesh(self.params.mesh_resolution, imp1.getWidth(), imp1.getHeight(), 1, 1000, 0.9)
+			mesh = SpringMesh(mesh_resolution, imp1.getWidth(), imp1.getHeight(), 1, 1000, 0.9)
 			vertices = mesh.getVertices()
 			maskSamples = RealPointSampleList(2)
 			for vertex in vertices:
@@ -238,15 +232,17 @@ class BlockMatcher(Callable):
 							ErrorStatistic(1))
 
 			pre_smooth_block_matches = len(pm12)
-			pre_smooth_filename = self.params.output_folder + str(imp2.getTitle())[:-4] + "_" + str(imp1.getTitle())[:-4] + "_pre_smooth_pts.txt"
-			self.writePointsFile(pm12, pre_smooth_filename)
+			if self.params.save_data:
+				pre_smooth_filename = self.params.output_folder + str(imp2.getTitle())[:-4] + "_" + str(imp1.getTitle())[:-4] + "_pre_smooth_pts.txt"
+				self.writePointsFile(pm12, pre_smooth_filename)
 
 			if self.params.use_local_smoothness_filter:
 				model = Util.createModel(self.params.local_model_index)
 				try:
-					model.localSmoothnessFilter(pm12, pm12, effective_local_region_sigma, self.params.max_local_epsilon, self.params.max_local_trust)
-					post_smooth_filename = self.params.output_folder + str(imp2.getTitle())[:-4] + "_" + str(imp1.getTitle())[:-4] + "_post_smooth_pts.txt"
-					self.writePointsFile(pm12, post_smooth_filename)
+					model.localSmoothnessFilter(pm12, pm12, self.params.local_region_sigma, self.params.max_local_epsilon, self.params.max_local_trust)
+					if self.params.save_data:
+						post_smooth_filename = self.params.output_folder + str(imp2.getTitle())[:-4] + "_" + str(imp1.getTitle())[:-4] + "_post_smooth_pts.txt"
+						self.writePointsFile(pm12, post_smooth_filename)
 				except:
 					pm12.clear()
 
@@ -254,11 +250,20 @@ class BlockMatcher(Callable):
 			post_smooth_block_matches = len(pm12)
 				
 			print time.asctime()
-			print str(self.imgB) + "_" + str(self.imgA) + "\tblock_matches\t" + str(pre_smooth_block_matches) + "\tsmooth_matches\t" + str(post_smooth_block_matches) + "\tmax_displacement\t" + str(max_displacement) + "\trelaxed_length\t" + str(int(imp1.getWidth()/self.params.mesh_resolution))
+			print str(self.imgB) + "_" + str(self.imgA) + "\tblock_matches\t" + str(pre_smooth_block_matches) + "\tsmooth_filtered\t" + str(pre_smooth_block_matches - post_smooth_block_matches) + "\tmax_displacement\t" + str(max_displacement) + "\trelaxed_length\t" + str(effective_point_distance) + "\tsigma\t" + str(self.params.local_region_sigma)
 			IJ.log(time.asctime())
-			IJ.log(str(self.imgB) + "_" + str(self.imgA) + "\tblock_matches\t" + str(pre_smooth_block_matches) + "\tsmooth_matches\t" + str(post_smooth_block_matches) + "\tmax_displacement\t" + str(max_displacement))
-			if self.wf:
-				self.wf.write(str(self.imgB) + "\t" + str(self.imgA) + "\t" + str(imp2.getTitle())[:-4] + "\t" + str(imp1.getTitle())[:-4] + "\t" + str(pre_smooth_block_matches) + "\t" + str(pre_smooth_block_matches - post_smooth_block_matches) + "\t" + str(max_displacement) + "\t" + str(effective_point_distance) + "\t" + str(effective_local_region_sigma) + "\n")
+			IJ.log(str(self.imgB) + "_" + str(self.imgA) + ": block_matches " + str(pre_smooth_block_matches) + ", smooth_filtered " + str(pre_smooth_block_matches - post_smooth_block_matches) + ", max_displacement " + str(max_displacement) + ", relaxed_length " + str(effective_point_distance) + ", sigma " + str(self.params.local_region_sigma))
+			if self.params.save_data and self.wf:
+				self.wf.write(str(self.imgB) + 
+					"\t" + str(self.imgA) + 
+					"\t" + str(imp2.getTitle())[:-4] + 
+					"\t" + str(imp1.getTitle())[:-4] + 
+					"\t" + str(pre_smooth_block_matches) + 
+					"\t" + str(pre_smooth_block_matches - post_smooth_block_matches) + 
+					"\t" + str(max_displacement) + 
+					"\t" + str(effective_point_distance) + 
+					"\t" + str(self.params.local_region_sigma) + 
+					"\t" + str(mesh_resolution) + "\n")
 
 			if self.params.export_point_roi:
 				pm12Sources = ArrayList()
@@ -290,18 +295,20 @@ class BlockMatcher(Callable):
 							NearestNeighborSearchOnKDTree(kdtreeMatches),
 							NearestNeighborSearchOnKDTree(kdtreeMask))
 				scaled_img = self.scaleIntImagePlus(img, 0.1)
-				# scaled_img.show()
-				fs = FileSaver(scaled_img)
-				fs.saveAsTiff(self.params.output_folder + str(imp2.getTitle())[:-4] + "_" + str(imp1.getTitle()))
+				if self.params.save_data:
+					fs = FileSaver(scaled_img)
+					fs.saveAsTiff(self.params.output_folder + str(imp2.getTitle())[:-4] + "_" + str(imp1.getTitle()))
+				else:
+					scaled_img.show()
 				print time.asctime()
 				print str(self.imgB) + "_" + str(self.imgA) + "\tsaved\t" + filenames[self.imgB]
 				IJ.log(time.asctime())
-				IJ.log(str(self.imgB) + "_" + str(self.imgA) + "\tsaved\t" + filenames[self.imgB])
+				IJ.log(str(self.imgB) + "_" + str(self.imgA) + ": saved " + filenames[self.imgB])
 		except Exception, ex:
 			self.exception = ex
 			print str(ex)
 			IJ.log(str(ex))
-			if self.wf:
+			if self.params.save_data and self.wf:
 				self.wf.write(str(ex) + "\n")
 		self.completed = time.time()
 		return self
@@ -322,31 +329,33 @@ def shutdownAndAwaitTermination(pool, timeout):
 		# Preserve interrupt status
 		Thread.currentThread().interrupt()
 
-def runBlockMatching(wafer_title):
+def runBlockMatchingAll(wafer_title):
 	MAX_CONCURRENT = 20
-	input_folder = "/mnt/data0/tommy/150318_debug_block_matching/" + wafer_title + "/"
-	# input_folder = "/home/seunglab/tommy/" + wafer_title + "/affine_renders_0175x/"
-	# input_folder = "/mnt/data0/tommy/tests/150409_elastic_solver_sensitivity/elastic_images/"
-	output_folder = "/mnt/data0/tommy/150325_block_match_vector_plots_smoothness/" + wafer_title + "/"
-	# output_folder = "/home/seunglab/tommy/" + wafer_title + "/150324_block_match_vector_plots/"
-	# output_folder = "/mnt/data0/tommy/tests/150409_elastic_solver_sensitivity/elastic_block_matching/"
+	params = BlockMatcherParameters(wafer_title=wafer_title)
 	start = 1
-	finish = len(os.listdir(input_folder))
-	params = BlockMatcherParameters(input_folder=input_folder, output_folder=output_folder)
+	finish = len(os.listdir(params.input_folder))
+	image_pairs = [(i-1, i) for i in range(start,finish)]
 
 	# Log file
 	t = time.localtime()
 	ts = str(t[0]) + str(t[1]) + str(t[2]) + str(t[3]) + str(t[4]) + str(t[5])
-	writefile = output_folder + ts + "_block_matching_loop_log.txt"
+	writefile = params.output_folder + ts + "_block_matching_loop_log.txt"
 	wf = open(writefile, 'w')
 	wf.write(time.asctime() + "\n")
 	wf.write(writefile + "\n")
 	param_values = vars(params)
 	for key in param_values:
 		wf.write(key + "\t" + str(param_values[key]) + "\n")
-	wf.write("B_idx\tA_idx\tB_file\tA_file\tmatches\tsmooth\tmax_displacement\tdistance\tlocal_sigma\n")
-
-	image_pairs = [(i-1, i) for i in range(start,finish)]
+	wf.write("B_idx\t" + 
+			"A_idx\t" + 
+			"B_file\t" + 
+			"A_file\t" + 
+			"matches\t" + 
+			"smooth_removed\t" + 
+			"max_displacement\t" + 
+			"eff_dist\t" + 
+			"eff_sigma\t" +
+			"mesh\n")
 
 	pool = Executors.newFixedThreadPool(MAX_CONCURRENT)
 	block_matchers = [BlockMatcher(pair[0], pair[1], params, wf) for pair in image_pairs]
@@ -359,10 +368,30 @@ def runBlockMatching(wafer_title):
 	wf.close()
 	shutdownAndAwaitTermination(pool, 5)
 
+def runBlockMatching(params_list, image_pairs):
+	MAX_CONCURRENT = 20
+	
+	block_matching_inputs = zip(image_pairs, params_list)
+
+	pool = Executors.newFixedThreadPool(MAX_CONCURRENT)
+	block_matchers = [BlockMatcher(pair[0], pair[1], params) for (pair, params) in block_matching_inputs]
+	futures = pool.invokeAll(block_matchers)
+
+	for future in futures:
+		print future.get(5, TimeUnit.SECONDS)
+
+	shutdownAndAwaitTermination(pool, 5)
+
 # runBlockMatching('')
 
 # Cycle through images
 # wafer_title = "S2-W004"
 # runBlockMatching(wafer_title)
-wafer_title = "S2-W001"
-runBlockMatching(wafer_title)
+# wafer_title = "S2-W001"
+# params_list = [BlockMatcherParameters(wafer_title=wafer_title, save_data=False, local_region_sigma=i) for i in [35, 105, 210, 350, 420, 560, 700, 906]]
+# image_pairs = [(1, 2) for p in params_list]
+# runBlockMatching(params_list, image_pairs)
+
+wafer_titles = ["S2-W001", "S2-W002", "S2-W003", "S2-W004", "S2-W005", "S2-W006", "S2-W007", "S2-W008"]
+for wafer in wafer_titles:
+	runBlockMatchingAll(wafer)

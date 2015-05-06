@@ -8,15 +8,14 @@ from ij.gui import Toolbar
 from java.awt import Color
 from ij import ImagePlus
 from ij import IJ
+from ini.trakem2.imaging.filters import CLAHE
+from mpicbg.trakem2.align import AlignmentUtils
  
 
-wafer = "S2-W008"
-# writefile = "/mnt/bucket/labs/seung/research/tommy/S2-W002/import_files/S2-W002_import.txt"
-writefile = "/mnt/data0/tommy/" + wafer + "/" + wafer + "_import.txt"
-# imagefolder = "/mnt/bucket/labs/seung/research/GABA/data/atlas/MasterUTSLdirectory/07122012S2/S2-W002/HighResImages_ROI1_W002_7nm_120apa/"
-imagefolder = "/mnt/data0/ashwin/07122012/" + wafer + "/"
+wafer_title = "S2-W001"
+project_folder = "/mnt/data0/tommy/tests/150501_trakem_project_creation/"
 
-project = Project.newFSProject("blank", None, "/mnt/data0/tommy/" + wafer + "/")
+project = Project.newFSProject("blank", None, project_folder)
 loader = project.getLoader()
 loader.setMipMapsRegeneration(False) # disable mipmaps
 layerset = project.getRootLayerSet()
@@ -24,7 +23,7 @@ layerset.setSnapshotsMode(1) # outlines
 
 task = loader.importImages(
           layerset.getLayers().get(0),  # the first layer
-          "/mnt/data0/tommy/" + wafer + "/" + wafer + "_import.txt", # the absolute file path to the text file with absolute image file paths
+          project_folder + wafer_title + "_import.txt", # the absolute file path to the text file with absolute image file paths
           "\t", # the column separator  <path> <x> <y> <section index>
           1.0, # section thickness, defaults to 1
           1.0, # calibration, defaults to 1
@@ -34,23 +33,90 @@ task = loader.importImages(
  
 task.join() # Optional: wait until all images have been imported
 
-project.saveAs("/mnt/data0/tommy/" + wafer + "/" + wafer + "_import.xml", True)
-Display.getFront().getProject().adjustProperties()
+# Get layerset
+layerset = project.getRootLayerSet()
+
+# Get transforms
+affine_folder = "/mnt/data0/tommy/" + wafer_title + "/affine_transforms/"
+# folder = "/usr/people/tmacrina/Desktop/elastic_experiments/150317_bad_correspondences/affine_alignments/"
+
+# Cycle through all layers
+for layer in layerset.getLayers():
+     # Cycle through all images in that layer
+     for patch in layer.getDisplayables(Patch):
+          # Find corresponding transform file
+          # Tile images are named like this:
+          #    Tile_r4-c4_S2-W002_sec1.tif
+          # So the associated transform csv is this:
+          #    Tile_r4-c4_S2-W002_sec1.csv
+          # Might be better to use patch.getImageFilePath()
+          patch_title = patch.getTitle()[:-4]  # knock off the .tif
+          title_split = patch_title.split("_")
+          if title_split[-1][0] != "s":
+               patch_title = "_".join(a[:-1])
+          tform_fn = affine_folder + patch_title + ".csv"
+
+          # Build affine transform
+          # Java defines its affine as follows:
+          # [ x']   [  m00  m01  m02  ] [ x ]   [ m00x + m01y + m02 ]
+          # [ y'] = [  m10  m11  m12  ] [ y ] = [ m10x + m11y + m12 ]
+          # [ 1 ]   [   0    0    1   ] [ 1 ]   [         1         ]
+          # Java function:
+          # AffineTransform(double m00, double m10, double m01, double m11, double m02, double m12)
+          #
+          # We spit out the transpose of that matrix from MATLAB as csv
+          # The Java function inputs are ordered as the rows of the transpose
+          if title_split[-2] == wafer_title:
+               affine_inputs = []
+               tform_csv = open(tform_fn)
+               tform_matrix = csv.reader(tform_csv)
+               for row in tform_matrix:
+                    affine_inputs.extend(map(float, row)[:2]) # extend not append
+               tform_csv.close()
+
+               affine_tform = AffineTransform(*affine_inputs) # expands the elements of the list
+
+               print patch_title
+               # Apply transform
+               patch.setAffineTransform(affine_tform)
+               print patch.getAffineTransform()
+               # Update internal the internals
+               patch.updateBucket()
+
+Display.repaint()
+layerset.setMinimumDimensions()
+# Display.getFront().getProject().save()
+
+
+# project.saveAs(project_folder + wafer + "_import.xml", True)
+# Display.getFront().getProject().adjustProperties()
 
 # project.destroy()
 
-layerset = project.getRootLayerSet()
-futures_CLAHE = []
-futures_mipmaps = []
+clahe_filter = CLAHE()
+print clahe_filter.toXML("\t")
+layer1 = layerset.getLayers()[1]
+roi = layer1.getDisplayables(Patch)[0].getBoundingBox()
+
 for layer in layerset.getLayers():
 	for patch in layer.getDisplayables(Patch):
-		print patch
-		imp = patch.getImagePlus()
-		# futures_CLAHE.append((IJ.run(imp, "Enhance Local Contrast (CLAHE)", "blocksize=127 histogram=256 maximum=3 mask=*None* fast_(less_accurate)"))
-		futures_CLAHE.append(Flat.getFastInstance().run(imp, 250, 256, 4, None, False))
-		futures_mipmaps.append(patch.updateMipMaps())
+          print patch
+          patch.setFilters([clahe_filter])
+          roi.add(patch.getBoundingBox())
 
-Utils.wait(futures_CLAHE)
-Utils.wait(futures_mipmaps)
+# Check that CLAHE applied properly with simple image
+img = project.getLoader().getFlatAWTImage(
+          layer1,
+          roi,
+          0.005, # layer_scale
+          0x0000ff00,
+          ImagePlus.COLOR_RGB,
+          Patch,
+          AlignmentUtils.filterPatches(layer1, None),
+          True,
+          Color(0x00ffffff, True))
 
-project.save()
+imp = ImagePlus("Flat montage", img)
+imp.show()
+
+# project.save()
