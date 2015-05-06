@@ -1,5 +1,5 @@
 %% review xy matches
-sec_num = 10;
+sec_num = 72;
 
 stats = plot_xy_matches_stats(secs{sec_num});
 [s, i] = sort(stats.dist, 'descend');

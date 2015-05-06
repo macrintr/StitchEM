@@ -10,6 +10,6 @@ end
 imgA = imwarp(secA.overview.img, secA.overview.rough_align_z.tforms);
 imgB = imwarp(secB.overview.img, secB.overview.rough_align_z.tforms);
 img = imfuse(imgA, imgB);
-% imshow(img);
+imshow(img);
 % print('rough_z_overviews', '-dpng')
-imwrite(img, 'rough_z_overviews.png');
+% imwrite(img, 'rough_z_overviews.png');

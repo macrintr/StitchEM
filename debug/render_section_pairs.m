@@ -1,18 +1,21 @@
-function render_section_pairs(secA, secB, display_rendering)
+function render_section_pairs(secA, secB, aA, aB)
 % Create aligned & stitched section from section cell series index
-alignment = 'z';
+if nargin == 2
+    aA = 'z'; 
+    aB = 'z';
+elseif nargin == 3
+    aB = aA;
+end
 
-tformsA = secA.alignments.(alignment).tforms;
+tformsA = secA.alignments.(aA).tforms;
 [sA sA_R] = render_section(secA, tformsA, 'scale', 0.05);
 
-tformsB = secB.alignments.(alignment).tforms;
+tformsB = secB.alignments.(aB).tforms;
 [sB sB_R] = render_section(secB, tformsB, 'scale', 0.05);
 
 [merge, merge_spatial_ref] = imfuse(sA, sA_R, sB, sB_R);
-if display_rendering
-    figure();
-    imshow(merge, merge_spatial_ref);
-end
+figure();
+imshow(merge, merge_spatial_ref);
 
 % filename = sprintf('%s/%s_fine_align_z_xy_%d_%d.tif', secA.wafer, secB.wafer, secB.num, secA.num);
 % imwrite(merge, fullfile(cachepath, filename));
