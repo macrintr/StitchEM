@@ -1,31 +1,31 @@
 function secs = propagate_tforms(secs, sec_num)
 % Propagate a tform through an entire stack, starting with the xy tform
 
-% Transform xy matches into rough_xy, if necessary
-tforms = secs{sec_num}.alignments.rough_xy.tforms;
-secs{sec_num}.xy_matches = transform_matches(secs{sec_num}.xy_matches, tforms, tforms);
-
-% Compose updated xy with rough_z to update rough_z_xy
-num_tiles = size(secs{sec_num}.alignments.xy.tforms, 1);
-rel_tforms_z_xy = {};
-for i=1:num_tiles
-    rel_tforms_z_xy{end+1} = secs{sec_num}.overview.rough_align_z.tforms;
-end
-rel_tforms_z_xy = rel_tforms_z_xy';
-
-% Compose this rough overview alignment to the xy alignment by tile
-tforms_z_xy = cellfun(@(rough, rel) compose_tforms(rough, rel), secs{sec_num}.alignments.xy.tforms, rel_tforms_z_xy, 'UniformOutput', false);
-
-% Save to data structure
-z_xy_alignment.tforms = tforms_z_xy;
-z_xy_alignment.rel_tforms = rel_tforms_z_xy;
-z_xy_alignment.rel_to = 'overview.rough_align_z';
-z_xy_alignment.method = 'rough_align_z';
-secs{sec_num}.alignments.rough_z_xy = z_xy_alignment;
-
 % Propagate through to the end of the secs
 for s = sec_num:length(secs)
-    if s == 0
+    
+    % Transform xy matches into rough_xy, if necessary
+    tforms = secs{s}.alignments.rough_xy.tforms;
+    % secs{sec_num}.xy_matches = transform_matches(secs{sec_num}.xy_matches, tforms, tforms);
+    
+    % Update xy alignment
+    rel_tforms = secs{s}.alignments.xy.rel_tforms;
+    secs{s}.alignments.xy.tforms = cellfun(@(rough, rel) compose_tforms(rough, rel), tforms, rel_tforms, 'UniformOutput', false);
+    
+    % Compose updated xy with rough_z to update rough_z_xy
+    num_tiles = size(secs{s}.alignments.xy.tforms, 1);
+    rel_tforms_z_xy = {};
+    for i=1:num_tiles
+        rel_tforms_z_xy{end+1} = secs{s}.overview.rough_align_z.tforms;
+    end
+    rel_tforms_z_xy = rel_tforms_z_xy';
+    
+    % Compose this rough overview alignment to the xy alignment by tile
+    tforms_z_xy = cellfun(@(rough, rel) compose_tforms(rough, rel), secs{s}.alignments.xy.tforms, rel_tforms_z_xy, 'UniformOutput', false);
+    secs{s}.alignments.rough_z_xy.tforms = tforms_z_xy;
+    secs{s}.alignments.rough_z_xy.rel_tforms = rel_tforms_z_xy;
+    
+    if s == 1
         secs{s}.alignments.prev_z = fixed_alignment(secs{s}, 'rough_z_xy');
         secs{s}.alignments.z = fixed_alignment(secs{s}, 'rough_z_xy');
     else

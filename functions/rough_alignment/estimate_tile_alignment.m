@@ -43,9 +43,14 @@ end
 tform_prescale = make_tform('scale', params.tile_scale);
 tform_rescale = make_tform('scale', 1 / (reg_scale * params.tile_scale));
 
+% Calculate the translation transform
+tx = size(overview_img, 2) * params.overview_cropping(1);
+ty = size(overview_img, 1) * params.overview_cropping(2);
+tform_translate = make_tform('translate', tx, ty);
+
 % Compose the final tform:
 % Prescale -> Register to overview -> Register overview to other overview -> Rescale
-tile_tform = affine2d(tform_prescale.T * tform_registration.T * params.overview_tform.T * tform_rescale.T);
+tile_tform = affine2d(tform_prescale.T * tform_registration.T * params.overview_tform.T * tform_translate.T * tform_rescale.T);
 
 % Return the intermediate transforms as a secondary output argument
 tforms.prescale = tform_prescale;
