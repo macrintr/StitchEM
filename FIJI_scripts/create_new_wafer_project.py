@@ -9,7 +9,14 @@ from java.awt import Color
 from ij import ImagePlus
 from ij import IJ
  
-project = Project.newFSProject("blank", None, "/home/seunglab/tommy/S2-W002/")
+
+wafer = "S2-W008"
+# writefile = "/mnt/bucket/labs/seung/research/tommy/S2-W002/import_files/S2-W002_import.txt"
+writefile = "/mnt/data0/tommy/" + wafer + "/" + wafer + "_import.txt"
+# imagefolder = "/mnt/bucket/labs/seung/research/GABA/data/atlas/MasterUTSLdirectory/07122012S2/S2-W002/HighResImages_ROI1_W002_7nm_120apa/"
+imagefolder = "/mnt/data0/ashwin/07122012/" + wafer + "/"
+
+project = Project.newFSProject("blank", None, "/mnt/data0/tommy/" + wafer + "/")
 loader = project.getLoader()
 loader.setMipMapsRegeneration(False) # disable mipmaps
 layerset = project.getRootLayerSet()
@@ -17,7 +24,7 @@ layerset.setSnapshotsMode(1) # outlines
 
 task = loader.importImages(
           layerset.getLayers().get(0),  # the first layer
-          "/mnt/bucket/labs/seung/research/tommy/S2-W002/import_files/S2-W002_import.txt", # the absolute file path to the text file with absolute image file paths
+          "/mnt/data0/tommy/" + wafer + "/" + wafer + "_import.txt", # the absolute file path to the text file with absolute image file paths
           "\t", # the column separator  <path> <x> <y> <section index>
           1.0, # section thickness, defaults to 1
           1.0, # calibration, defaults to 1
@@ -27,7 +34,7 @@ task = loader.importImages(
  
 task.join() # Optional: wait until all images have been imported
 
-project.saveAs("/home/seunglab/tommy/S2-W002/", True)
+project.saveAs("/mnt/data0/tommy/" + wafer + "/" + wafer + "_import.xml", True)
 Display.getFront().getProject().adjustProperties()
 
 # project.destroy()
