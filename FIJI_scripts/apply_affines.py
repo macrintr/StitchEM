@@ -10,7 +10,7 @@ import csv
 from java.awt.geom import AffineTransform
 
 # Wafer
-wafer_title = "S2-W003"
+wafer_title = "S2-W006"
 
 # Get the first open project
 project = Project.getProject(wafer_title + "_import.xml")
