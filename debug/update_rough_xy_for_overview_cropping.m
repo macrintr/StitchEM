@@ -5,8 +5,13 @@ function sec = update_rough_xy_for_overview_cropping(sec)
 s = 0.07;
 % scaling = affine2d([s 0 0; 0 s 0; 0 0 1]);
 
-tx = sec.overview.size(1) * 0.25 / s;
-ty = sec.overview.size(2) * 0.25 / s;
+if (strcmp(sec.wafer, 'S2-W007') && sec.num >= 51) || strcmp(sec.wafer, 'S2-W008')
+    tx = sec.overview.size(1) * 0.33 / s;
+    ty = sec.overview.size(2) * 0.16 / s;
+else
+    tx = sec.overview.size(1) * 0.25 / s;
+    ty = sec.overview.size(2) * 0.25 / s;
+end
 translation = affine2d([1 0 0; 0 1 0; tx ty 1]);
 
 for i = 1:length(sec.alignments.rough_xy.tforms)

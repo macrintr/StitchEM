@@ -28,7 +28,7 @@ if length(tileA_num) == length(tileB_num)
         secs{sec_num}.xy_matches.B = [secs{sec_num}.xy_matches.B; B];
         
     end
-    secs{sec_num}.alignments.xy = align_xy(secs{sec_num});
+%     secs{sec_num}.alignments.xy = align_xy(secs{sec_num});
 %     secs = propagate_tforms(secs, sec_num);
 end
 

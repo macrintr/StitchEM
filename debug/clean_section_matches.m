@@ -4,8 +4,8 @@ function secs = clean_section_matches(secs, i)
 % Set thresholds
 xy_definitely_bad = 10;
 xy_possibly_bad = 3;
-z_definitely_bad = 80;
-z_possibly_bad = 80;
+z_definitely_bad = 200;
+z_possibly_bad = 200;
 
 xy_count_limit = 600; % 25 matches per seam (24 seams)
 z_count_limit = 400; % 25 matches per pair (16 pairs)
@@ -14,7 +14,7 @@ if i > 1 && width(secs{i}.z_matches.A) < 3
     secs{i}.z_matches = transform_z_matches_inverse(secs, i);
 end
 
-for matches_idx = 1:2
+for matches_idx = 2:2
     if matches_idx == 1
         alignment_type = 'xy';
     else
@@ -69,7 +69,7 @@ for matches_idx = 1:2
             disp('<strong>Realign z section</strong>');
             secs{i}.alignments.z = align_z_pair_lsq(secs{i});
         end
-        secs = propagate_tforms(secs, i);
+%         secs = propagate_tforms(secs, i);
         
     end
 end

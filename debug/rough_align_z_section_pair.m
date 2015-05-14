@@ -46,22 +46,28 @@ s = 1/params.overview_scale;
 S = [s 0 0; 0 s 0; 0 0 1];
 tform_rescaled_display = affine2d(S^-1 * tform_moving.T * S);
 
-% Then finish composing for the real scale
-s = 1/(secB.overview.scale * params.overview_to_tile_resolution_ratio);
+% Rescale for full overview
+s = 1/(secB.overview.scale);
 S = [s 0 0; 0 s 0; 0 0 1];
-tform_rescaled_final = affine2d(S^-1 * tform_rescaled_display.T * S);
+tform_rescaled_overview = affine2d(S^-1 * tform_rescaled_display.T * S);
+
+% Then finish composing for the real scale
+s = 1/(params.overview_to_tile_resolution_ratio);
+S = [s 0 0; 0 s 0; 0 0 1];
+tform_rescaled_tile = affine2d(S^-1 * tform_rescaled_overview.T * S);
 
 % Adjust transform for initial transforms (rare)
-% tform_rescaled_final = compose_tforms(secA.overview.rough_align_z.rel_tforms, tform_rescaled_real);
+tform_final_overview = compose_tforms(secA.overview.rough_align_z.tforms, tform_rescaled_overview);
+tform_final_tile = compose_tforms(secA.overview.rough_align_z.tforms, tform_rescaled_tile);
 
 % Save to data structure
-z_alignment.tforms = tform_rescaled_final;
-z_alignment.rel_tforms = tform_rescaled_final;
+z_alignment.tforms = tform_final_overview;
+z_alignment.rel_tforms = tform_final_overview;
 z_alignment.rel_to = 'None';
 z_alignment.rel_to_sec = secA.num;
 z_alignment.method = 'rough_align_z';
 z_alignment.data = stats;
-z_alignment.data.overview_scale = secB.overview.scale;
+z_alignment.data.overview_scale = params.overview_scale;
 secB.overview.rough_align_z = z_alignment;
 
 % Display the transformed sections overlapping
@@ -82,7 +88,7 @@ imshow(merge, merge_spatial_ref)
 num_tiles = size(secB.alignments.xy.tforms, 1);
 rel_tforms_z_xy = {};
 for i=1:num_tiles
-    rel_tforms_z_xy{end+1} = tform_rescaled_final;
+    rel_tforms_z_xy{end+1} = tform_final_tile;
 end
 rel_tforms_z_xy = rel_tforms_z_xy';
 

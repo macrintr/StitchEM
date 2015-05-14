@@ -9,7 +9,8 @@ info = get_path_info(waferpath);
 sec_nums = info.sec_nums;
 
 % Skip sections
-%sec_nums(103) = []; % skip
+sec_nums(15) = []; % skip
+sec_nums(77) = []; % skip
 
 % Load default parameters
 default_params
@@ -29,6 +30,8 @@ default_params
 
 % S2-W006
 
-params(15).z.matching_mode = 'manual';
-params(16).z.matching_mode = 'manual';
-params(77).z.matching_mode = 'manual';
+% params(15).z.matching_mode = 'manual';
+% params(16).z.matching_mode = 'manual';
+% params(77).z.matching_mode = 'manual';
+
+params(170).xy.features.min_overlap_area = 0.002;
