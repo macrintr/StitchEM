@@ -54,7 +54,7 @@ class BlockMatcherParameters():
 			block_radius = 35,
 			min_R = 0.2,
 			max_curvature_R = 10,
-			rod_R = 0.8,
+			rod_R = 1.0,
 			use_local_smoothness_filter = True,
 			local_model_index = 3,
 			local_region_sigma = 240,
@@ -213,6 +213,7 @@ class BlockMatcher(Callable):
 
 			ct = TranslationModel2D()
 
+
 			BlockMatching.matchByMaximalPMCC(
 							ip1,
 							ip2,
@@ -294,7 +295,7 @@ class BlockMatcher(Callable):
 							img, 
 							NearestNeighborSearchOnKDTree(kdtreeMatches),
 							NearestNeighborSearchOnKDTree(kdtreeMask))
-				scaled_img = self.scaleIntImagePlus(img, 0.1)
+				scaled_img = self.scaleIntImagePlus(img, 0.05)
 				if self.params.save_data:
 					fs = FileSaver(scaled_img)
 					fs.saveAsTiff(self.params.output_folder + str(imp2.getTitle())[:-4] + "_" + str(imp1.getTitle()))
@@ -304,6 +305,8 @@ class BlockMatcher(Callable):
 				print str(self.imgB) + "_" + str(self.imgA) + "\tsaved\t" + filenames[self.imgB]
 				IJ.log(time.asctime())
 				IJ.log(str(self.imgB) + "_" + str(self.imgA) + ": saved " + filenames[self.imgB])
+			imp1.close()
+			imp2.close()
 		except Exception, ex:
 			self.exception = ex
 			print str(ex)
@@ -392,6 +395,6 @@ def runBlockMatching(params_list, image_pairs):
 # image_pairs = [(1, 2) for p in params_list]
 # runBlockMatching(params_list, image_pairs)
 
-wafer_titles = ["S2-W001", "S2-W002", "S2-W003", "S2-W004", "S2-W005", "S2-W006", "S2-W007", "S2-W008"]
+wafer_titles = ["S2-W008", "S2-W007"]
 for wafer in wafer_titles:
 	runBlockMatchingAll(wafer)
