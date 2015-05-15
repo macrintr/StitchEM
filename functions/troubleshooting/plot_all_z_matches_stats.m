@@ -22,6 +22,7 @@ end
 for i=start:finish
     tformsA = secs{i-1}.alignments.z.tforms;
     tformsB = secs{i}.alignments.z.tforms;
+    disp(['Sec ' num2str(i)]);
     stats = calculate_matches_stats(secs{i}.z_matches, tformsA, tformsB);
     sec_num = ones(length(stats), 1) * secs{i}.num;
     stats.sec_num = sec_num;

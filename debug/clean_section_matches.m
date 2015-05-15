@@ -14,7 +14,7 @@ if i > 1 && width(secs{i}.z_matches.A) < 3
     secs{i}.z_matches = transform_z_matches_inverse(secs, i);
 end
 
-for matches_idx = 2:2
+for matches_idx = 1:2
     if matches_idx == 1
         alignment_type = 'xy';
     else
@@ -69,7 +69,6 @@ for matches_idx = 2:2
             disp('<strong>Realign z section</strong>');
             secs{i}.alignments.z = align_z_pair_lsq(secs{i});
         end
-%         secs = propagate_tforms(secs, i);
         
     end
 end

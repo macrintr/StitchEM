@@ -2,19 +2,13 @@
 if ~exist('params', 'var'); error('The ''params'' variable does not exist. Load parameters before doing alignment.'); end
 if ~exist('secs', 'var'); secs = cell(length(sec_nums), 1); end
 if ~exist('error_log', 'var'); error_log = {}; end
-if ~exist('status', 'var'); status = struct(); end
 if ~isfield(status, 'step'); status.step = 'xy'; end
 if ~isfield(status, 'section'); status.section = 1; end
 if ~strcmp(status.step, 'xy'); disp('<strong>Skipping XY alignment.</strong> Clear ''status'' to reset.'), return; end
 error_log = {};
 
-if status.section == 1
-    disp('==== <strong>Started XY alignment</strong>.')
-else
-    fprintf('==== <strong>Resuming XY alignment on section %d/%d.</strong> Clear ''status'' to reset.\n', status.section, length(sec_nums))
-end
+disp('==== <strong>XY alignment</strong>.')
 for s = start:finish
-    status.section = s;
     sec_timer = tic;
     
     % Parameters
@@ -102,8 +96,6 @@ end
 % filename = sprintf('%s_xy_aligned.mat', secs{1}.wafer);
 % save(filename, 'secs', 'error_log', '-v7.3')
 % fprintf('Saved to: %s [%.2fs]\n', fullfile(cachepath, filename), toc(save_timer))
-
-status.step = 'finished_xy';
 
 % total_xy_time = sum(cellfun(@(sec) sec.runtime.xy.time_elapsed, secs));
 % fprintf('==== <strong>Finished XY alignment in %.2fs (%.2fs / section)</strong>.\n\n', total_xy_time, total_xy_time / length(secs));
