@@ -10,9 +10,9 @@ if nargin < 3
 end
 
 % Load overview for the sections
-secB = load_overview(secB, secB.overview.scale);
+secB = load_overview(secB);
 if isempty(secA.overview.img)
-    secA = load_overview(secA, secA.overview.scale);
+    secA = load_overview(secA);
 end
 
 % These parameters come from register_overviews
@@ -42,28 +42,22 @@ end
 
 % Rescale the tform
 % First to the appropriate level for display
-s = 1/params.overview_scale;
+s = params.overview_scale;
 S = [s 0 0; 0 s 0; 0 0 1];
-tform_rescaled_display = affine2d(S^-1 * tform_moving.T * S);
+tform_rescaled_display = affine2d(S * tform_moving.T * S^-1);
 
-% Rescale for full overview
-s = 1/(secB.overview.scale);
-S = [s 0 0; 0 s 0; 0 0 1];
-tform_rescaled_overview = affine2d(S^-1 * tform_rescaled_display.T * S);
+% Adjust transform for initial transform
+tform_final_overview = compose_tforms(secA.overview.alignment.tform, tform_rescaled_display);
 
 % Then finish composing for the real scale
-s = 1/(params.overview_to_tile_resolution_ratio);
+s = params.overview_to_tile_resolution_ratio;
 S = [s 0 0; 0 s 0; 0 0 1];
-tform_rescaled_tile = affine2d(S^-1 * tform_rescaled_overview.T * S);
-
-% Adjust transform for initial transforms (rare)
-tform_final_overview = compose_tforms(secA.overview.rough_align_z.tforms, tform_rescaled_overview);
-tform_final_tile = compose_tforms(secA.overview.rough_align_z.tforms, tform_rescaled_tile);
+tform_final_tile = affine2d(S * tform_final_overview.T * S^-1);
 
 % Save to data structure
 z_alignment.tforms = tform_final_overview;
-z_alignment.rel_tforms = tform_final_overview;
-z_alignment.rel_to = 'None';
+z_alignment.rel_tforms = tform_rescaled_display;
+z_alignment.rel_to = 'secA.overview.alignment.tform';
 z_alignment.rel_to_sec = secA.num;
 z_alignment.method = 'rough_align_z';
 z_alignment.data = stats;
@@ -80,6 +74,10 @@ secB.overview.rough_align_z = z_alignment;
 [fixed, fixed_spatial_ref] = imwarp(secA.overview.img, secA.overview.alignment.tform);
 [moving, moving_spatial_ref] = imwarp(secB.overview.img, tform_rescaled_display);
 [merge, merge_spatial_ref] = imfuse(fixed, fixed_spatial_ref, moving, moving_spatial_ref);
+% resize_merge = imresize(merge, 0.10);
+% render_dir = '/mnt/data0/tommy/matlab_renders';
+% imwrite(resize_merge, fullfile(render_dir, 'overview_rough_z', [secB.wafer '_' num2str(secB.num) '.tif'])); 
+
 figure();
 imshow(merge, merge_spatial_ref)
 

@@ -17,5 +17,9 @@ tformsB = secB.alignments.(aB).tforms;
 figure();
 imshow(merge, merge_spatial_ref);
 
+% resize_merge = imresize(merge, 0.50);
+% render_dir = '/mnt/data0/tommy/matlab_renders';
+% imwrite(resize_merge, fullfile(render_dir, 'rough_z', [secB.wafer '_' num2str(secB.num) '.tif'])); 
+
 % filename = sprintf('%s/%s_fine_align_z_xy_%d_%d.tif', secA.wafer, secB.wafer, secB.num, secA.num);
 % imwrite(merge, fullfile(cachepath, filename));

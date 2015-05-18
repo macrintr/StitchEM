@@ -1,17 +1,17 @@
 function imshow_tile_on_overview(sec, tile_num)
 % Display overview with tile overlaid
 
-rough_z_xy = 1;
+rough_z_xy = 0;
 
 tile_to_overview_scale = 0.07;
 S = [tile_to_overview_scale 0 0; 0 tile_to_overview_scale 0; 0 0 1];
-sec = load_overview(sec, 1);
+sec = load_overview(sec);
 overview = sec.overview.img;
 tile = imread(sec.tile_paths{tile_num});
 
 if rough_z_xy
     tformO = sec.overview.rough_align_z.tforms;
-    tformO = affine2d(S^-1 * tformO.T * S);
+%     tformO = affine2d(S^-1 * tformO.T * S);
     tformT = sec.alignments.rough_z_xy.tforms{tile_num};
 else
     tformO = sec.overview.alignment.tform;

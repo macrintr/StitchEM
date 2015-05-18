@@ -37,7 +37,7 @@ for s = start:finish
     secB = secs{s};
     
     % Compose with previous Z alignment
-    rel_alignments = {'prev_z', 'z'};
+    rel_alignments = {'rough_z_xy', 'prev_z', 'z'};
     if ~isfield(secA.alignments, 'prev_z');
         rel_alignments = 'z'; % fixed sections have no previous Z alignment
     end

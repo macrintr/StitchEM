@@ -3,8 +3,8 @@
 waferpath('/mnt/data0/ashwin/07122012/S2-W001')
 info = get_path_info(waferpath);
 wafer = info.wafer;
-sec_nums = info.sec_nums;
-sec_nums(103) = []; % skip
+% sec_nums = info.sec_nums;
+% sec_nums(103) = []; % skip
 
 % Load default parameters
 default_params
