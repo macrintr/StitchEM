@@ -1,26 +1,27 @@
 %% Rough & XY Alignment
-if ~exist('params'); error('The ''params'' variable does not exist. Load parameters before doing alignment.'); end
 if ~exist('secs'); secs = cell(length(sec_nums), 1); end
-if ~exist('error_log'); error_log = {}; end
-error_log = {};
 
 disp('==== <strong>XY alignment</strong>.')
 for s = start:finish
     sec_timer = tic;
-    
-    % Parameters
-    xy_params = params(sec_nums(s)).xy;
     
     fprintf('=== Aligning %s (<strong>%d/%d</strong>) in XY\n', get_path_info(get_section_path(sec_nums(s)), 'name'), s, length(sec_nums))
     
     % Check for overwrite
     % TO DO
     
-    % Section structure
+    % Section structure & parameters
     if length(secs) < s ~exist('sec') || sec.num ~= sec_nums(s)
+        % Check for params
+        if ~exist('params'); error('The ''params'' variable does not exist. Load parameters before doing alignment.'); end
+        xy_params = params(sec_nums(s)).xy;        
+        
         % Create a new section structure
         sec = load_section(sec_nums(s), 'skip_tiles', xy_params.skip_tiles, 'wafer_path', waferpath());
     else
+        % Check for params
+        xy_params = sec{s}.params.xy;
+        
         % Use section in the workspace
     	sec = secs{s};
         disp('Using section that was already loaded. Clear ''sec'' to force section to be reloaded.')
@@ -42,9 +43,6 @@ for s = start:finish
     
     % Match XY features
     sec.xy_matches = match_xy(sec, 'xy', xy_params.matching);
-    
-    % Setup the error log
-    sec.error_log = [];
     
     % Flag bad matching
     if sec.xy_matches.meta.avg_error > xy_params.max_match_error

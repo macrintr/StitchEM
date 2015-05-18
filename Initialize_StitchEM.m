@@ -13,26 +13,11 @@ addpath(genpath(fullfile(pwd, 'functions')));
 addpath(genpath(fullfile(pwd, 'pipeline')));
 addpath(genpath(fullfile(pwd, 'debug')));
 addpath(genpath(fullfile(pwd, 'development')));
-addpath(genpath(fullfile(pwd, 'cache')));
 
-cachepath(fullfile(pwd, 'cache'));
-renderspath(fullfile(pwd, 'renders'));
-
-% renders_dir = '/mnt/data0/tommy/matlab_renders';
-% render_rough_xy(fullfile(renders_dir, 'rough_xy'));
-% render_xy(fullfile(renders_dir, 'xy'));
-% render_overview_rough_z(fullfile(renders_dir, 'overview_rough_z'));
-% render_rough_z(fullfile(renders_dir, 'rough_z'));
-% render_z(fullfile(renders_dir, 'z'));
-
+renderpath('/mnt/data0/tommy/matlab_renders');
 
 % Set the current wafer path
 % waferpath('/data/home/talmo/EMdata/W002');
 % waferpath('/data/home/talmo/EMdata/S2-W003');
 
 clear ans
-%% Development
-% cd('development/model_fitting');
-% addpath(pwd);
-% addpath(fullfile(pwd, 'functions'));
-% addpath(genpath(fullfile(pwd, 'CPD2')));
