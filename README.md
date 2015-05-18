@@ -10,12 +10,14 @@ Requirements
 
 License
 -------
+Released under the latest General Public License.
 
 How to use
 ----------
 The pipeline acts in two phases to align serial electron microscopy
-images. It generates a "rough" affine alignment (using MATLAB), then
-provides a final piecewise affine alignment (using TrakEM2 in FIJI).
+images. It generates a "rough" affine alignment (using feature matching
+in MATLAB), then provides a final piecewise affine alignment (using 
+cross correlation with TrakEM2 in FIJI).
 
 Authors
 -------
@@ -24,4 +26,4 @@ Authors
 
 Contact
 -------
-Thomas Macrina, tmacrina@princeton.edu
+Thomas Macrina, tmacrina at princeton edu

@@ -7,11 +7,11 @@ function alignment = rough_align_xy(sec, varargin)
 params = parse_input(varargin{:});
 
 if params.verbosity > 0
-    fprintf('== Rough aligning tiles for section %d.\n', sec.num)
+    fprintf('== Rough aligning tiles for %s.\n', sec.name)
 end
 total_time = tic;
 
-%% Register to overview
+% Register to overview
 registration_tforms = cell(sec.num_tiles, 1);
 if params.align_to_overview
     reg_params = params.overview_registration;
@@ -62,7 +62,7 @@ else
     if params.verbosity > 0; disp('Skipping overview registration.'); end
 end
 
-%% Grid alignment
+% Grid alignment
 % Align unregistered tiles to grid relative to closest registered tiles
 alignment = rel_grid_alignment(sec, registration_tforms, params.rel_to, params.expected_overlap);
 
