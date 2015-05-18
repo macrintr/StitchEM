@@ -13,9 +13,12 @@ License
 
 Authors
 -------
-Talmo Periera
+* Talmo Periera
+* Thomas Macrina
 
-Thomas Macrina, tmacrina <at> princeton.edu
+Contact
+-------
+Thomas Macrina, tmacrina@princeton.edu
 
 How to use
 ----------
