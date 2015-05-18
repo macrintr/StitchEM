@@ -4,9 +4,9 @@ A set of tools for serial electron microscopy image registration.
 
 Requirements
 ------------
-MATLAB 2013
-FIJI (ImgeJ 1.49p)
-    TrakEM2 (1.0a 2012-07-04)
+* MATLAB 2013
+* FIJI (ImgeJ 1.49p)
+* TrakEM2 FIJI plugin (1.0a 2012-07-04)
 
 License
 -------
@@ -14,6 +14,7 @@ License
 Authors
 -------
 Talmo Periera
+
 Thomas Macrina, tmacrina <at> princeton.edu
 
 How to use
