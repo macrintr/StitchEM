@@ -18,12 +18,12 @@ addpath(genpath(fullfile(pwd, 'cache')));
 cachepath(fullfile(pwd, 'cache'));
 renderspath(fullfile(pwd, 'renders'));
 
-renders_dir = '/mnt/data0/tommy/matlab_renders';
-render_rough_xy(fullfile(renders_dir, 'rough_xy'));
-render_xy(fullfile(renders_dir, 'xy'));
-render_overview_rough_z(fullfile(renders_dir, 'overview_rough_z'));
-render_rough_z(fullfile(renders_dir, 'rough_z'));
-render_z(fullfile(renders_dir, 'z'));
+% renders_dir = '/mnt/data0/tommy/matlab_renders';
+% render_rough_xy(fullfile(renders_dir, 'rough_xy'));
+% render_xy(fullfile(renders_dir, 'xy'));
+% render_overview_rough_z(fullfile(renders_dir, 'overview_rough_z'));
+% render_rough_z(fullfile(renders_dir, 'rough_z'));
+% render_z(fullfile(renders_dir, 'z'));
 
 
 % Set the current wafer path

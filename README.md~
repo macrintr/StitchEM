@@ -1,6 +1,6 @@
 StitchEM
 ========
-A set of tools for serial electron microscopy image registration.
+A set of tools for serial electron microscopy image stitching and alignment.
 
 Requirements
 ------------
@@ -18,6 +18,6 @@ Thomas Macrina, tmacrina <at> princeton.edu
 
 How to use
 ----------
-The pipeline acts in two phases to align serial electron microscopy
+This pipeline acts in two phases to align serial electron microscopy
 images. It generates a "rough" affine alignment (using MATLAB), then
 provides a final piecewise affine alignment (using TrakEM2 in FIJI).
