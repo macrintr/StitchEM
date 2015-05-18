@@ -14,6 +14,7 @@ wafer_title = "S2-W006"
 
 # Get the first open project
 project = Project.getProject(wafer_title + "_import.xml")
+# project = Project.getProject("S2-W001_XML_short_test.xml")
 
 # Get layerset
 layerset = project.getRootLayerSet()

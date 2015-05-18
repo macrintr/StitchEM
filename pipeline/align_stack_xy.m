@@ -1,10 +1,7 @@
 %% Rough & XY Alignment
-if ~exist('params', 'var'); error('The ''params'' variable does not exist. Load parameters before doing alignment.'); end
-if ~exist('secs', 'var'); secs = cell(length(sec_nums), 1); end
-if ~exist('error_log', 'var'); error_log = {}; end
-if ~isfield(status, 'step'); status.step = 'xy'; end
-if ~isfield(status, 'section'); status.section = 1; end
-if ~strcmp(status.step, 'xy'); disp('<strong>Skipping XY alignment.</strong> Clear ''status'' to reset.'), return; end
+if ~exist('params'); error('The ''params'' variable does not exist. Load parameters before doing alignment.'); end
+if ~exist('secs'); secs = cell(length(sec_nums), 1); end
+if ~exist('error_log'); error_log = {}; end
 error_log = {};
 
 disp('==== <strong>XY alignment</strong>.')
@@ -17,17 +14,15 @@ for s = start:finish
     fprintf('=== Aligning %s (<strong>%d/%d</strong>) in XY\n', get_path_info(get_section_path(sec_nums(s)), 'name'), s, length(sec_nums))
     
     % Check for overwrite
-    if ~isempty(secs{s}) && isfield(secs{s}.alignments, 'xy')
-        if xy_params.overwrite; warning('XY:AlignedSecOverwritten', 'Section is already aligned, but will be overwritten.')
-        else error('XY:AlignedSecNotOverwritten', 'Section is already aligned.'); end
-    end
+    % TO DO
     
     % Section structure
-    if ~exist('sec', 'var') || sec.num ~= sec_nums(s)
+    if length(secs) < s ~exist('sec') || sec.num ~= sec_nums(s)
         % Create a new section structure
         sec = load_section(sec_nums(s), 'skip_tiles', xy_params.skip_tiles, 'wafer_path', waferpath());
     else
         % Use section in the workspace
+    	sec = secs{s};
         disp('Using section that was already loaded. Clear ''sec'' to force section to be reloaded.')
     end
     
@@ -69,13 +64,9 @@ for s = start:finish
         if sec.alignments.xy.meta.avg_post_error > xy_params.max_aligned_error
             disp('<strong>STOP</strong> XY overall alignment error beyond threshold');
             sec.error_log{end+1} = sprintf('%s: sec.alignments.xy.meta.avg_post_error > xy_params.max_aligned_error', sec.name);
-            % msg = sprintf('[%s]: Error after alignment is very large. This may be due to bad matching.', sec.name);
-            % id = 'XY:LargeAlignmentError';
-            % if xy_params.ignore_error; warning(id, msg); else error(id, msg); end
         end
     catch
-        message = sprintf('Failed xy alignment for %s_Sec%d', sec.wafer, sec.num);
-        error_log{end + 1} = message;
+        fprintf('Failed xy alignment for %s_Sec%d', sec.wafer, sec.num);
     end
     
     % Clear images and XY features to save memory
@@ -90,13 +81,7 @@ for s = start:finish
     clear sec
 end
 
-% Save to cache
-% disp('=== Saving sections to disk.');
-% save_timer = tic;
-% filename = sprintf('%s_xy_aligned.mat', secs{1}.wafer);
-% save(filename, 'secs', 'error_log', '-v7.3')
-% fprintf('Saved to: %s [%.2fs]\n', fullfile(cachepath, filename), toc(save_timer))
 
-% total_xy_time = sum(cellfun(@(sec) sec.runtime.xy.time_elapsed, secs));
-% fprintf('==== <strong>Finished XY alignment in %.2fs (%.2fs / section)</strong>.\n\n', total_xy_time, total_xy_time / length(secs));
+total_xy_time = sum(cellfun(@(sec) sec.runtime.xy.time_elapsed, secs));
+fprintf('==== <strong>Finished XY alignment in %.2fs (%.2fs / section)</strong>.\n\n', total_xy_time, total_xy_time / length(secs));
 disp('=== <strong>Finished XY alignemnt</strong> ====');
