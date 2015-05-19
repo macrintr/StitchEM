@@ -18,7 +18,7 @@ for i=start:finish
     
     secB = align_overview_rough_z(secs{i-1}, secs{i});
     
-    imwrite_overview_rough_z(secs{i-1}, secs{i})
+    imwrite_overview_pair(secs{i-1}, secs{i}, 'initial', 'rough_z', 'overview_rough_z')
     secs{i-1} = imclear(secs{i-1});
 end
 

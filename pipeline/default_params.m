@@ -6,6 +6,7 @@ defaults.xy.skip_tiles = [];
 % [rough_align_xy] Rough alignment
 defaults.xy.rough.align_to_overview = true;
 defaults.xy.rough.overview_registration.tile_scale = 0.07 * 0.78;
+defaults.xy.rough.overview_registration.overview_to_tile_resolution_ratio = 0.07;
 defaults.xy.rough.overview_registration.overview_scale = 0.78;
 defaults.xy.rough.overview_registration.overview_crop_ratio = 0.5;
 defaults.xy.rough.overview_registration.overview_cropping = [0.25 0.25 0.5 0.5];
