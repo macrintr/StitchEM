@@ -14,7 +14,7 @@ addpath(genpath(fullfile(pwd, 'pipeline')));
 addpath(genpath(fullfile(pwd, 'debug')));
 addpath(genpath(fullfile(pwd, 'development')));
 
-renderpath('/mnt/data0/tommy/matlab_renders');
+renderpath('/home/usr/tmacrina/seungmount/research/tommy');
 
 % Set the current wafer path
 % waferpath('/data/home/talmo/EMdata/W002');
