@@ -2,7 +2,7 @@
 % load('S2-W001_clean_matches_working.mat');
 % W001;
 
-folder = ['/mnt/data0/tommy/' secs{1}.wafer '/affine_transforms/'];
+folder = ['/mnt/data0/tommy/matlab_renders/affine_transforms/'];
 
 start = 1;
 finish = length(secs);

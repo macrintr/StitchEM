@@ -12,8 +12,8 @@ function stats = plot_xy_matches_stats(sec)
 % If points do not closely clump in the same overlap, then there is likely
 % a poor match that should be investigated.
 
-tformsA = sec.alignments.xy.tforms;
-tformsB = sec.alignments.xy.tforms;
+tformsA = sec.alignments.z.tforms;
+tformsB = sec.alignments.z.tforms;
 stats = calculate_matches_stats(sec.xy_matches, tformsA, tformsB);
 
 group_stats = grpstats(stats,'pair',{'mean', 'std', 'median'},'DataVars',{'dist','ang'});

@@ -17,7 +17,7 @@ end
 num_tiles = size(secs{s}.alignments.xy.tforms, 1);
 rel_tforms_z_xy = {};
 for i=1:num_tiles
-    rel_tforms_z_xy{end+1} = secs{s}.overview.rough_align_z.tforms;
+    rel_tforms_z_xy{end+1} = secs{s}.overview.alignments.rough_z.tform;
 end
 rel_tforms_z_xy = rel_tforms_z_xy';
 
