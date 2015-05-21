@@ -74,31 +74,3 @@ defaults.z.ignore_error = true; % only throws warning if true
 
 %% Initialize parameters with defaults
 params = repmat(defaults, max(sec_nums), 1);
-
-%% Presets for custom per-section parameters
-% Presets for XY alignment:
-xy_presets.grid_align = defaults.xy;
-xy_presets.grid_align.max_match_error = inf;
-xy_presets.grid_align.rough.align_to_overview = false;
-xy_presets.gmm_filter = defaults.xy;
-xy_presets.gmm_filter.matching.filter_method = 'gmm';
-xy_presets.gmm_filter.matching.filter_fallback = 'geomedian';
-
-% Presets for Z alignment:
-z_presets.ignore_z_error = defaults.z;
-z_presets.ignore_z_error.ignore_error = true;
-z_presets.fixed_z = defaults.z;
-z_presets.fixed_z.alignment_method = 'fixed';
-z_presets.rel_to_2previous = defaults.z;
-z_presets.rel_to_2previous.rel_to = -2;
-z_presets.rel_to_3previous = defaults.z;
-z_presets.rel_to_3previous.rel_to = -3;
-z_presets.large_trans = defaults.z;
-z_presets.large_trans.max_match_error = inf;
-z_presets.large_trans.matching.inlier_cluster = 'smallest_var';
-z_presets.manual_matching = defaults.z;
-z_presets.manual_matching.matching_mode = 'auto'; % or 'manual'
-z_presets.manual_matching.max_aligned_error = 250;
-z_presets.low_res = defaults.z;
-z_presets.low_res.features.scale = 0.075;
-z_presets.low_res.features.SURF.MetricThreshold = 1000;

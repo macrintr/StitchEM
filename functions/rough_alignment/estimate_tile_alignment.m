@@ -17,7 +17,16 @@ function [tile_tform, tforms, varargout] = estimate_tile_alignment(tile_img, ove
 [params, unmatched_params] = parse_inputs(varargin{:});
 
 % Pre-process the images
-[tile, overview] = pre_process(tile_img, overview_img, params);
+tile_img = imresize(tile_img, 1 / params.tile_prescale * params.tile_scale * params.overview_scale);
+overview = overview_pre_process(overview_img, params);
+
+size(tile_img)
+size(overview)
+
+figure
+imshow(tile);
+figure
+imshow(overview);
 
 % (Try to) register the tile to the overview image
 try
@@ -58,6 +67,8 @@ tforms.registration = tform_registration;
 tforms.overview = params.overview_tform;
 tforms.rescale = tform_rescale;
 
+error('BOOG');
+
 %% Visualization
 if params.show_registration
     % Calculate tile transform without prescaling or rescaling
@@ -86,19 +97,13 @@ end
 function [tile_img, overview_img] = pre_process(tile_img, overview_img, params)
 % Resize
 if params.tile_prescale ~= params.tile_scale
-    tile_img = imresize(tile_img, 1 / params.tile_prescale * params.tile_scale);
+    tile_img = imresize(tile_img, 1 / params.tile_prescale * params.tile_scale * params.overview_scale);
 end
 if params.overview_prescale ~= params.overview_scale
     overview_img = imresize(overview_img, 1 / params.overview_prescale * params.overview_scale);
 end
 
 % Crop to center
-% overview_img = imcrop(overview_img, [size(overview_img, 2) * (params.overview_crop_ratio / 2), size(overview_img, 1) * (params.overview_crop_ratio / 2), size(overview_img, 2) * params.overview_crop_ratio, size(overview_img, 1) * params.overview_crop_ratio]);
-% Crop to the offset from W007 Sec51 through all W008
-% First cropping adjustment 141209
-% overview_img = imcrop(overview_img, [size(overview_img, 2) * 0.342, size(overview_img, 1) * 0.171, size(overview_img, 2) * 0.537, size(overview_img, 1) * 0.537]);
-% Second cropping adjustment 141210
-% overview_img = imcrop(overview_img, [size(overview_img, 2) * 0.33, size(overview_img, 1) * 0.16, size(overview_img, 2) * 0.57, size(overview_img, 1) * 0.57]);
 overview_img = imcrop(overview_img, [size(overview_img, 2) * params.overview_cropping(1), size(overview_img, 1) * params.overview_cropping(2), size(overview_img, 2) * params.overview_cropping(3), size(overview_img, 1) * params.overview_cropping(4)]);
 
 end
@@ -150,7 +155,7 @@ p.addParameter('overview_cropping', [0.25 0.25 0.5 0.5]);
 
 % Tile
 p.addParameter('tile_prescale', 1.0);
-p.addParameter('tile_scale', 0.78 * 0.07);
+p.addParameter('tile_scale', 0.07);
 
 % Visualization
 p.addParameter('show_registration', false);

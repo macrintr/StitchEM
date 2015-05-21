@@ -1,6 +1,31 @@
 %% rough xy alignment
 for i=start:finish
+    % Section structure & parameters
+    if length(secs) < s && ~exist('sec') || sec.num ~= sec_nums(s)
+        % Check for params
+        if ~exist('params'); error('The ''params'' variable does not exist. Load parameters before doing alignment.'); end
+        xy_params = params(sec_nums(s)).xy;        
+        
+        % Create a new section structure
+        sec = load_section(sec_nums(s), 'skip_tiles', xy_params.skip_tiles, 'wafer_path', waferpath());
+    else
+        % Check for params
+        xy_params = sec{s}.params.xy;
+        
+        % Use section in the workspace
+    	sec = secs{s};
+        disp('Using section that was already loaded. Clear ''sec'' to force section to be reloaded.')
+    end
     
+    % Load images
+    if ~isfield(sec.tiles, 'full'); sec = load_tileset(sec, 'full', 1.0); end
+    if ~isfield(sec.tiles, 'rough'); sec = load_tileset(sec, 'rough', xy_params.rough.overview_registration.tile_scale); end
+    if isempty(sec.overview) || ~isfield(sec.overview, 'img') || isempty(sec.overview.img)
+        sec = load_overview(sec);
+    end
+    
+    % Rough alignment
+    sec.alignments.rough_xy = rough_align_xy(sec, xy_params.rough);
 end
 
 %% xy alignment

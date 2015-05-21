@@ -12,6 +12,7 @@ addpath(pwd);
 addpath(genpath(fullfile(pwd, 'functions')));
 addpath(genpath(fullfile(pwd, 'pipeline')));
 addpath(genpath(fullfile(pwd, 'debug')));
+addpath(genpath(fullfile(pwd, 'classes')));
 addpath(genpath(fullfile(pwd, 'development')));
 
 renderpath('/home/usr/tmacrina/seungmount/research/tommy');

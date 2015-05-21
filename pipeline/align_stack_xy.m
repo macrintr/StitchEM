@@ -20,19 +20,21 @@ for s = start:finish
         sec = load_section(sec_nums(s), 'skip_tiles', xy_params.skip_tiles, 'wafer_path', waferpath());
     else
         % Check for params
-        xy_params = sec{s}.params.xy;
+        xy_params = secs{s}.params.xy;
         
         % Use section in the workspace
     	sec = secs{s};
         disp('Using section that was already loaded. Clear ''sec'' to force section to be reloaded.')
     end
     
+    xy_params = params(sec_nums(s)).xy;  
+    
     % Load images
     if ~isfield(sec.tiles, 'full'); sec = load_tileset(sec, 'full', 1.0); end
     if ~isfield(sec.tiles, 'rough'); sec = load_tileset(sec, 'rough', xy_params.rough.overview_registration.tile_scale); end
     if isempty(sec.overview) || ~isfield(sec.overview, 'img') || isempty(sec.overview.img) ...
             || ~isfield(sec.overview, 'scale') || sec.overview.scale ~= xy_params.rough.overview_registration.overview_scale
-        sec = load_overview(sec, xy_params.rough.overview_registration.overview_scale);
+        sec = load_overview(sec);
     end
     
     % Rough alignment
