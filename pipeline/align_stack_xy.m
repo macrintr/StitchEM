@@ -38,7 +38,7 @@ for s = start:finish
     end
     
     % Rough alignment
-    sec.alignments.rough_xy = rough_align_xy(sec, xy_params.rough);
+    sec.alignments.rough_xy = rough_align_xy(sec);
 
     % Detect XY features
     sec.features.xy = detect_features(sec, 'alignment', 'rough_xy', 'regions', 'xy', xy_params.features);

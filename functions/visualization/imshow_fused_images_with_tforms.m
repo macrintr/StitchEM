@@ -1,4 +1,4 @@
-function show_fused_images_with_tforms(imgA, tformA, imgB, tformB)
+function imshow_fused_images_with_tforms(imgA, tformA, imgB, tformB)
 % Show fused image of warped images
 
 [warpA, refA] = imwarp(imgA, tformA);

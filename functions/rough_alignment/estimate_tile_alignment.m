@@ -20,13 +20,13 @@ function [tile_tform, tforms, varargout] = estimate_tile_alignment(tile_img, ove
 tile_img = imresize(tile_img, 1 / params.tile_prescale * params.tile_scale * params.overview_scale);
 overview = overview_pre_process(overview_img, params);
 
-size(tile_img)
-size(overview)
-
-figure
-imshow(tile);
-figure
-imshow(overview);
+% size(tile_img)
+% size(overview)
+% 
+% figure
+% imshow(tile_img);
+% figure
+% imshow(overview);
 
 % (Try to) register the tile to the overview image
 try
@@ -67,7 +67,7 @@ tforms.registration = tform_registration;
 tforms.overview = params.overview_tform;
 tforms.rescale = tform_rescale;
 
-error('BOOG');
+% error('BOOG');
 
 %% Visualization
 if params.show_registration
@@ -152,6 +152,7 @@ p.addParameter('overview_prescale', 1.0);
 p.addParameter('overview_scale', 0.78);
 p.addParameter('overview_crop_ratio', 0.5);
 p.addParameter('overview_cropping', [0.25 0.25 0.5 0.5]);
+p.addParameter('median_filter_radius', 6);
 
 % Tile
 p.addParameter('tile_prescale', 1.0);

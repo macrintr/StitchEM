@@ -16,6 +16,8 @@ yellow = uint8([255 255 0]);
 red = uint8([255 0 0]);
 color = green;
 
+img = repmat(img, [1,1,3]);
+
 % build inlier circles
 in_num = size(inliers, 1);
 in_circles = int32([inliers ones(in_num, 1)*radius]);
