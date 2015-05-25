@@ -21,5 +21,5 @@ tformsB = secB.alignments.(aB).tforms;
 [sB sB_R] = render_section(secB, tformsB, 'scale', 0.05);
 
 [merge, m_R] = imfuse(sA, sA_R, sB, sB_R);
-% figure();
-% imshow(merge, m_R);
+figure();
+imshow(merge, m_R);

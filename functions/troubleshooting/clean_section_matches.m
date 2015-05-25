@@ -2,7 +2,7 @@ function secs = clean_section_matches(secs, i)
 % Clean xy & z matches of sec #i
 
 % Set thresholds
-xy_definitely_bad = 10;
+xy_definitely_bad = 400;
 xy_possibly_bad = 3;
 z_definitely_bad = 200;
 z_possibly_bad = 200;

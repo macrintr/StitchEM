@@ -41,10 +41,10 @@ for i=start:finish
         secs{i-1} = load_overview(secs{i-1});
     end
     
-    secB = align_overview_rough_z(secs{i-1}, secs{i});
+    secB = align_overview_rough_z(secs{i-1}, secs{i}, 1);
     
-    imwrite_overview_pair(secs{i-1}, secs{i}, 'initial', 'rough_z', 'overview_rough_z')
-    secs{i-1} = imclear(secs{i-1});
+%     imwrite_overview_pair(secs{i-1}, secs{i}, 'initial', 'rough_z', 'overview_rough_z')
+    secs{i-1} = imclear_sec(secs{i-1});
 end
 
 %% rough z alignment

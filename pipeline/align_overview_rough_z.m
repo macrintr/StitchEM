@@ -11,12 +11,15 @@ end
 
 % These parameters come from register_overviews
 % They should be stored with the rough_z stats
-params.overview_scale = 0.75;
+params.overview_scale = 0.78;
 params.overview_prescale = 1;
 params.median_filter_radius = 6;
-unmatched_params.SURF_MetricThreshold = 500;
-unmatched_params.SURF_NumOctaves = 7;
-unmatched_params.SURF_NumScaleLevels = 3;
+params.overview_crop_ratio = 1.0;
+params.overview_cropping = [0 0 1 1];
+
+SURF_params.SURF_MetricThreshold = 500;
+SURF_params.SURF_NumOctaves = 7;
+SURF_params.SURF_NumScaleLevels = 3;
 
 % Preprocess the images (resize, crop, filter)
 filteredA = overview_pre_process(secA.overview.img, params);
@@ -30,7 +33,7 @@ if manual
     tform_moving = fitgeotrans(ptsB, ptsA, 'nonreflectivesimilarity');
 else
     % Register overviews
-    [tform_moving, stats] = surf_register(filteredA, filteredB, unmatched_params);
+    [tform_moving, stats] = surf_register(filteredA, filteredB, SURF_params);
 end
 
 % Rescale the tform
@@ -40,7 +43,7 @@ S = [s 0 0; 0 s 0; 0 0 1];
 tform_rescaled_display = affine2d(S * tform_moving.T * S^-1);
 
 % Adjust transform for initial transform
-tform_final_overview = compose_tforms(secA.overview.alignment.tform, tform_rescaled_display);
+tform_final_overview = compose_tforms(secA.overview.alignments.initial.tform, tform_rescaled_display);
 
 % Save to data structure
 z_alignment.tform = tform_final_overview;
@@ -50,7 +53,7 @@ z_alignment.rel_to_sec = secA.num;
 z_alignment.method = 'align_overview_rough_z';
 z_alignment.data = stats;
 z_alignment.data.overview_scale = params.overview_scale;
-secB.overview.rough_align_z = z_alignment;
+secB.overview.alignments.rough_z = z_alignment;
 
 
 

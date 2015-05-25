@@ -31,14 +31,12 @@ for s = start:finish
     
     % Load images
     if ~isfield(sec.tiles, 'full'); sec = load_tileset(sec, 'full', 1.0); end
-    if ~isfield(sec.tiles, 'rough'); sec = load_tileset(sec, 'rough', xy_params.rough.overview_registration.tile_scale); end
-    if isempty(sec.overview) || ~isfield(sec.overview, 'img') || isempty(sec.overview.img) ...
-            || ~isfield(sec.overview, 'scale') || sec.overview.scale ~= xy_params.rough.overview_registration.overview_scale
+    if isempty(sec.overview) || ~isfield(sec.overview, 'img') || isempty(sec.overview.img)
         sec = load_overview(sec);
     end
     
     % Rough alignment
-    sec.alignments.rough_xy = rough_align_xy(sec);
+    sec.alignments.rough_xy = align_rough_xy(sec);
 
     % Detect XY features
     sec.features.xy = detect_features(sec, 'alignment', 'rough_xy', 'regions', 'xy', xy_params.features);

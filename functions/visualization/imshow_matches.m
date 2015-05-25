@@ -11,6 +11,10 @@ function mov = imshow_matches(secA, secB, matches, scale)
 % Output:
 %   mov: movie object - can be played with implay(mov, 1)
 
+if nargin < 4
+    scale = 0.3;
+end
+
 % Load the two tiles, if not loaded already
 secA = smart_load_tile(secA, scale);
 secB = smart_load_tile(secB, scale);

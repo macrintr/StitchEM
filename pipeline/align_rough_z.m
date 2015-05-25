@@ -14,7 +14,7 @@ rel_tform_tile = affine2d(S * tform_final_overview.T * S^-1);
 
 % Assign the rough_align_z transform to every tile
 rel_tforms = cell(size(secB.alignments.xy.tforms));
-rel_tforms(:) = rel_tform_tile;
+rel_tforms(:) = {rel_tform_tile};
 
 % Compose this rough overview alignment to the xy alignment by tile
 tforms = cellfun(@(rough, rel) compose_tforms(rough, rel), secB.alignments.xy.tforms, rel_tforms, 'UniformOutput', false);
