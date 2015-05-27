@@ -1,14 +1,6 @@
 %% Z Alignment
-if ~exist('params', 'var'); error('The ''params'' variable does not exist. Load parameters before doing Z alignment.'); end
 if ~exist('secs', 'var'); error('The ''secs'' variable does not exist. Run XY alignment or load a saved stack before doing Z alignment.'); end
-if ~exist('status', 'var') || strcmp(status.step, 'finished_xy'); status.step = 'z'; status.section = 1; end
-if ~strcmp(status.step, 'z'); disp('<strong>Skipping Z alignment.</strong> Clear ''status'' to reset.'), return; end
-
-if status.section == 1
-    disp('==== <strong>Started Z alignment</strong>.')
-else
-    fprintf('==== <strong>Resuming Z alignment on section %d/%d.</strong> Clear ''status'' to reset.\n', status.section, length(sec_nums))
-end
+disp('==== <strong>Started Z alignment</strong>.')
 
 % Align section pairs
 for s = start:finish
@@ -16,7 +8,7 @@ for s = start:finish
     fprintf('=== Aligning %s (<strong>%d/%d</strong>) in Z\n', secs{s}.name, s, length(sec_nums))
     
     % Parameters
-    z_params = params(sec_nums(s)).z;
+    z_params = secs{s}.params.z;
     display_rendering = 0;
     
     % Check for existing alignment
@@ -26,7 +18,7 @@ for s = start:finish
     
     % Keep first section fixed
     if s == 1
-        secs{s}.alignments.z = fixed_alignment(secs{s}, 'rough_z_xy');
+        secs{s}.alignments.z = fixed_alignment(secs{s}, 'rough_z');
         secs{s}.runtime.z.time_elapsed = toc(sec_timer);
         secs{s}.runtime.z.timestamp = datestr(now);
         continue
@@ -37,13 +29,12 @@ for s = start:finish
     secB = secs{s};
     
     % Compose with previous Z alignment
-    rel_alignments = {'rough_z_xy', 'prev_z', 'z'};
+    rel_alignments = {'rough_z', 'prev_z', 'z'};
     if ~isfield(secA.alignments, 'prev_z');
         rel_alignments = 'z'; % fixed sections have no previous Z alignment
     end
     
-    secB.alignments.prev_z = compose_alignments(secA, rel_alignments, secB, 'rough_z_xy');
-%     secB.alignments.prev_z = fixed_alignment(secB, 'rough_z_xy');
+    secB.alignments.prev_z = compose_alignments(secA, rel_alignments, secB, 'rough_z');
     
     % Keep fixed
     if strcmp(z_params.alignment_method, 'fixed')
@@ -117,16 +108,3 @@ for s = start:finish
     clear secA secB 
     
 end
-
-% Save to cache
-% disp('=== Saving sections to disk.');
-% save_timer = tic;
-% filename = sprintf('results/%s_z_aligned.mat', secs{1}.wafer);
-% save(filename, 'secs', 'status', '-v7.3')
-% fprintf('Saved to: %s [%.2fs]\n', fullfile(cachepath, filename), toc(save_timer))
-% 
-% secs{end} = imclear_sec(secs{end});
-% status.step = 'finished_z';
-% 
-% total_z_time = sum(cellfun(@(sec) sec.runtime.z.time_elapsed, secs));
-% fprintf('==== <strong>Finished Z alignment in %.2fs (%.2fs / section)</strong>.\n\n', total_z_time, total_z_time / length(secs));

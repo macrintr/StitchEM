@@ -20,7 +20,7 @@ prev_z_align_secB = secB.alignments.prev_z.rel_tforms{first_non_missing};
 z_align_secB = secB.alignments.z.rel_tforms{first_non_missing};
 
 for i=index_of_missing_tile
-    rough_z_align_secB = secB.alignments.rough_z_xy.tforms{i};
+    rough_z_align_secB = secB.alignments.rough_z.tforms{i};
 
     prev_z_tform_missing = affine2d(rough_z_align_secB.T * prev_z_align_secB.T);
     z_tform_missing = affine2d(prev_z_tform_missing.T * z_align_secB.T);  

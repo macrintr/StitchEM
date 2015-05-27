@@ -21,6 +21,10 @@ SURF_params.SURF_MetricThreshold = 500;
 SURF_params.SURF_NumOctaves = 7;
 SURF_params.SURF_NumScaleLevels = 3;
 
+% Double check that overviews are loaded
+if isempty(secA.overview.img); secA = load_overview(secA); end;
+if isempty(secB.overview.img); secB = load_overview(secB); end;
+
 % Preprocess the images (resize, crop, filter)
 filteredA = overview_pre_process(secA.overview.img, params);
 filteredB = overview_pre_process(secB.overview.img, params);

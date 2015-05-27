@@ -23,14 +23,14 @@ rel_tforms_z_xy = rel_tforms_z_xy';
 
 % Compose this rough overview alignment to the xy alignment by tile
 tforms_z_xy = cellfun(@(rough, rel) compose_tforms(rough, rel), secs{s}.alignments.xy.tforms, rel_tforms_z_xy, 'UniformOutput', false);
-secs{s}.alignments.rough_z_xy.tforms = tforms_z_xy;
-secs{s}.alignments.rough_z_xy.rel_tforms = rel_tforms_z_xy;
+secs{s}.alignments.rough_z.tforms = tforms_z_xy;
+secs{s}.alignments.rough_z.rel_tforms = rel_tforms_z_xy;
 
 if s == 1
-    secs{s}.alignments.prev_z = fixed_alignment(secs{s}, 'rough_z_xy');
-    secs{s}.alignments.z = fixed_alignment(secs{s}, 'rough_z_xy');
+    secs{s}.alignments.prev_z = fixed_alignment(secs{s}, 'rough_z');
+    secs{s}.alignments.z = fixed_alignment(secs{s}, 'rough_z');
 else
-    secs{s}.alignments.prev_z = compose_alignments(secs{s-1}, {'prev_z', 'z'}, secs{s}, 'rough_z_xy');
+    secs{s}.alignments.prev_z = compose_alignments(secs{s-1}, {'rough_z', 'prev_z', 'z'}, secs{s}, 'rough_z');
     secs{s}.z_matches = transform_matches(secs{s}.z_matches, secs{s-1}.alignments.z.tforms, secs{s}.alignments.prev_z.tforms);
     secs{s}.alignments.z = align_z_pair_lsq(secs{s});
     

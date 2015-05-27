@@ -5,7 +5,7 @@
 %          '/home/tmacrina/StitchEM/results/S2-W008_z_aligned.mat'};
 
 %% Set thresholds
-xy_definitely_bad = 10;
+xy_definitely_bad = 200;
 xy_possibly_bad = 3;
 z_definitely_bad = 120;
 z_possibly_bad = 30;
@@ -27,8 +27,8 @@ z_count_limit = 400; % 25 matches per pair (16 pairs)
 %     movie_storage = cell(length(secs), 2);
 %     
 %     for k = [2:10:length(secs)]
-start = 1;
-finish = length(secs); %min(start + 9, length(secs));
+% start = 1;
+% finish = length(secs); %min(start + 9, length(secs));
 % try
 for i = start:finish
     

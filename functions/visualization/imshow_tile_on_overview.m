@@ -10,11 +10,11 @@ overview = sec.overview.img;
 tile = imread(sec.tile_paths{tile_num});
 
 if rough_z_xy
-    tformO = sec.overview.rough_align_z.tforms;
+    tformO = sec.overview.alignments.rough_z.tform;
 %     tformO = affine2d(S^-1 * tformO.T * S);
     tformT = sec.alignments.rough_z_xy.tforms{tile_num};
 else
-    tformO = sec.overview.alignment.tform;
+    tformO = sec.overview.alignments.initial.tform;
     tformT = sec.alignments.rough_xy.tforms{tile_num};
 end
 tformTS = affine2d(tformT.T * S);

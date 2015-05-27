@@ -28,5 +28,3 @@ tformB = secB.overview.alignments.(aB).tform;
 [sB sB_R] = imwarp(secB.overview.img, tformB);
 
 [merge, m_R] = imfuse(sA, sA_R, sB, sB_R);
-figure();
-imshow(merge, m_R);

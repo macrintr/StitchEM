@@ -35,10 +35,10 @@ if params.align_to_overview
     tiles = sec.tiles.(tile_set).img;
     
     % Overview
-    if isempty(sec.overview.img); sec = load_overview(sec); end;
+    if isempty(sec.overview) || ~isfield(sec.overview, 'img') || isempty(sec.overview.img); sec = load_overview(sec); end;
     assert(~isempty(sec.overview), 'Overview is not loaded in the section.')
     overview = sec.overview.img;
-    params.overview_tform = sec.overview.alignment.tform;
+    params.overview_tform = sec.overview.alignments.initial.tform;
 
     % Estimate alignments
     intermediate_tforms = cell(sec.num_tiles, 1);
@@ -69,7 +69,7 @@ if params.align_to_overview
     reg_meta.tile_prescale = params.tile_prescale;
     reg_meta.overview_prescale = params.overview_prescale;
     reg_meta.overview_tform = params.overview_tform;
-    reg_meta.overview_rel_to_sec = sec.overview.alignment.rel_to_sec;
+    reg_meta.overview_rel_to_sec = sec.overview.alignments.initial.rel_to_sec;
     reg_meta.intermediate_tforms = intermediate_tforms;
 else
     disp('Skipping overview registration.');
