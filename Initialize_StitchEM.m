@@ -14,8 +14,8 @@ addpath(genpath(fullfile(pwd, 'pipeline')));
 addpath(genpath(fullfile(pwd, 'debug')));
 addpath(genpath(fullfile(pwd, 'classes')));
 addpath(genpath(fullfile(pwd, 'development')));
-
-renderpath('/home/usr/tmacrina/seungmount/research/tommy');
+addpath(genpath(fullfile(pwd, 'wafers_zfish')));
+addpath(genpath(fullfile(pwd, 'wafers_piriform')));
 
 % Set the current wafer path
 % waferpath('/data/home/talmo/EMdata/W002');

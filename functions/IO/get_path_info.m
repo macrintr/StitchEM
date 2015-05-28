@@ -11,9 +11,14 @@ end
 
 %% Regular expressions for naming patterns
 % Change these if using a different naming convention
-section_pattern = '(?<wafer>S\d+-W\d+)_Sec(?<sec>\d+)_Montage$';
-tile_pattern = 'Tile_r(?<row>\d+)-c(?<col>\d+)_(?<wafer>S\d+-W\d+)_sec(?<sec>\d+)+[.]tif$';
-overview_pattern = 'MontageOverviewImage_(?<wafer>S\d+-W\d+)_sec(?<sec>\d+).tif$';
+% section_pattern = '(?<wafer>S\d+-W\d+)_Sec(?<sec>\d+)_Montage$';
+% tile_pattern = 'Tile_r(?<row>\d+)-c(?<col>\d+)_(?<wafer>S\d+-W\d+)_sec(?<sec>\d+)+[.]tif$';
+% overview_pattern = 'MontageOverviewImage_(?<wafer>S\d+-W\d+)_sec(?<sec>\d+).tif$';
+
+% zfish wafer titles not preceded by 'S2-'
+section_pattern = '(?<wafer>W\d+)_Sec(?<sec>\d+)_Montage$'; 
+tile_pattern = 'Tile_r(?<row>\d+)-c(?<col>\d+)_(?<wafer>W\d+)_sec(?<sec>\d+)+[.]tif$';
+overview_pattern = 'MontageOverviewImage_(?<wafer>W\d+)_sec(?<sec>\d+).tif$';
 
 %% Parse the path
 info.path = path;

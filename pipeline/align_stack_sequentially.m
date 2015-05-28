@@ -1,6 +1,6 @@
 %% set start % finish
-start = 121; finish = 121;
-sections = [121];
+start = 1; finish = 1;
+sections = [start:finish];
 
 %% rough xy alignment
 for s=sections

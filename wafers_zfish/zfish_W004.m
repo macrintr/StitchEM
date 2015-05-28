@@ -1,14 +1,18 @@
 %% Configuration
+
+% renderpath
+renderpath('/usr/people/tmacrina/seungmount/research/tommy/150528_zfish/affine_reviews/');
+
 % Wafer and sections
-waferpath('/usr/people/tmacrina/seungmount/research/GABA/data/atlas/MasterUTSLdirectory/07122012S2/S2-W001/HighResImages_ROI1_7nm_120apa/')
-dinfo = get_path_info(waferpath);
+waferpath('/usr/people/tmacrina/seungmount/research/GABA/data/atlas/MasterUTSLdirectory/10122012-1/W004/HighResImages_Fine_5nm_120apa_W004/')
+info = get_path_info(waferpath);
 wafer = info.wafer;
 sec_nums = info.sec_nums;
 
 % Load default parameters
 default_params
 
-%% Custom per-section parameters
+% Custom per-section parameters
 % Note: The index of params corresponds to the actual section number.
 % 
 % Example:
@@ -23,5 +27,5 @@ default_params
 
 % S2-W001
 
-params(54).xy.skip_tiles = [1];
-params(56).xy.skip_tiles = [1];
+% params(54).xy.skip_tiles = [1];
+% params(56).xy.skip_tiles = [1];

@@ -8,18 +8,17 @@ global ProgramPaths;
 
 % Update
 if nargin > 0
-    ProgramPaths.renders = GetFullPath(new_path);
-    disp('Set render path.')
-end
-
-% Defaults
-if isempty(ProgramPaths) || ~isfield(ProgramPaths, 'base')
-    ProgramPaths.base = GetFullPath(fullfile(mfilename('fullpath'), '../../..'));
+    
+    clear ProgramPaths;
+    
+    ProgramPaths.base = GetFullPath(new_path);
     ProgramPaths.rough_xy = fullfile(ProgramPaths.base, 'rough_xy');
     ProgramPaths.xy = fullfile(ProgramPaths.base, 'xy');
     ProgramPaths.rough_z = fullfile(ProgramPaths.base, 'rough_z');
     ProgramPaths.overview_rough_z = fullfile(ProgramPaths.base, 'overview_rough_z');
     ProgramPaths.z = fullfile(ProgramPaths.base, 'z');
+    
+    disp('Set render path.')
 end
 
 % Return current

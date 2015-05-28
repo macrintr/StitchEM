@@ -1,28 +1,25 @@
-function stats = plot_xy_matches_stats(sec)
-% Plot correspondence stats dataset for distributions
-
+function fig = create_xy_matches_stats_plot(sec)
+% Create invisible plot of xy correspondence stats dataset for distributions
+%
 % Inputs:
 %   sec: the section with xy matches & alignment
 %
 % Outputs:
-%   stats: dataset object containing the transformed points and the
-%   computations that led to the plot
+%   fig: figure set invisible for easy saving
 %
 % There should be a tight distribution between points in the same overlap.
 % If points do not closely clump in the same overlap, then there is likely
 % a poor match that should be investigated.
+%
+% fig = create_xy_matches_stats_plot(sec)
 
-tformsA = sec.alignments.xy.tforms;
-tformsB = sec.alignments.xy.tforms;
-stats = calculate_matches_stats(sec.xy_matches, tformsA, tformsB);
-
+stats = calculate_xy_matches_stats(sec);
 group_stats = grpstats(stats,'pair',{'mean', 'std', 'median'},'DataVars',{'dist','ang'});
 
 pairs = unique([stats.tileA stats.tileB], 'rows');
 
 name = sprintf('%s plot_xy_matches_stats', sec.name);
-figure('name', name);
-subplot(2, 1, 1);
+fig = figure('name', name, 'visible', 'off');
 scatter(stats.pair, stats.dist);
 hold on
 scatter(group_stats.pair, group_stats.mean_dist, '*', 'MarkerEdgeColor', [1 0 0]);
@@ -34,14 +31,4 @@ set(gca, 'XTickLabel', labels);
 title('Euclidean distance between corresponding points')
 xlabel('Tile pairs (A B)');
 ylabel('Distance (px)');
-grid on
-
-subplot(2, 1, 2);
-scatter(stats.pair, stats.ang)
-set(gca, 'Xtick', [1:1:size(pairs, 1)]);
-labels = cellfun(@num2str, num2cell(pairs, 2), 'UniformOutput', false);
-set(gca, 'XTickLabel', labels);
-title('Direction of vector between corresponding points')
-xlabel('Tile pairs (A B)');
-ylabel('Angle B-to-A (rad)');
 grid on
