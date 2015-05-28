@@ -16,7 +16,7 @@ params.overview_scale = 0.78;
 params.overview_crop_ratio = 0.5;
 params.expected_overlap = 0.10;
 params.overview_cropping = [0.25 0.25 0.5 0.5];
-params.median_filter_radius = 6;
+params.median_filter_radius = 0;
 
 fprintf('== Rough aligning tiles for %s.\n', sec.name)
 total_time = tic;

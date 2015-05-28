@@ -14,8 +14,8 @@ if params.overview_crop_ratio < 1
 end
 
 % Apply median filter
-% if params.median_filter_radius > 0
-%     img = medfilt2(img, [params.median_filter_radius params.median_filter_radius]);
-% end
+if params.median_filter_radius > 0
+    img = medfilt2(img, [params.median_filter_radius params.median_filter_radius]);
+end
 
 end

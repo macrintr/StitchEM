@@ -2,10 +2,10 @@
 % load('S2-W001_clean_matches_working.mat');
 % W001;
 
-folder = ['/mnt/data0/tommy/matlab_renders/affine_transforms/'];
+folder = ['/usr/people/tmacrina/seungmount/research/tommy/150502_piriform/affine_transforms/'];
 
 start = 1;
-finish = length(secs);
+finish = 168;
 for i = start:finish
     for j = 1:length(secs{i}.tile_paths)
         tile_path = secs{i}.tile_paths{j};

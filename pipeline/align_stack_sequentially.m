@@ -1,8 +1,9 @@
 %% set start % finish
-start = 56; finish = 57;
+start = 121; finish = 121;
+sections = [121];
 
 %% rough xy alignment
-for s=start:finish
+for s=sections
     % Check for params
     if ~exist('params'); error('The ''params'' variable does not exist. Load parameters before doing alignment.'); end
     xy_params = params(sec_nums(s)).xy;
@@ -18,13 +19,18 @@ for s=start:finish
 end
 
 %% check rough xy
-for s=start:finish
+for s=sections
     figure
     plot_section(secs{s}, secs{s}.alignments.rough_xy);
 end
 
+%% repair rough xy
+s=start;
+tile_num = 16;
+secs{s} = repair_rough_xy_tile(secs{s}, tile_num);
+
 %% xy alignment
-for s=start:finish
+for s=sections
     sec_timer = tic;
     
     % Set sec variable
@@ -74,52 +80,51 @@ for s=start:finish
 end
 
 %% check xy
-for s=start:finish
+for s=sections
     stats = plot_xy_matches_stats(secs{s});
     figure
     plot_section(secs{s}, secs{s}.alignments.xy);
 end
 
 %% cleanup xy
-for s=start:finish
-    secs = clean_xy_matches(secs, s, 10);
+for s=sections
+    secs = clean_xy_matches(secs, s, 20);
 end
 
 %% debug xy
-for s=start:finish
+for s=sections
     figure
     plot_section(secs{s}, secs{s}.alignments.rough_xy);
     plot_matches(secs{s}.xy_matches);
 end
 
 %% overview rough z alignment
-for i=start:finish
+for s=sections
     % Load overview for the sections
-    secs{i} = load_overview(secs{i});
-    if isempty(secs{i-1}.overview.img)
-        secs{i-1} = load_overview(secs{i-1});
+    secs{s} = load_overview(secs{s});
+    if isempty(secs{s-1}.overview.img)
+        secs{s-1} = load_overview(secs{s-1});
     end
     
-    secs{i} = align_overview_rough_z(secs{i-1}, secs{i}, 1);
+    secs{s} = align_overview_rough_z(secs{s-1}, secs{s}, 1);
     
-    % imwrite_overview_pair(secs{i-1}, secs{i}, 'initial', 'rough_z', 'overview_rough_z')
-    
-    secs{i} = imclear_sec(secs{i});
-    secs{i-1} = imclear_sec(secs{i-1});
+    % imwrite_overview_pair(secs{s-1}, secs{s}, 'initial', 'rough_z', 'overview_rough_z')
+    secs{s} = imclear_sec(secs{s});
+    secs{s-1} = imclear_sec(secs{s-1});   
 end
 
 %% check overview rough z
-for s=start:finish
-    imshow_overview_pair(secs{s-1}, secs{s});
+for s=sections
+    imshow_overview_pair(secs{s-1}, secs{s}); 
 end
 
 %% rough z alignment
-for i=start:finish
-    secs{i} = align_rough_z(secs{i});
+for s=sections
+    secs{s} = align_rough_z(secs{s});
 end
 
 %% check rough z
-for s=start:finish
+for s=158
     imshow_section_pair(secs{s-1}, secs{s}, 'xy', 'rough_z');
 end
 
@@ -127,22 +132,26 @@ end
 align_stack_z;
 
 %% check z
-for s=start:finish
+for s=sections
     stats = plot_z_matches_stats(secs, s);
     plot_z_matches_global(secs{s-1}, secs{s});
 end
 
 %% cleanup z
-for s=start:finish
-    secs = clean_z_matches(secs, s);
+for s=2:168
+    secs = clean_z_matches(secs, s, 80);
 end
 
 %% debug z
-for s=start:finish
+for s=sections
     imshow_section_pair(secs{s-1}, secs{s}, 'z', 'prev_z');
 end
 
 %% propagate
-for s=start:finish
+for s=start
     secs = propagate_tforms_through_secs(secs, s);
 end
+
+%% save
+filename = '150520_S2-W001-W002_affine_double_check.mat';
+save(filename, 'secs', '-v7.3')
