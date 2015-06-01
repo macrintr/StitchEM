@@ -1,25 +1,20 @@
 %% Z Alignment
 if ~exist('secs', 'var'); error('The ''secs'' variable does not exist. Run XY alignment or load a saved stack before doing Z alignment.'); end
-disp('==== <strong>Started Z alignment</strong>.')
+disp('==== <strong>Starting z alignment</strong>.')
+
+start = 1; finish = 3;
 
 % Align section pairs
 for s = start:finish
-    status.section = s; sec_timer = tic;
     fprintf('=== Aligning %s (<strong>%d/%d</strong>) in Z\n', secs{s}.name, s, length(sec_nums))
     
     % Parameters
     z_params = secs{s}.params.z;
-    display_rendering = 0;
-    
-    % Check for existing alignment
-    if isfield(secs{s}.alignments, 'z') && ~z_params.overwrite
-        error('Z:AlignedSecNotOverwritten', 'Section is already Z aligned. Set its ''overwrite'' parameter to true to overwrite alignment.')
-    end
     
     % Keep first section fixed
     if s == 1
-        secs{s}.alignments.z = fixed_alignment(secs{s}, 'rough_z');
-        secs{s}.runtime.z.time_elapsed = toc(sec_timer);
+        secs{s}.alignments.prev_z = fixed_alignment(secs{s}, 'rough_z');
+        secs{s}.alignments.z = fixed_alignment(secs{s}, 'prev_z');
         secs{s}.runtime.z.timestamp = datestr(now);
         continue
     end
@@ -30,22 +25,17 @@ for s = start:finish
     
     % Compose with previous Z alignment
     rel_alignments = {'rough_z', 'prev_z', 'z'};
-    if ~isfield(secA.alignments, 'prev_z');
-        rel_alignments = 'z'; % fixed sections have no previous Z alignment
-    end
-    
     secB.alignments.prev_z = compose_alignments(secA, rel_alignments, secB, 'rough_z');
     
     % Keep fixed
     if strcmp(z_params.alignment_method, 'fixed')
         secB.alignments.z = fixed_alignment(secB, 'prev_z');
-        secB.runtime.z.time_elapsed = toc(sec_timer);
         secB.runtime.z.timestamp = datestr(now);
         secs{s} = secB;
         continue
     end
     
-    % Match features
+    % Match features & align
     switch z_params.matching_mode
         case 'auto'
             % Load tile images
@@ -62,23 +52,11 @@ for s = start:finish
             if height(secB.z_matches.A) == 0
                 secB.z_matches = select_z_matches(secA, secB);
                 secB.z_matches = transform_z_matches_inverse({secA, secB}, 2);
-                display_rendering = 1;
             end
 
         case 'manual'
             secB.z_matches = select_z_matches(secA, secB);
             secB.z_matches = transform_z_matches_inverse({secA, secB}, 2);
-            display_rendering = 1;
-    end
-        
-    % Check for bad matching
-    if secB.z_matches.meta.avg_error > z_params.max_match_error && ~strcmp(z_params.matching_mode, 'manual')
-        msg = sprintf('[%s]: Error after matching is very large. This may be because the two sections are misaligned by a large rotation/translation or due to bad matching.', secB.name);
-        if z_params.ignore_error
-            warning('Z:LargeMatchError', msg)
-        else
-            error('Z:LargeMatchError', msg)
-        end
     end
 
     secB.alignments.z = align_z_pair_lsq(secB);
@@ -91,20 +69,23 @@ for s = start:finish
     if index_of_missing_tile
         fprintf('Missing tile % ', index_of_missing_tile)
         secB = propagate_z_for_missing_tiles(secA, secB);
-        display_rendering = 1;
     end
     
+    % Save images for checking
+    imwrite_section_pair(secA, secB, 'z', 'z', 'z');
+    
     % Clear tile images and features to save memory
-    secA = imclear_sec(secA, 'tiles');
-    secA.features.base_z.tiles = [];
     secB.features.z.tiles = [];
     
     % Save
-    secB.params.z = z_params;
-    secB.runtime.z.time_elapsed = toc(sec_timer);
     secB.runtime.z.timestamp = datestr(now);
-    secs{s + z_params.rel_to} = secA;
     secs{s} = secB;
-    clear secA secB 
+    clear secA secB
+    
+    % Save residuals for checking
+    imwrite_z_residuals(secs, s, 'z');
     
 end
+secs{finish} = imclear_sec(secs{finish});
+
+disp('==== <strong>Finished z alignment</strong>.')

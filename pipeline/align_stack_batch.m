@@ -1,9 +1,5 @@
-%% set start % finish
-start = 1; finish = 1;
-sections = [start:finish];
-
 %% rough xy alignment
-for s=sections
+for s=1:sec_nums(end)
     % Check for params
     if ~exist('params'); error('The ''params'' variable does not exist. Load parameters before doing alignment.'); end
     xy_params = params(sec_nums(s)).xy;

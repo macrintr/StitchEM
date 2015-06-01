@@ -1,4 +1,4 @@
-function stats = calculate_xy_matches_stats(sec)
+function stats = calculate_z_residuals(secs, sec_num)
 % Calculate xy_match stats
 %
 % Inputs:
@@ -13,6 +13,6 @@ function stats = calculate_xy_matches_stats(sec)
 %
 % stats = calculate_xy_matches_stats(sec)
 
-tformsA = sec.alignments.xy.tforms;
-tformsB = sec.alignments.xy.tforms;
-stats = calculate_matches_stats(sec.xy_matches, tformsA, tformsB);
+tformsA = secs{sec_num-1}.alignments.z.tforms;
+tformsB = secs{sec_num}.alignments.z.tforms;
+stats = calculate_matches_stats(secs{sec_num}.z_matches, tformsA, tformsB);

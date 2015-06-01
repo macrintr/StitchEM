@@ -1,4 +1,4 @@
-function fig = create_xy_matches_stats_plot(sec)
+function plot_xy_residuals(sec)
 % Create invisible plot of xy correspondence stats dataset for distributions
 %
 % Inputs:
@@ -13,13 +13,11 @@ function fig = create_xy_matches_stats_plot(sec)
 %
 % fig = create_xy_matches_stats_plot(sec)
 
-stats = calculate_xy_matches_stats(sec);
+stats = calculate_xy_residuals(sec);
 group_stats = grpstats(stats,'pair',{'mean', 'std', 'median'},'DataVars',{'dist','ang'});
 
 pairs = unique([stats.tileA stats.tileB], 'rows');
 
-name = sprintf('%s plot_xy_matches_stats', sec.name);
-fig = figure('name', name, 'visible', 'off');
 scatter(stats.pair, stats.dist);
 hold on
 scatter(group_stats.pair, group_stats.mean_dist, '*', 'MarkerEdgeColor', [1 0 0]);

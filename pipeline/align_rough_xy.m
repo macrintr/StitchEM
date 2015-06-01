@@ -35,7 +35,6 @@ if params.align_to_overview
     tiles = sec.tiles.(tile_set).img;
     
     % Overview
-    if isempty(sec.overview) || ~isfield(sec.overview, 'img') || isempty(sec.overview.img); sec = load_overview(sec); end;
     assert(~isempty(sec.overview), 'Overview is not loaded in the section.')
     overview = sec.overview.img;
     params.overview_tform = sec.overview.alignments.initial.tform;
