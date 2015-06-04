@@ -8,16 +8,17 @@ params.xy.skip_tiles = [];
 % Overview registration
 params.rough_xy.rel_to = 'initial';
 params.rough_xy.align_to_overview = true;
-params.rough_xy.median_filter_radius = 6;
-params.rough_xy.overivew_to_tile_resolution_ratio = 0.05; % ratio of pixel actual dimensions
+% ratio of pixel actual dimensions
+params.rough_xy.overivew_to_tile_resolution_ratio = 0.05; % piriform
+% params.rough_xy.overivew_to_tile_resolution_ratio = 0.05; % zfish
 params.rough_xy.tile_prescale = 1;
 params.rough_xy.overview_prescale = 1;
 params.rough_xy.overview_scale = 0.78;
 params.rough_xy.expected_overlap = 0.10;
-% params.rough_xy.overview_cropping = [0.25 0.25 0.5 0.5]; % piriform
-params.rough_xy.overview_cropping = [0.38 0.25 0.40 0.66];
-% params.rough_xy.overview_cropping = [0.38 0.40 0.35 0.25];
+params.rough_xy.overview_cropping = [0.25 0.25 0.5 0.5]; % piriform
+% params.rough_xy.overview_cropping = [0.38 0.25 0.40 0.66]; % zfish
 params.rough_xy.median_filter_radius = 0;
+
 % Tile to overview SURF parameters (no good justification)
 params.rough_xy.SURF_MetricThreshold = 1000;
 params.rough_xy.SURF_NumOctaves = 4;

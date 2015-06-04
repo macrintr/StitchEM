@@ -24,8 +24,8 @@ default_params
 
 % S2-W002:
 % XY
-params(1).xy.matching.filter_method = 'gmm';
-params(1).xy.matching.filter_fallback = 'geomedian';
+% params(1).xy.matching.filter_method = 'gmm';
+% params(1).xy.matching.filter_fallback = 'geomedian';
 
 % Z
 % params(2).z = z_presets.manual_matching;
@@ -41,11 +41,3 @@ params(1).xy.matching.filter_fallback = 'geomedian';
 % params(134).z = z_presets.large_trans;
 % params(135).z = z_presets.large_trans;
 % params(136).z = z_presets.large_trans;
-
-%% Run alignment
-% try
-%     align_stack_xy
-%     align_stack_z
-% catch alignment_error
-%     troubleshoot
-% end

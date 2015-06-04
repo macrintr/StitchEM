@@ -374,7 +374,7 @@ def runBlockMatchingAll(wafer_title):
 	shutdownAndAwaitTermination(pool, 5)
 
 def runBlockMatching(params_list, image_pairs):
-	MAX_CONCURRENT = 20
+	MAX_CONCURRENT = 4
 	
 	block_matching_inputs = zip(image_pairs, params_list)
 
