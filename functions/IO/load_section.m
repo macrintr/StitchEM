@@ -31,12 +31,9 @@ sec.tile_sizes = cellfun(@(t) imsize(t), sec.tile_paths, 'UniformOutput', false)
 sec.skipped_tiles = params.skip_tiles;
 if ~isempty(params.skip_tiles)
     keep = setdiff(1:sec.num_tiles, params.skip_tiles);
-    new_idx = zeros(sec.num_tiles);
-    new_idx(keep) = 1:length(keep);
-    
     % Update fields
     sec.num_tiles = length(keep);
-    sec.grid = new_idx(sec.grid);
+    sec.grid = remove_skipped_tiles_from_grid(sec.grid, params.skip_tiles);
     sec.tile_paths = sec.tile_paths(keep);
     sec.tile_sizes = sec.tile_sizes(keep);
 end

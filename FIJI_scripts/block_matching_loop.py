@@ -46,7 +46,7 @@ from script.imglib.algorithm import Scale2D
 
 class BlockMatcherParameters():
 	def __init__(self,
-			wafer_title = "S2-W001",
+			wafer_title = "W004",
 			export_point_roi = True,
 			export_displacement_vectors = True,
 			scale = 1.00,
@@ -62,10 +62,12 @@ class BlockMatcherParameters():
 			max_local_trust = 999999,
 			point_distance = 180,
 			save_data = True):
-		self.input_folder = "/mnt/data0/tommy/affine_renders_0175x/" + wafer_title + "/"
+		bucket = "/usr/people/tmacrina/seungmount/research/"
+		project_folder = bucket + "tommy/150528_zfish/"
+		self.input_folder = project_folder + "affine_renders_0175x/" + wafer_title + "/"
 		# input_folder = "/home/seunglab/tommy/" + wafer_title + "/affine_renders_0175x/"
 		# input_folder = "/mnt/data0/tommy/tests/150409_elastic_solver_sensitivity/elastic_images/"
-		self.output_folder = "/mnt/data0/tommy/affine_block_matching/" + wafer_title + "/"
+		self.output_folder = project_folder + "affine_block_matching/" + wafer_title + "/"
 		# output_folder = "/home/seunglab/tommy/" + wafer_title + "/150324_block_match_vector_plots/"
 		# output_folder = "/mnt/data0/tommy/tests/150409_elastic_solver_sensitivity/elastic_block_matching/"	
 
@@ -395,6 +397,6 @@ def runBlockMatching(params_list, image_pairs):
 # image_pairs = [(1, 2) for p in params_list]
 # runBlockMatching(params_list, image_pairs)
 
-wafer_titles = ["S2-W008", "S2-W007"]
+wafer_titles = ["W004"]
 for wafer in wafer_titles:
 	runBlockMatchingAll(wafer)

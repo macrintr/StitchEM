@@ -3,8 +3,8 @@ function imshow_tile_on_overview(sec, tile_num)
 
 rough_z_xy = 0;
 
-tile_to_overview_scale = 0.07;
-S = [tile_to_overview_scale 0 0; 0 tile_to_overview_scale 0; 0 0 1];
+s = sec.params.rough_xy.overivew_to_tile_resolution_ratio;
+S = [s 0 0; 0 s 0; 0 0 1];
 sec = load_overview(sec);
 overview = sec.overview.img;
 tile = imread(sec.tile_paths{tile_num});

@@ -2,10 +2,10 @@
 % load('S2-W001_clean_matches_working.mat');
 % W001;
 
-folder = ['/usr/people/tmacrina/seungmount/research/tommy/150502_piriform/affine_transforms/'];
+folder = ['/usr/people/tmacrina/seungmount/research/tommy/150528_zfish/affine_transforms/'];
 
 start = 1;
-finish = 168;
+finish = length(secs);
 for i = start:finish
     for j = 1:length(secs{i}.tile_paths)
         tile_path = secs{i}.tile_paths{j};

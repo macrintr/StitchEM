@@ -1,18 +1,20 @@
 import os
 import re
 
-wafer = "W001"
-bucket = "/mnt/bucket/labs/seung/research/"
-writefile = bucket + "tommy/150502_piriform/S2-" + wafer + "_import.txt"
+wafer = "W004"
+bucket = "/usr/people/tmacrina/seungmount/research/"
+writefile = bucket + "tommy/150528_zfish/" + wafer + "_import.txt"
 # writefile = "/mnt/data0/tommy/S2-" + wafer + "/S2-" + wafer + "_import.txt"
-imagefolder = bucket + "GABA/data/atlas/MasterUTSLdirectory/07122012S2/S2-" + wafer + "/HighResImages_ROI1_7nm_120apa/"
+
+imagefolder = bucket + "GABA/data/atlas/MasterUTSLdirectory/10122012-1/" + wafer + "/HighResImages_Fine_5nm_120apa_" + wafer + "/"
+# imagefolder = bucket + "GABA/data/atlas/MasterUTSLdirectory/07122012S2/S2-" + wafer + "/HighResImages_ROI1_7nm_120apa/"
 # imagefolder = "/mnt/data0/ashwin/07122012/S2-" + wafer + "/"
 
-wf = open(writefile, 'w')
+wf = open(writefile, 'w+')
 foldernames = os.listdir(imagefolder)
 for folder in foldernames:
 	if folder[-7:] == "Montage":
-		layer = int(re.match(r'\d+', folder[11:]).group())
+		layer = int(re.match(r'\d+', folder[8:]).group())
 		# print layer
 
 		# if layer == 173:

@@ -4,6 +4,8 @@ function secs = review_xy_matches(secs, i, threshold);
 % Inputs:
 %   sec: Section struct
 %   threshold: minimum pixel residual of matches to look at
+%
+% secs = review_xy_matches(secs, i, threshold);
 
 if nargin < 2
     threshold = 10;

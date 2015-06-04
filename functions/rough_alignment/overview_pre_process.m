@@ -7,10 +7,13 @@ if params.overview_prescale ~= params.overview_scale
 end
 
 % Crop to center
-if params.overview_crop_ratio < 1
-    crop_start = (1 - params.overview_crop_ratio) / 2;
-    crop_end = params.overview_crop_ratio;
-    img = imcrop(img, [size(img, 2) * crop_start, size(img, 1) * crop_start, size(img, 2) * crop_end, size(img, 1) * crop_end]);
+if params.overview_cropping(3) < 1 || params.overview_cropping(4) < 1
+    crop = params.overview_cropping;
+    crop_x0 = size(img, 2) * crop(1);
+    crop_y0 = size(img, 1) * crop(2);
+    crop_x1 = size(img, 2) * crop(3);
+    crop_y1 = size(img, 1) * crop(4);
+    img = imcrop(img, [crop_x0, crop_y0, crop_x1, crop_y1]);
 end
 
 % Apply median filter

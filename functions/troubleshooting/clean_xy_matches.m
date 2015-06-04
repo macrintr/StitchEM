@@ -2,7 +2,7 @@ function secs = clean_xy_matches(secs, i, threshold)
 % Clean xy & z matches of sec #i
 
 if nargin < 3
-    threshold = 10;
+    threshold = 20;
 end
 
 % Set thresholds

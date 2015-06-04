@@ -3,20 +3,7 @@ function alignment = align_rough_xy(sec)
 % Usage:
 %   sec.alignments.rough_xy = rough_align_xy(sec)
 
-% Base alignment
-params.rel_to = 'initial';
-
-% Overview registration
-params.align_to_overview = true;
-params.median_filter_radius = 6;
-params.overivew_to_tile_resolution_ratio = 0.07;
-params.tile_prescale = 1;
-params.overview_prescale = 1;
-params.overview_scale = 0.78;
-params.overview_crop_ratio = 0.5;
-params.expected_overlap = 0.10;
-params.overview_cropping = [0.25 0.25 0.5 0.5];
-params.median_filter_radius = 0;
+params = sec.params.rough_xy;
 
 fprintf('== Rough aligning tiles for %s.\n', sec.name)
 total_time = tic;
@@ -26,17 +13,14 @@ registration_tforms = cell(sec.num_tiles, 1);
 if params.align_to_overview
     
     % Tiles
-
     % Load rough tileset
     if ~isfield(sec.tiles, 'rough'); sec = load_tileset(sec, 'rough', params.overivew_to_tile_resolution_ratio * params.overview_scale); end
-    
-    tile_set = closest_tileset(sec, params.overivew_to_tile_resolution_ratio * params.overview_scale);
-    assert(~isempty(tile_set), 'Could not find any tile sets at or above the specified scale.')
-    tiles = sec.tiles.(tile_set).img;
+    tile_set = 'rough';
+    tiles = sec.tiles.rough.img;
     
     % Overview
     assert(~isempty(sec.overview), 'Overview is not loaded in the section.')
-    overview = sec.overview.img;
+    overview = sec.overview.img;    
     params.overview_tform = sec.overview.alignments.initial.tform;
 
     % Estimate alignments
@@ -47,7 +31,7 @@ if params.align_to_overview
     
     parfor t = 1:sec.num_tiles
         registration_time = tic;
-        try
+        try            
             % reg_params are the parameters specified by this function
             % p are additional parameters needed by estimate_tile_alignments
             [registration_tforms{t}, intermediate_tforms{t}] = ...

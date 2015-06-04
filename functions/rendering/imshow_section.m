@@ -6,4 +6,5 @@ function imshow_section(sec, alignment)
 %   alignment: alignment struct (subset of sec struct)
 
 [section, section_R] = render_section(sec, alignment);
+figure;
 imshow(section, section_R);

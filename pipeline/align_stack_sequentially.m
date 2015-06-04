@@ -1,5 +1,5 @@
 %% set start % finish
-start = 1; finish = 1;
+start = 149; finish = 149;
 sections = [start:finish];
 
 %% rough xy alignment
@@ -27,7 +27,7 @@ end
 
 %% repair rough xy
 s=start;
-% tile_num = 16;
+tile_num = 3;
 secs{s} = repair_rough_xy_tile(secs{s}, tile_num);
 
 %% xy alignment

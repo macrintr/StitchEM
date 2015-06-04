@@ -12,4 +12,5 @@ plot_z_residuals(secs, s);
 path = renderpath();
 set(gcf, 'PaperUnits', 'inches', 'PaperPosition', [0 0 20 2])
 print(fig, '-r100', '-dtiff', fullfile(path.(dir), [secs{s}.name '_z_matches_residuals.tif']));
-fprintf('<strong>Writing</strong> %s for %s to renderpath\n', dir, secs{s}.name)
+fprintf('<strong>Writing</strong> %s for %s to renderpath\n', dir, secs{s}.name);
+close;

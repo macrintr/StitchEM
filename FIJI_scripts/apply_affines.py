@@ -10,17 +10,19 @@ import csv
 from java.awt.geom import AffineTransform
 
 # Wafer
-wafer_title = "S2-W006"
+wafer = "W004"
+bucket = "/usr/people/tmacrina/seungmount/research/"
+project_folder = bucket + "tommy/150528_zfish/"
 
 # Get the first open project
-project = Project.getProject(wafer_title + "_import.xml")
+project = Project.getProject(wafer + "_import.xml")
 # project = Project.getProject("S2-W001_XML_short_test.xml")
 
 # Get layerset
 layerset = project.getRootLayerSet()
 
 # Get transforms
-folder = "/mnt/data0/tommy/" + wafer_title + "/affine_transforms/"
+folder = project_folder + "/affine_transforms/"
 # folder = "/usr/people/tmacrina/Desktop/elastic_experiments/150317_bad_correspondences/affine_alignments/"
 
 # Cycle through all layers
@@ -49,7 +51,7 @@ for layer in layerset.getLayers():
 		#
 		# We spit out the transpose of that matrix from MATLAB as csv
 		# The Java function inputs are ordered as the rows of the transpose
-		if title_split[-2] == wafer_title:
+		if title_split[-2] == wafer:
 			affine_inputs = []
 			tform_csv = open(tform_fn)
 			tform_matrix = csv.reader(tform_csv)

@@ -8,6 +8,7 @@ waferpath('/usr/people/tmacrina/seungmount/research/GABA/data/atlas/MasterUTSLdi
 info = get_path_info(waferpath);
 wafer = info.wafer;
 sec_nums = info.sec_nums;
+sec_nums(122) = []; % skip
 
 % Load default parameters
 default_params
@@ -29,3 +30,4 @@ default_params
 
 % params(54).xy.skip_tiles = [1];
 % params(56).xy.skip_tiles = [1];
+params(149).xy.skip_tiles = [3];

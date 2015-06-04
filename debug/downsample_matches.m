@@ -15,9 +15,9 @@ tile_pairs = unique([stats.tileA stats.tileB], 'rows');
 id_list = [];
 for i=1:length(tile_pairs)
     stats_segment = stats(stats.tileA == tile_pairs(i, 1) & stats.tileB == tile_pairs(i, 2), :);
-    if length(stats_segment) > 25 % limit will cap this to 25
+    if length(stats_segment) > 25 % only look at seams with a lot of matches
         mask = rand(length(stats_segment), 1) < percent;
-        if sum(mask) > 3 % need at least 3
+        if sum(mask) > 3 % need to leave 3 matches
             id_list = [id_list; stats_segment.id(mask)];
         end
     end

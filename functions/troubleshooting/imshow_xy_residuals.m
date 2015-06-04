@@ -1,4 +1,4 @@
-function imshow_xy_matches_stats(sec)
+function imshow_xy_residuals(sec)
 % Display figure of xy_matches stats
 %
 % Inputs:
@@ -6,5 +6,5 @@ function imshow_xy_matches_stats(sec)
 %
 % imshow_xy_matches_stats(sec)
 
-fig = create_xy_matches_stats_plot(sec);
-set(fig,'visible','on');
+figure;
+plot_xy_residuals(sec);

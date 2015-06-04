@@ -17,9 +17,9 @@ import csv
 from java.awt.geom import AffineTransform
  
 
-wafer_title = "stack"
-bucket = "/mnt/bucket/labs/seung/research/"
-project_folder = bucket + "tommy/150502_piriform/"
+wafer = "W004"
+bucket = "/usr/people/tmacrina/seungmount/research/"
+project_folder = bucket + "tommy/150528_zfish/"
 # project_folder = "/mnt/data0/tommy/tests/150501_trakem_project_creation/"
 
 project = Project.newFSProject("blank", None, project_folder)
@@ -30,7 +30,7 @@ layerset = project.getRootLayerSet()
 
 task = loader.importImages(
           layerset.getLayers().get(0),  # the first layer
-          project_folder + wafer_title + "_import.txt", # the absolute file path to the text file with absolute image file paths
+          project_folder + wafer + "_import.txt", # the absolute file path to the text file with absolute image file paths
           "\t", # the column separator  <path> <x> <y> <section index>
           1.0, # section thickness, defaults to 1
           1.0, # calibration, defaults to 1

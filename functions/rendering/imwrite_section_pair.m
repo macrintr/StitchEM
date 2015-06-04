@@ -14,4 +14,5 @@ function imwrite_section_pair(secA, secB, aA, aB, dir)
 merge = imresize(merge, 0.5);
 path = renderpath();
 imwrite(merge, fullfile(path.(dir), [secB.name '_z_render.tif']));
-fprintf('<strong>Writing</strong> %s for %s to renderpath\n', dir, secB.name)
+fprintf('<strong>Writing</strong> %s for %s to renderpath\n', dir, secB.name);
+close;

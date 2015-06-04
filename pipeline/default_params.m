@@ -1,75 +1,88 @@
+clear params;
 %% Defaults: XY alignment
 % General
-defaults.xy.overwrite = true; % throws error if section is already XY aligned
-defaults.xy.skip_tiles = [];
+params.xy.overwrite = true; % throws error if section is already XY aligned
+params.xy.skip_tiles = [];
 
 % [rough_align_xy] Rough alignment
-defaults.xy.rough.align_to_overview = true;
-defaults.xy.rough.overview_registration.overview_to_tile_resolution_ratio = 0.07;
-defaults.xy.rough.overview_registration.overview_scale = 0.78;
-defaults.xy.rough.overview_registration.overview_crop_ratio = 0.5;
-defaults.xy.rough.overview_registration.overview_cropping = [0.25 0.25 0.5 0.5];
+% Overview registration
+params.rough_xy.rel_to = 'initial';
+params.rough_xy.align_to_overview = true;
+params.rough_xy.median_filter_radius = 6;
+params.rough_xy.overivew_to_tile_resolution_ratio = 0.05; % ratio of pixel actual dimensions
+params.rough_xy.tile_prescale = 1;
+params.rough_xy.overview_prescale = 1;
+params.rough_xy.overview_scale = 0.78;
+params.rough_xy.expected_overlap = 0.10;
+% params.rough_xy.overview_cropping = [0.25 0.25 0.5 0.5]; % piriform
+params.rough_xy.overview_cropping = [0.38 0.25 0.40 0.66];
+% params.rough_xy.overview_cropping = [0.38 0.40 0.35 0.25];
+params.rough_xy.median_filter_radius = 0;
+% Tile to overview SURF parameters (no good justification)
+params.rough_xy.SURF_MetricThreshold = 1000;
+params.rough_xy.SURF_NumOctaves = 4;
+params.rough_xy.SURF_NumScaleLevels = 3;
 
 % [detect_features] Feature detection
-defaults.xy.features.detection_scale = 1.0;
-defaults.xy.features.min_overlap_area = 0.02;
-defaults.xy.features.SURF.MetricThreshold = 11000; % for full res tiles
+params.xy.features.detection_scale = 1.0;
+params.xy.features.min_overlap_area = 0.02;
+params.xy.features.SURF.MetricThreshold = 11000; % for full res tiles
 
 % [match_xy] Matching: NNR
-defaults.xy.matching.NNR.MaxRatio = 0.6;
-defaults.xy.matching.NNR.MatchThreshold = 1.0;
+params.xy.matching.NNR.MaxRatio = 0.6;
+params.xy.matching.NNR.MatchThreshold = 1.0;
 
 % [match_xy] Matching: Outlier filtering
-defaults.xy.matching.filter_method = 'geomedian'; % 'geomedian', 'gmm' or 'none'
-defaults.xy.matching.filter_fallback = 'none';
-defaults.xy.matching.keep_outliers = true;
-defaults.xy.matching.geomedian.cutoff = '1.25x';
-defaults.xy.matching.GMM.inlier_cluster = 'smallest_var';
-defaults.xy.matching.GMM.warning = 'error';
-defaults.xy.matching.GMM.Replicates = 5;
+params.xy.matching.filter_method = 'geomedian'; % 'geomedian', 'gmm' or 'none'
+params.xy.matching.filter_fallback = 'none';
+params.xy.matching.keep_outliers = true;
+params.xy.matching.geomedian.cutoff = '1.25x';
+params.xy.matching.GMM.inlier_cluster = 'smallest_var';
+params.xy.matching.GMM.warning = 'error';
+params.xy.matching.GMM.Replicates = 5;
 
 % [align_xy] Alignment
-defaults.xy.align.fixed_tile = 1;
+params.xy.align.fixed_tile = 1;
 
 % Quality control checks
-defaults.xy.max_match_error = 100; % avg error after matching
-defaults.xy.max_aligned_error = 5; % avg error after alignment
-defaults.xy.ignore_error = true; % still throws warning if true
+params.xy.max_match_error = 100; % avg error after matching
+params.xy.max_aligned_error = 5; % avg error after alignment
+params.xy.ignore_error = true; % still throws warning if true
 
-%% Defaults: Z alignment
+%% params: Z alignment
 % General
-defaults.z.overwrite = true; % throws error if section is already Z aligned
-defaults.z.rel_to = -1; % relative section to align to
-defaults.z.scale = 0.125;
-defaults.z.SURF.MetricThreshold = 2000;
+params.z.overwrite = true; % throws error if section is already Z aligned
+params.z.rel_to = -1; % relative section to align to
+params.z.scale = 0.125;
+params.z.SURF.MetricThreshold = 2000;
 
 % [detect_features] Feature detection (0.125x)
-defaults.z.features.scale = 0.125;
-defaults.z.features.SURF.MetricThreshold = 2000;
+params.z.features.scale = 0.125;
+params.z.features.SURF.MetricThreshold = 2000;
 
 % Matching
-defaults.z.matching_mode = 'auto'; % 'auto' or 'manual'
+params.z.matching_mode = 'auto'; % 'auto' or 'manual'
 
 % [match_z] Matching: NNR
-defaults.z.matching.NNR.MaxRatio = 0.6;
-defaults.z.matching.NNR.MatchThreshold = 1.0;
+params.z.matching.NNR.MaxRatio = 0.6;
+params.z.matching.NNR.MatchThreshold = 1.0;
 
 % [match_z] Matching: Outlier filtering
-defaults.z.matching.filter_method = 'gmm'; % 'geomedian', 'gmm' or 'none'
-defaults.z.matching.filter_fallback = 'geomedian';
-defaults.z.matching.keep_outliers = true;
-defaults.z.matching.geomedian.cutoff = '1.25x';
-defaults.z.matching.GMM.inlier_cluster = 'geomedian';
-defaults.z.matching.GMM.warning = 'off';
-defaults.z.matching.GMM.Replicates = 5;
+params.z.matching.filter_method = 'gmm'; % 'geomedian', 'gmm' or 'none'
+params.z.matching.filter_fallback = 'geomedian';
+params.z.matching.keep_outliers = true;
+params.z.matching.geomedian.cutoff = '1.25x';
+params.z.matching.GMM.inlier_cluster = 'geomedian';
+params.z.matching.GMM.warning = 'off';
+params.z.matching.GMM.Replicates = 5;
 
 % Alignment
-defaults.z.alignment_method = 'cpd'; % 'lsq', 'cpd' or 'fixed'
+params.z.alignment_method = 'cpd'; % 'lsq', 'cpd' or 'fixed'
 
 % Quality control checks
-defaults.z.max_match_error = 1000; % avg error after matching
-defaults.z.max_aligned_error = 50; % avg error after alignment
-defaults.z.ignore_error = true; % only throws warning if true
+params.z.max_match_error = 1000; % avg error after matching
+params.z.max_aligned_error = 50; % avg error after alignment
+params.z.ignore_error = true; % only throws warning if true
 
-%% Initialize parameters with defaults
-params = repmat(defaults, max(sec_nums), 1);
+%% Initialize parameters with params
+params = repmat(params, max(sec_nums), 1);

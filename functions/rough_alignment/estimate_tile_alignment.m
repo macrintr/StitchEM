@@ -13,18 +13,12 @@ function [tile_tform, tforms] = estimate_tile_alignment(tile_img, overview_img, 
 %   tile_scale = 0.05
 %   show_registration = false
 
-% Maybe use these? No good justification.
-SURF_params.SURF_MetricThreshold = 500;
-SURF_params.SURF_NumOctaves = 7;
-SURF_params.SURF_NumScaleLevels = 3;
-
 % Pre-process the images
 tile = tile_img;
 overview = overview_pre_process(overview_img, params);
-
 % (Try to) register the tile to the overview image
 try
-    tform_registration = surf_register(overview, tile);
+    tform_registration = surf_register(overview, tile, params);
 catch err
     fprintf('Fallback\n');
     tform_registration = fallback_registration(overview, tile, err);
@@ -32,12 +26,12 @@ end
 
 % Check for signs of bad registration in the transform
 [reg_scale, ~, reg_translation] = estimate_tform_params(tform_registration);
-if reg_scale > 1.5 || any(reg_translation > size(overview))
+if reg_scale > 1.5 || reg_translation(1) > size(overview, 2) || reg_translation(2) > size(overview, 1)
     warning('First tile registration to its overview appears to be very oddly scaled or translated. Fallback!')
     tform_registration = fallback_registration(overview, tile, err);
     
     [reg_scale, ~, reg_translation] = estimate_tform_params(tform_registration);
-    if reg_scale > 1.5 || any(reg_translation > size(overview))
+    if reg_scale > 1.5 || reg_translation(1) > size(overview, 2) || reg_translation(2) > size(overview, 1)
         error('Second tile registration is oddly scaled or translated.');
     end
 end
@@ -68,15 +62,15 @@ tforms.resolution_up = tform_resolution_up;
 
 end
 
-function tform_registration = fallback_registration(overview, tile, err)
+function tform_registration = fallback_registration(overview, tile)
 % Try different parameters for registration if it failed
 %disp('Could not find enough potential matches to reliably register tile to overview.')
 %disp('Trying different parameters for feature detection.')
 
 % Smooth out possible artifacts using a median filter
-median_filter_radius = 6;
-filtered_overview = medfilt2(overview, [median_filter_radius, median_filter_radius]);
-filtered_tile = medfilt2(tile, [median_filter_radius, median_filter_radius]);
+median_filter_radius = [6, 6];
+filtered_overview = medfilt2(overview, median_filter_radius);
+filtered_tile = medfilt2(tile, median_filter_radius);
 
 % Try the registration again with fallback params
 tform_registration = surf_register(filtered_overview, filtered_tile, 'fallback');

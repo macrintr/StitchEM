@@ -126,7 +126,7 @@ p1.parse(fixed_img, moving_img, varargin{:});
 fixed_img = p1.Results.fixed_img;
 moving_img = p1.Results.moving_img;
 profile_args = profiles.(p1.Results.profile);
-custom_args = p1.Unmatched;
+% custom_args = p1.Unmatched;
 
 % Create inputParser instance for second round of parsing
 p2 = inputParser;
@@ -159,6 +159,6 @@ p2.addParameter('min_inliers', 5);
 p2.addParameter('verbosity', 0);
 
 % Validate and parse input
-p2.parse(profile_args{:}, custom_args);
+p2.parse(profile_args{:}); %, custom_args);
 params = p2.Results;
 end
