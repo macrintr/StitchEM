@@ -62,9 +62,10 @@ class BlockMatcherParameters():
 			max_local_trust = 999999,
 			point_distance = 180,
 			save_data = True):
-		bucket = "/usr/people/tmacrina/seungmount/research/"
+		# bucket = "/usr/people/tmacrina/seungmount/research/"
+		bucket = "/mnt/data0/"
 		project_folder = bucket + "tommy/150528_zfish/"
-		self.input_folder = project_folder + "affine_renders_0175x/" + wafer_title + "/"
+		self.input_folder = project_folder + "affine_renders_0125x/" + wafer_title + "/"
 		# input_folder = "/home/seunglab/tommy/" + wafer_title + "/affine_renders_0175x/"
 		# input_folder = "/mnt/data0/tommy/tests/150409_elastic_solver_sensitivity/elastic_images/"
 		self.output_folder = project_folder + "affine_block_matching/" + wafer_title + "/"

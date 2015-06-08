@@ -1,4 +1,7 @@
 clear params;
+
+% CHANGE get_path_info REGEX when changing datasets!
+
 %% Defaults: XY alignment
 % General
 params.xy.overwrite = true; % throws error if section is already XY aligned
@@ -9,7 +12,7 @@ params.xy.skip_tiles = [];
 params.rough_xy.rel_to = 'initial';
 params.rough_xy.align_to_overview = true;
 % ratio of pixel actual dimensions
-params.rough_xy.overivew_to_tile_resolution_ratio = 0.05; % piriform
+params.rough_xy.overivew_to_tile_resolution_ratio = 0.07; % piriform
 % params.rough_xy.overivew_to_tile_resolution_ratio = 0.05; % zfish
 params.rough_xy.tile_prescale = 1;
 params.rough_xy.overview_prescale = 1;

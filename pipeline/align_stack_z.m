@@ -3,9 +3,12 @@ if ~exist('secs', 'var'); error('The ''secs'' variable does not exist. Run XY al
 disp('==== <strong>Starting z alignment</strong>.')
 
 start = 122; finish = length(secs);
+W2_start = 168;
+list = [71-1, 72-1, 88-1, 89-1, 135-1, 136-1];
+list = list + W2_start;
 
 % Align section pairs
-for s = start:finish
+for s = list
     fprintf('=== Aligning %s (<strong>%d/%d</strong>) in Z\n', secs{s}.name, s, length(sec_nums))
     
     % Parameters
@@ -60,8 +63,8 @@ for s = start:finish
     end
 
     secs{s}.alignments.z = align_z_pair_lsq(secs{s});    
-    secs = clean_z_matches(secs, s, 200);
-    secs = clean_z_matches(secs, s, 120);
+%     secs = clean_z_matches(secs, s, 200);
+%     secs = clean_z_matches(secs, s, 120);
     
     % Cover up any propagation errors caused by missing tiles
     % TO DO: Need to evaluate if this can handle back-to-back missing tiles
@@ -86,10 +89,12 @@ for s = start:finish
     % Save residuals for checking
     imwrite_z_residuals(secs, s, 'z');
     
+    secs = propagate_tforms_through_secs(secs, s);
+    
 end
 secs{finish} = imclear_sec(secs{finish});
 disp('==== <strong>Finished z alignment</strong>.')
 
-filename = 'wafers_zfish/150602_W004.mat';
-save(filename, 'secs', '-v7.3');
-disp('==== <strong>Saved secs</strong>.')
+% filename = 'wafers_piriform/150520_S2-W001-W002_affine_double_check.mat';
+% save(filename, 'secs', '-v7.3');
+% disp('==== <strong>Saved secs</strong>.')

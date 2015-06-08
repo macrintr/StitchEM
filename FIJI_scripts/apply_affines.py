@@ -22,11 +22,12 @@ project = Project.getProject(wafer + "_import.xml")
 layerset = project.getRootLayerSet()
 
 # Get transforms
+starting_index = len(layers) + 1
 folder = project_folder + "/affine_transforms/"
 # folder = "/usr/people/tmacrina/Desktop/elastic_experiments/150317_bad_correspondences/affine_alignments/"
 
 # Cycle through all layers
-for layer in layerset.getLayers():
+for layer in layerset.getLayers()[starting_index:1]:
 	# Cycle through all images in that layer
 	for patch in layer.getDisplayables(Patch):
 		# Find corresponding transform file

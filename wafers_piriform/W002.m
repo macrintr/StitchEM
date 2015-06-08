@@ -1,7 +1,10 @@
 %% Configuration
+
+% renderpath
+renderpath('/usr/people/tmacrina/seungmount/research/tommy/150502_piriform/affine_reviews/');
+
 % Wafer and sections
-waferpath('/mnt/data0/ashwin/07122012/S2-W002')
-% waferpath('/data/home/talmo/EMdata/W002')
+waferpath('/usr/people/tmacrina/seungmount/research/GABA/data/atlas/MasterUTSLdirectory/07122012S2/S2-W002/HighResImages_ROI1_W002_7nm_120apa')
 info = get_path_info(waferpath);
 wafer = info.wafer;
 sec_nums = info.sec_nums;
@@ -41,3 +44,6 @@ default_params
 % params(134).z = z_presets.large_trans;
 % params(135).z = z_presets.large_trans;
 % params(136).z = z_presets.large_trans;
+
+% No Sec19
+% Need to recreate Sec70, 

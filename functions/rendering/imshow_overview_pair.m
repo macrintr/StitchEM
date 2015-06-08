@@ -6,6 +6,8 @@ function imshow_overview_pair(secA, secB, aA, aB)
 %   secB: section struct
 %   aA: string for section A alignment (i.e. 'z')
 %   aB: string for section B alignment (i.e. 'z')
+%
+% imshow_overview_pair(secA, secB, aA, aB)
 
 if nargin == 2
     aA = 'initial'; 
