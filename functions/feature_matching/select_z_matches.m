@@ -14,8 +14,8 @@ scale = 0.025;
 % [A, R_A] = imshow_section(secA, 'tforms', secA.alignments.(alignmentA).tforms, 'suppress_display', true, 'display_scale', scale);
 % [B, R_B] = imshow_section(secB, 'tforms', secB.alignments.(alignmentB).tforms, 'suppress_display', true, 'display_scale', scale);
 
-[A, R_A] = imshow_section(secA, alignmentA);
-[B, R_B] = imshow_section(secB, alignmentB);
+[A, R_A] = render_section(secA, alignmentA, 'scale', scale);
+[B, R_B] = render_section(secB, alignmentB, 'scale', scale);
 
 ptsAin = [];
 ptsBin = [];

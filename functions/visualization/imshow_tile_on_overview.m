@@ -1,7 +1,7 @@
 function imshow_tile_on_overview(sec, tile_num)
 % Display overview with tile overlaid
 
-rough_z = 1;
+rough_z = 0;
 
 s = sec.params.rough_xy.overview_to_tile_resolution_ratio;
 S = [s 0 0; 0 s 0; 0 0 1];

@@ -17,16 +17,18 @@ import csv
 from java.awt.geom import AffineTransform
  
 
-wafer = "S2-W002"
+wafer = "S2-W003-W008"
 # bucket = "/usr/people/tmacrina/seungmount/research/"
 bucket = "/mnt/data0/"
 # writefile = bucket + "tommy/150528_zfish/" + wafer + "_import.txt"
 project_folder = bucket + "tommy/150502_piriform/S2-W001/"
 
-project = Project.getProject("150528_S2-W001_elastic.xml")
+project = Project.getProject("150605_S2-W001_elastic_S2-W002_affine.xml")
 loader = project.getLoader()
 # loader.setMipMapsRegeneration(False) # disable mipmaps
 layerset = project.getRootLayerSet()
+
+
 
 layers = layerset.getLayers()
 starting_index = len(layers) + 1
@@ -46,9 +48,11 @@ task.join() # Optional: wait until all images have been imported
 clahe_filter = CLAHE()
 print clahe_filter.toXML("\t")
 
-for layer in layerset.getLayers()[starting_index:]:
+for layer in layerset.getLayers()[starting_index:1]:
+     # layer.recreateBuckets()
 	for patch in layer.getDisplayables(Patch):
           print patch
+          patch.updateBucket()
           patch.setFilters([clahe_filter])
           # roi.add(patch.getBoundingBox())
 
