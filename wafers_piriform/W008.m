@@ -1,12 +1,15 @@
-% Configuration
+%% Configuration
+
+% renderpath
+renderpath('/usr/people/tmacrina/seungmount/research/tommy/150502_piriform/affine_reviews/');
+
 % Wafer and sections
-waferpath('/mnt/data0/ashwin/07122012/S2-W008')
+waferpath('/usr/people/tmacrina/seungmount/research/GABA/data/atlas/MasterUTSLdirectory/07122012S2/S2-W005/HighResImages_ROI1_W005_7nm_120apa')
 info = get_path_info(waferpath);
 wafer = info.wafer;
 sec_nums = info.sec_nums;
-sec_nums(14) = [];
 
-% Load parameters
+% Load default parameters
 default_params
 
 % Custom per-section parameters

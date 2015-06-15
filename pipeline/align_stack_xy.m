@@ -1,15 +1,13 @@
 %% Rough & XY Alignment
 if ~exist('secs'); secs = cell(length(sec_nums), 1); end
-W2_start = 168;
-% list = [2, 71-1, 72-1, 89-1, 136-1];
-start = W2_start + 1;
-finish = length(secs);
-% list = list + W2_start;
-list = [70, 71, 87, 88, 134, 135] + W2_start;
+wafer_list = find_wafer_in_secs(secs, 'S2-W006');
+start = 1;
+finish = 1;
+list = [wafer_list(start):wafer_list(finish)];
 
 disp('==== <strong>Starting rough xy, xy, & rough z alignment</strong>.')
 for s = list
-    fprintf('=== Aligning %s (<strong>%d/%d</strong>) in XY\n', get_path_info(get_section_path(sec_nums(s - W2_start)), 'name'), s, length(secs))
+    fprintf('=== Aligning %s (<strong>%d/%d</strong>) in XY\n', get_path_info(get_section_path(sec_nums(start)), 'name'), s, length(secs))
     
 %     % Section structure & parameters
 %     % Check for params
@@ -45,7 +43,7 @@ for s = list
         
         secs{s}.overview.alignments.rough_z = alignment;
     else
-        secs{s} = align_overview_rough_z(secs{s-1}, secs{s}, 1);
+        secs{s} = align_overview_rough_z(secs{s-1}, secs{s});
         imwrite_overview_pair(secs{s-1}, secs{s}, 'initial', 'rough_z', 'overview_rough_z');
         secs{s-1} = imclear_sec(secs{s-1});
     end

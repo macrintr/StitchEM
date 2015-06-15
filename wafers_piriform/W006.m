@@ -1,16 +1,13 @@
 %% Configuration
-% Specify wafer path
-waferpath('/mnt/data0/ashwin/07122012/S2-W006')
 
-% Analyze path
+% renderpath
+renderpath('/usr/people/tmacrina/seungmount/research/tommy/150502_piriform/affine_reviews/');
+
+% Wafer and sections
+waferpath('/usr/people/tmacrina/seungmount/research/GABA/data/atlas/MasterUTSLdirectory/07122012S2/S2-W005/HighResImages_ROI1_W005_7nm_120apa')
 info = get_path_info(waferpath);
-% status.wafer = info.wafer;
-% status.pipeline_script = mfilename;
+wafer = info.wafer;
 sec_nums = info.sec_nums;
-
-% Skip sections
-sec_nums(15) = []; % skip
-sec_nums(77) = []; % skip
 
 % Load default parameters
 default_params

@@ -13,7 +13,7 @@ if nargin < 3
 end
 
 total_time = tic;
-fprintf('== Aligning %s in Z (LSQ)\n', secB.name)
+% fprintf('== Aligning %s in Z (LSQ)\n', secB.name)
 
 % Solve using least squares
 % Ax = B -> x = A \ B
@@ -38,6 +38,6 @@ alignmentB.meta.avg_post_error = avg_post_error;
 alignmentB.meta.method = mfilename;
 
 % fprintf('Error: %f -> <strong>%fpx / match</strong> [%.2fs]\n', avg_prior_error, avg_post_error, toc(total_time))
-fprintf('Error: <strong>%fpx / match</strong> [%.2fs]\n', avg_post_error, toc(total_time))
+% fprintf('Error: <strong>%fpx / match</strong> [%.2fs]\n', avg_post_error, toc(total_time))
 end
 

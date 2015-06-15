@@ -1,4 +1,4 @@
-function alignment = ransac_section_xy(sec)
+function matches = ransac_section_xy(sec)
 % Use RANSAC on a section's xy matches to improve total alignment
 %
 % Inputs:
