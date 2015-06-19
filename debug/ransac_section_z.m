@@ -10,10 +10,10 @@ function sec = ransac_section_z(secs, s)
 % alignment = ransac_section_z(sec)
 
 
-plot_z_matches_global(secs{s-1}, secs{s});
-imshow_z_residuals(secs, s);
+% plot_z_matches_global(secs{s-1}, secs{s});
+% imshow_z_residuals(secs, s);
 
-params.iterations = 200;
+params.iterations = 100;
 params.min_inliers = 5;
 params.point_threshold = 50;
 params.acceptable_fraction_of_original_matches = 0.80;
@@ -92,7 +92,9 @@ end
 
 sec = secs{s};
 sec.z_matches = best_matches;
+sec.z_matches.meta.ransac = params;
+sec.z_matches.meta.ransac.date = datestr(now);
 sec.alignments.z = best_alignment;
 
-plot_z_matches_global(secs{s-1}, sec);
-imshow_z_residuals({secs{s-1}, sec}, 2);
+% plot_z_matches_global(secs{s-1}, sec);
+% imshow_z_residuals({secs{s-1}, sec}, 2);

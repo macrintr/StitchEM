@@ -6,5 +6,6 @@ function imshow_z_residuals(secs, s)
 %
 % imshow_z_matches_stats(sec)
 
-figure;
+name = sprintf('z residuals %s Sec%d', secs{s}.wafer, s);
+figure('name', name);
 plot_z_residuals(secs, s);

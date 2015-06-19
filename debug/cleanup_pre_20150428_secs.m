@@ -75,6 +75,8 @@ for i=start:finish
     end
 end
 
+cleanup_overview_rough_z_data;
+
 for s=1:length(secs)
     secs = clean_xy_matches(secs, s, 200);
     secs = clean_xy_matches(secs, s, 100);

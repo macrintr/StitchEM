@@ -1,24 +1,33 @@
-function alignmentB = align_z_pair_lsq(secB, z_matches, base_alignment)
+function alignmentB = align_z_pair_lsq(secB, base_alignment, tform_type)
 %ALIGN_Z_PAIR_LSQ Produces a Z alignment using least squares.
 % Usage:
 %   alignmentB = align_z_pair_lsq(secB)
-%   alignmentB = align_z_pair_lsq(secB, z_matches)
-%   alignmentB = align_z_pair_lsq(secB, z_matches, base_alignment)
+%   alignmentB = align_z_pair_lsq(secB, tform_type)
 
 if nargin < 2
-    z_matches = secB.z_matches;
+    base_alignment = z_matches.alignmentB;;
 end
 if nargin < 3
-    base_alignment = z_matches.alignmentB;
+    tform_type = 'affine';
 end
 
-total_time = tic;
-% fprintf('== Aligning %s in Z (LSQ)\n', secB.name)
+z_matches = secB.z_matches;
 
-% Solve using least squares
-% Ax = B -> x = A \ B
-T = [z_matches.B.global_points ones(height(z_matches.A), 1)] \ [z_matches.A.global_points ones(height(z_matches.A), 1)];
-tform = affine2d([T(:, 1:2) [0 0 1]']);
+total_time = tic;
+fprintf('== Aligning %s in Z (LSQ) as <strong>%s</strong>\n', secB.name, tform_type)
+
+if strcmp(tform_type, 'rigid')
+    P = [z_matches.A.global_points ones(height(z_matches.A), 1)]';
+    Q = [z_matches.B.global_points ones(height(z_matches.A), 1)]';
+    [U, r, lrms] = Kabsch(P, Q);
+    T = [U(1:2, 1:2) r(1:2); [0 0 1]]';
+    tform = affine2d(T);
+else
+    % Solve using least squares
+    % Ax = B -> x = A \ B
+    T = [z_matches.B.global_points ones(height(z_matches.A), 1)] \ [z_matches.A.global_points ones(height(z_matches.A), 1)];
+    tform = affine2d([T(:, 1:2) [0 0 1]']);
+end
 
 % All the transforms are adjusted by the same section transformation
 rel_to = base_alignment;
@@ -38,6 +47,6 @@ alignmentB.meta.avg_post_error = avg_post_error;
 alignmentB.meta.method = mfilename;
 
 % fprintf('Error: %f -> <strong>%fpx / match</strong> [%.2fs]\n', avg_prior_error, avg_post_error, toc(total_time))
-% fprintf('Error: <strong>%fpx / match</strong> [%.2fs]\n', avg_post_error, toc(total_time))
+fprintf('Error: <strong>%fpx / match</strong> [%.2fs]\n', avg_post_error, toc(total_time))
 end
 

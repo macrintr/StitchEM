@@ -1,9 +1,10 @@
 %% Rough & XY Alignment
 if ~exist('secs'); secs = cell(length(sec_nums), 1); end
-wafer_list = find_wafer_in_secs(secs, 'S2-W006');
+wafer_list = find_wafer_in_secs(secs, 'S2-W001');
 start = 1;
-finish = 1;
+finish = length(wafer_list);
 list = [wafer_list(start):wafer_list(finish)];
+list = 7;
 
 disp('==== <strong>Starting rough xy, xy, & rough z alignment</strong>.')
 for s = list
@@ -40,10 +41,10 @@ for s = list
         alignment.rel_tform = affine2d();
         alignment.rel_to = 'initial';
         alignment.method = 'fixed';
-        
+        alignment.data = struct();
         secs{s}.overview.alignments.rough_z = alignment;
     else
-        secs{s} = align_overview_rough_z(secs{s-1}, secs{s});
+        secs{s} = align_overview_rough_z(secs{s-1}, secs{s}, 1);
         imwrite_overview_pair(secs{s-1}, secs{s}, 'initial', 'rough_z', 'overview_rough_z');
         secs{s-1} = imclear_sec(secs{s-1});
     end
@@ -73,6 +74,8 @@ for s = list
         fprintf('Failed xy alignment for %s_Sec%d\n', secs{s}.wafer, secs{s}.num);
         imwrite_error_message(secs{s}, 'xy', 'xy');
     end
+
+    secs = update_sec_tforms(secs, s);
     
     % Clear XY features to save memory
 %     secs{s}.features.xy.tiles = []; 
@@ -85,6 +88,6 @@ secs{finish} = imclear_sec(secs{finish});
 disp('==== <strong>Finished rough xy, xy, & rough z alignment</strong>.')
 
 % Save secs
-% filename = 'wafers_piriform/150520_S2-W001-W002_affine_double_check.mat';
+% filename = 'wafers_piriform/150611_S2-W001-W003_affine_double_check.mat';
 % save(filename, 'secs', '-v7.3');
 % disp('==== <strong>Saved secs</strong>.')

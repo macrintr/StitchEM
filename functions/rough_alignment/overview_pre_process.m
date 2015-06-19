@@ -2,9 +2,7 @@ function img = overview_pre_process(img, params)
 % Manipulate a section overview's image for feature detection
 
 % Resize
-if params.overview_prescale ~= params.overview_scale
-    img = imresize(img, (1 / params.overview_prescale) * params.overview_scale);
-end
+img = imresize(img, params.overview_scale);
 
 % Crop to center
 if params.overview_cropping(3) < 1 || params.overview_cropping(4) < 1
