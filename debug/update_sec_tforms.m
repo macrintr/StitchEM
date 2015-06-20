@@ -4,11 +4,11 @@ function secs = update_sec_tforms(secs, s, rough_z_tform_type, z_tform_type)
 % Inputs
 %   secs: cell array of section structs
 %   s: cell array index of section to update
-%   rough_z_tform_type: rough_z affine or rigid requirement
-%   z_tform_type: z affine or rigid requirement
+%   rough_z_tform_type: rough_z affine/rigid requirement ('affine' or 'rigid')
+%   z_tform_type: z affine/rigid requirement ('affine' or 'rigid')
 %
 % Output
-%   secs
+%   secs: cell array with an updated sec struct at s
 %
 % secs = update_sec_tforms(secs, s, rough_z_tform_type, z_tform_type)
 

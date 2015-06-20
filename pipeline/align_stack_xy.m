@@ -88,6 +88,6 @@ secs{finish} = imclear_sec(secs{finish});
 disp('==== <strong>Finished rough xy, xy, & rough z alignment</strong>.')
 
 % Save secs
-% filename = 'wafers_piriform/150611_S2-W001-W003_affine_double_check.mat';
-% save(filename, 'secs', '-v7.3');
-% disp('==== <strong>Saved secs</strong>.')
+filename = 'wafers_piriform/150611_S2-W001-W003_affine_double_check.mat';
+save(filename, 'secs', '-v7.3');
+disp('==== <strong>Saved secs</strong>.')
