@@ -4,7 +4,7 @@
 renderpath('/usr/people/tmacrina/seungmount/research/tommy/150502_piriform/affine_reviews/');
 
 % Wafer and sections
-waferpath('/usr/people/tmacrina/seungmount/research/GABA/data/atlas/MasterUTSLdirectory/07122012S2/S2-W005/HighResImages_ROI1_W005_7nm_120apa')
+waferpath('/usr/people/tmacrina/seungmount/research/GABA/data/atlas/MasterUTSLdirectory/07122012S2/S2-W006/HighResImages_ROI1_W006_7nm_120apa')
 info = get_path_info(waferpath);
 wafer = info.wafer;
 sec_nums = info.sec_nums;

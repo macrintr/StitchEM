@@ -23,8 +23,12 @@ implay(mov, 1);
 
 % Review matches
 id_list = enter_array(); % Exit function by pressing '0' then 'Enter'
-disp(['Removing ' num2str(length(id_list)) ' inspected matches']);
-[secs{i}.xy_matches, secs{i}.xy_matches.inspected_outliers] = remove_matches_by_id(secs{i}.xy_matches, id_list);
-
-disp('<strong>Realign xy section</strong>');
-secs{i}.alignments.xy = align_xy(secs{i});
+if length(id_list) > 0
+    disp(['Removing ' num2str(length(id_list)) ' inspected matches']);
+    [secs{i}.xy_matches, secs{i}.xy_matches.inspected_outliers] = remove_matches_by_id(secs{i}.xy_matches, id_list);
+    
+    disp('<strong>Realign xy section</strong>');
+    secs{i}.alignments.xy = align_xy(secs{i});
+else
+    disp('No removals.\n');
+end

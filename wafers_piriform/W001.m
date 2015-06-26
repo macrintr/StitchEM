@@ -1,7 +1,7 @@
 %% Configuration
 % Wafer and sections
 waferpath('/usr/people/tmacrina/seungmount/research/GABA/data/atlas/MasterUTSLdirectory/07122012S2/S2-W001/HighResImages_ROI1_7nm_120apa/')
-dinfo = get_path_info(waferpath);
+info = get_path_info(waferpath);
 wafer = info.wafer;
 sec_nums = info.sec_nums;
 
@@ -23,5 +23,6 @@ default_params
 
 % S2-W001
 
+params(52).xy.skip_tiles = [13];
 params(54).xy.skip_tiles = [1];
 params(56).xy.skip_tiles = [1];

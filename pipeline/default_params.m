@@ -2,7 +2,7 @@ clear params;
 
 % CHANGE get_path_info REGEX when changing datasets!
 
-%% Defaults: XY alignment
+%% Defaults: Rough XY alignment
 % General
 params.xy.overwrite = true; % throws error if section is already XY aligned
 params.xy.skip_tiles = [];
@@ -17,7 +17,7 @@ params.rough_xy.overview_to_tile_resolution_ratio = 0.07; % piriform
 params.rough_xy.tile_prescale = 1;
 params.rough_xy.overview_prescale = 1;
 params.rough_xy.overview_scale = 0.78;
-params.rough_xy.expected_overlap = 0.10;
+params.rough_xy.expected_overlap = 0.06;
 params.rough_xy.overview_cropping = [0.25 0.25 0.5 0.5]; % piriform
 % params.rough_xy.overview_cropping = [0.38 0.25 0.40 0.66]; % zfish
 params.rough_xy.median_filter_radius = 0;
@@ -26,6 +26,8 @@ params.rough_xy.median_filter_radius = 0;
 params.rough_xy.SURF_MetricThreshold = 1000;
 params.rough_xy.SURF_NumOctaves = 4;
 params.rough_xy.SURF_NumScaleLevels = 3;
+
+%% Defaults: XY alignment
 
 % [detect_features] Feature detection
 params.xy.features.detection_scale = 1.0;

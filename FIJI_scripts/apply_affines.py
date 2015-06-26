@@ -10,24 +10,21 @@ import csv
 from java.awt.geom import AffineTransform
 
 # Wafer
-wafer = "W004"
-bucket = "/usr/people/tmacrina/seungmount/research/"
-project_folder = bucket + "tommy/150528_zfish/"
+wafers = [u'S2-W001', u'S2-W002', u'S2-W003', u'S2-W004', u'S2-W005', u'S2-W006']
+bucket = '/mnt/bucket/labs/seung/research/'
+# project_folder = bucket + 'tommy/150528_zfish/'
+project_folder = bucket + 'tommy/150502_piriform/'
+tform_folder = project_folder + 'affine_transforms/'
 
 # Get the first open project
-project = Project.getProject(wafer + "_import.xml")
-# project = Project.getProject("S2-W001_XML_short_test.xml")
+project = Project.getProject('stack_import.xml')
+# project = Project.getProject('S2-W001_XML_short_test.xml')
 
 # Get layerset
 layerset = project.getRootLayerSet()
 
-# Get transforms
-starting_index = len(layers) + 1
-folder = project_folder + "/affine_transforms/"
-# folder = "/usr/people/tmacrina/Desktop/elastic_experiments/150317_bad_correspondences/affine_alignments/"
-
 # Cycle through all layers
-for layer in layerset.getLayers()[starting_index:1]:
+for layer in layerset.getLayers():
 	# Cycle through all images in that layer
 	for patch in layer.getDisplayables(Patch):
 		# Find corresponding transform file
@@ -37,10 +34,11 @@ for layer in layerset.getLayers()[starting_index:1]:
 		# 	Tile_r4-c4_S2-W002_sec1.csv
 		# Might be better to use patch.getImageFilePath()
 		patch_title = patch.getTitle()[:-4]  # knock off the .tif
-		title_split = patch_title.split("_")
-		if title_split[-1][0] != "s":
-			patch_title = "_".join(a[:-1])
-		tform_fn = folder + patch_title + ".csv"
+		title_split = patch_title.split('_')
+		if title_split[-1][0] != 's':
+			patch_title = '_'.join(title_split[:-1])
+		tform_fn = tform_folder + patch_title + '.csv'
+		# print title_split[-2]
 
 		# Build affine transform
 		# Java defines its affine as follows:
@@ -52,7 +50,7 @@ for layer in layerset.getLayers()[starting_index:1]:
 		#
 		# We spit out the transpose of that matrix from MATLAB as csv
 		# The Java function inputs are ordered as the rows of the transpose
-		if title_split[-2] == wafer:
+		if title_split[-2] in wafers:
 			affine_inputs = []
 			tform_csv = open(tform_fn)
 			tform_matrix = csv.reader(tform_csv)

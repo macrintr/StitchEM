@@ -14,7 +14,7 @@ if params.align_to_overview
     
     % Tiles
     % Load rough tileset
-    if ~isfield(sec.tiles, 'rough'); sec = load_tileset(sec, 'rough', params.overivew_to_tile_resolution_ratio * params.overview_scale); end
+    if ~isfield(sec.tiles, 'rough'); sec = load_tileset(sec, 'rough', params.overview_to_tile_resolution_ratio * params.overview_scale); end
     tile_set = 'rough';
     tiles = sec.tiles.rough.img;
     

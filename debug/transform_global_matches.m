@@ -1,15 +1,27 @@
-function matches = transform_z_matches_inverse(secs, sec_num)
-% Transform z_matches global_points to local_points
+function matches = transform_global_matches(matches, secA, secB, alignmentA, alignmentB)
+% Transform matches global_points to local_points
+%
+% Input
+%   matches: matches struct
+%   secA: fixed section struct
+%   secB: moving section struct
+%   alignmentA: string for fixed alignment
+%   alignmentB: string for moving alignment
+%
+% Output
+%   matches: updated matches struct with local_matches added to tables
+%
+% matches = transform_global_matches(matches, secA, secB, alignmentA, alignmentB)
 
-matches = secs{sec_num}.z_matches;
-regionsA = sec_bb(secs{sec_num-1}, 'z');
-regionsB = sec_bb(secs{sec_num}, 'prev_z');
-tformsA = secs{sec_num-1}.alignments.z.tforms;
-tformsB = secs{sec_num}.alignments.prev_z.tforms;
+regionsA = sec_bb(secA, alignmentA);
+regionsB = sec_bb(secB, alignmentB);
+tformsA = secA.alignments.(alignmentA).tforms;
+tformsB = secB.alignments.(alignmentB).tforms;
 tilesA = ones(height(matches.A), 1);
 tilesB = ones(height(matches.B), 1);
 localA = zeros(height(matches.A), 2);
 localB = zeros(height(matches.B), 2);
+
 for i = 1:height(matches.A)
     for j = 1:length(regionsA)
         if inpolygon(matches.A.global_points(i, 1), matches.A.global_points(i, 2), regionsA{j}(:, 1), regionsA{j}(:, 2))

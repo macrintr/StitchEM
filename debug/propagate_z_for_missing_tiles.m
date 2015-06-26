@@ -1,4 +1,4 @@
-function secB = propagate_z_for_missing_tiles(secA, secB)
+function secB = propagate_z_for_missing_tiles(secA, secB, use_intermediaries)
 % Propagate alignments when one middle section is missing one tile or more
 %
 % Inputs:
@@ -10,26 +10,37 @@ function secB = propagate_z_for_missing_tiles(secA, secB)
 % needs to be repaired. Then you restart the fine z alignment at the
 % section immediately following secB.
 
+if nargin < 3
+    use_intermediaries = false;
+end
+
 missing_tile_numbers = find(~secA.grid)';
 index_of_missing_tile = secB.grid(missing_tile_numbers);
 
 % Need to propagate from a non-missing tile
 [r, c] = find(secA.grid, 1);
 first_non_missing = secA.grid(r, c); 
-prev_z_align_secB = secB.alignments.prev_z.rel_tforms{first_non_missing};
-z_align_secB = secB.alignments.z.rel_tforms{first_non_missing};
 
-for i=index_of_missing_tile
-    rough_z_align_secB = secB.alignments.rough_z.tforms{i};
+prev_z_rel = secB.alignments.prev_z.rel_tforms{first_non_missing};
+z_rel = secB.alignments.z.rel_tforms{first_non_missing};
 
-    prev_z_tform_missing = affine2d(rough_z_align_secB.T * prev_z_align_secB.T);
-    z_tform_missing = affine2d(prev_z_tform_missing.T * z_align_secB.T);  
+for i=index_of_missing_tile   
+    rough_z = secB.alignments.rough_z.tforms{i};
+    prev_z = affine2d(rough_z.T * prev_z_rel.T);   
     
-    secB.alignments.prev_z.rel_tforms{i} = prev_z_align_secB;
-    secB.alignments.prev_z.tforms{i} = prev_z_tform_missing;
-    secB.alignments.z.tforms{i} = z_tform_missing;
-    secB.alignments.prev_z.repairs = 'propagate_z_for_missing_tiles';
-    secB.alignments.z.repairs = 'propagate_z_for_missing_tiles';    
+    if use_intermediaries
+        z = affine2d(prev_z.T * z_rel.T);
+    else
+        xy = secB.alignments.xy.tforms{i};
+        z = affine2d(xy.T * z_rel.T);
+    end
+    
+    secB.alignments.prev_z.rel_tforms{i} = prev_z_rel;
+    secB.alignments.prev_z.tforms{i} = prev_z;    
+    
+    secB.alignments.z.tforms{i} = z;
+    secB.alignments.prev_z.repairs = mfilename;
+    secB.alignments.z.repairs = mfilename;
 end
 
 % render_section_pairs(secA, secB, 1);

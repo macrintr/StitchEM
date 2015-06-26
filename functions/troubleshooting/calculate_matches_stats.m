@@ -15,7 +15,7 @@ stats = dataset();
 
 pair_set = unique([matches.tileA matches.tileB], 'rows');
 
-% Cycle through all the sems
+% Cycle through all the seams
 for i=1:size(pair_set, 1)
     
     % Determine the two tiles involved in this seam
@@ -34,12 +34,8 @@ for i=1:size(pair_set, 1)
 
     % Provide a pair category so it can be noted on a chart easily
     pts.pair = ones(length(pts), 1) * i;
-
-    if i==1
-        stats = pts;
-    else
-        stats = [stats; pts];
-    end
+    
+    stats = [stats; pts];
     
 end
 

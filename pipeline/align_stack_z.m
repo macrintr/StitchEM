@@ -3,12 +3,12 @@ if ~exist('secs', 'var'); error('The ''secs'' variable does not exist. Run XY al
 disp('==== <strong>Starting z alignment</strong>.')
 
 wafer_list = find_wafer_in_secs(secs, 'S2-W006');
-start = 1;
-finish = 1;
-list = [wafer_list(start):wafer_list(finish)];
+wafer_start = wafer_list(1) - 1;
+list = [77, 78];
 
 % Align section pairs
-for s = list
+for i = list
+    s = i + wafer_start;
     fprintf('=== Aligning %s (<strong>%d/%d</strong>) in Z\n', secs{s}.name, s, length(secs))
     
     % Parameters
@@ -24,9 +24,11 @@ for s = list
     end
     
     % Compose with previous Z alignment
-    rel_alignments = {'rough_z', 'prev_z', 'z'};
-    secs{s}.alignments.prev_z = compose_alignments(secs{s + k}, rel_alignments, secs{s}, 'rough_z');
-    
+%     rel_alignments = {'rough_z', 'prev_z', 'z'};
+%     secs{s}.alignments.prev_z = compose_alignments(secs{s + k}, rel_alignments, secs{s}, 'rough_z');
+    rel_alignments = {'z'};
+    secs{s}.alignments.prev_z = compose_alignments(secs{s + k}, rel_alignments, secs{s}, 'xy');
+
     % Keep fixed
     if strcmp(z_params.alignment_method, 'fixed')
         secs{s}.alignments.z = fixed_alignment(secs{s}, 'prev_z');
@@ -51,7 +53,6 @@ for s = list
 
             if height(secs{s}.z_matches.A) == 0
                 secs{s}.z_matches = select_z_matches(secs{s + k}, secs{s});
-                secs{s}.z_matches = transform_z_matches_inverse(secs, s);
             end
             
             % Clear tile features to save memory
@@ -59,7 +60,6 @@ for s = list
 
         case 'manual'
             secs{s}.z_matches = select_z_matches(secs{s + k}, secs{s});
-            secs{s}.z_matches = transform_z_matches_inverse({secs{s + k}, secs{s}}, 2);
     end
 
     secs{s}.alignments.z = align_z_pair_lsq(secs{s});    
@@ -90,13 +90,13 @@ for s = list
     imwrite_z_residuals(secs, s, 'z');
     
 end
-secs{finish} = imclear_sec(secs{finish});
+secs{list(end) + wafer_start} = imclear_sec(secs{list(end) + wafer_start});
 
 % Propagate transforms through remaining stack
-secs = propagate_tforms_through_secs(secs, finish);
+secs = propagate_tforms_through_secs(secs, list(end) + wafer_start);
 
 disp('==== <strong>Finished z alignment</strong>.')
 
-filename = 'wafers_piriform/150611_S2-W001-W003_affine_double_check.mat';
-save(filename, 'secs', '-v7.3');
-disp('==== <strong>Saved secs</strong>.')
+% filename = 'wafers_piriform/150611_S2-W001-W003_affine_double_check.mat';
+% save(filename, 'secs', '-v7.3');
+% disp('==== <strong>Saved secs</strong>.')

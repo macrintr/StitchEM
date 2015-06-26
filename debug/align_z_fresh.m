@@ -33,6 +33,7 @@ if strcmp(tform_type, 'rigid')
     tform_moving = affine2d(T);
 end
 
+figure;
 imshow_fused_images_with_tforms(fixed_img, affine2d(eye(3)), moving_img, tform_moving);
 
 % S = [scale 0 0; 0 scale 0; 0 0 1];

@@ -1,4 +1,4 @@
-function matches = transform_matches(matches, tformsA, tformsB)
+function matches = transform_local_matches(matches, tformsA, tformsB)
 % Transform the local_points of the matches according to the input tforms
 %
 % Inputs:
@@ -9,7 +9,7 @@ function matches = transform_matches(matches, tformsA, tformsB)
 % Outputs:
 %   matches: updated matches struct
 %
-% matches = transform_matches(matches, tformsA, tformsB)
+% matches = transform_local_matches(matches, tformsA, tformsB)
 
 for i=1:length(tformsA)
     tform = tformsA{i};

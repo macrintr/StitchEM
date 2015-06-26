@@ -26,8 +26,8 @@ from mpicbg.models import TranslationModel2D
 from mpicbg.trakem2.align import Util
 
 from net.imglib2 import RealPoint
-from net.imglib2 import KDTree
-from net.imglib2 import RealPointSampleList
+from net.imglib2.collection import KDTree
+from net.imglib2.collection import RealPointSampleList
 from net.imglib2.exception import ImgLibException
 from net.imglib2.img.imageplus import ImagePlusImg
 from net.imglib2.img.imageplus import ImagePlusImgFactory
@@ -46,7 +46,7 @@ from script.imglib.algorithm import Scale2D
 
 class BlockMatcherParameters():
 	def __init__(self,
-			wafer_title = "W004",
+			wafer_title = "stack",
 			export_point_roi = True,
 			export_displacement_vectors = True,
 			scale = 1.00,
@@ -63,9 +63,9 @@ class BlockMatcherParameters():
 			point_distance = 180,
 			save_data = True):
 		# bucket = "/usr/people/tmacrina/seungmount/research/"
-		bucket = "/mnt/data0/"
-		project_folder = bucket + "tommy/150528_zfish/"
-		self.input_folder = project_folder + "affine_renders_0125x/" + wafer_title + "/"
+		bucket = "/mnt/data/"
+		project_folder = bucket + "tommy/150502_piriform/"
+		self.input_folder = project_folder + "affine_renders_0175x/" + wafer_title + "/"
 		# input_folder = "/home/seunglab/tommy/" + wafer_title + "/affine_renders_0175x/"
 		# input_folder = "/mnt/data0/tommy/tests/150409_elastic_solver_sensitivity/elastic_images/"
 		self.output_folder = project_folder + "affine_block_matching/" + wafer_title + "/"
@@ -375,7 +375,7 @@ def runBlockMatchingAll(wafer_title):
 	shutdownAndAwaitTermination(pool, 5)
 
 def runBlockMatching(params_list, image_pairs):
-	MAX_CONCURRENT = 4
+	MAX_CONCURRENT = 12
 	
 	block_matching_inputs = zip(image_pairs, params_list)
 
@@ -398,6 +398,6 @@ def runBlockMatching(params_list, image_pairs):
 # image_pairs = [(1, 2) for p in params_list]
 # runBlockMatching(params_list, image_pairs)
 
-wafer_titles = ["W004"]
+wafer_titles = ["stack"]
 for wafer in wafer_titles:
 	runBlockMatchingAll(wafer)

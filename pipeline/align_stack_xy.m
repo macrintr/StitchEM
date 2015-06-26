@@ -1,39 +1,41 @@
 %% Rough & XY Alignment
-if ~exist('secs'); secs = cell(length(sec_nums), 1); end
-wafer_list = find_wafer_in_secs(secs, 'S2-W001');
+% if ~exist('secs'); secs = cell(length(sec_nums), 1); end
+if ~exist('secs'); secs = cell(length(1005), 1); end
+wafer_list = find_wafer_in_secs(secs, 'S2-W006');
 start = 1;
 finish = length(wafer_list);
-list = [wafer_list(start):wafer_list(finish)];
-list = 7;
+wafer_start = wafer_list(1) - 1;
+list = [78];
 
 disp('==== <strong>Starting rough xy, xy, & rough z alignment</strong>.')
-for s = list
-    fprintf('=== Aligning %s (<strong>%d/%d</strong>) in XY\n', get_path_info(get_section_path(sec_nums(start)), 'name'), s, length(secs))
+for i = list
+    s = i + wafer_start;
+    fprintf('=== Aligning %s (<strong>%d/%d</strong>) in XY\n', get_path_info(get_section_path(sec_nums(i)), 'name'), s, length(wafer_list))
     
 %     % Section structure & parameters
 %     % Check for params
 %     if ~exist('params'); error('The ''params'' variable does not exist. Load parameters before doing alignment.'); end
-%     xy_params = params(sec_nums(s - W2_start)).xy;
+%     xy_params = params(sec_nums(i)).xy;
 %     
 %     % Create a new section structure
-%     secs{s} = load_section(sec_nums(s - W2_start), 'skip_tiles', xy_params.skip_tiles, 'wafer_path', waferpath());
+%     secs{s} = load_section(sec_nums(i), 'skip_tiles', xy_params.skip_tiles, 'wafer_path', waferpath());
 %     
 %     % Save params
-%     secs{s}.params = params(sec_nums(s - W2_start));
+%     secs{s}.params = params(sec_nums(i));
 %     
 %     % Load images
 %     if ~isfield(secs{s}.tiles, 'full'); secs{s} = load_tileset(secs{s}, 'full', 1.0); end
 %     
-    if isempty(secs{s}.overview) || ~isfield(secs{s}.overview, 'img') || isempty(secs{s}.overview.img)
-        secs{s} = load_overview(secs{s});
-    end
+%     if isempty(secs{s}.overview) || ~isfield(secs{s}.overview, 'img') || isempty(secs{s}.overview.img)
+%         secs{s} = load_overview(secs{s});
+%     end
 %     
 %     % Rough alignment
 %     secs{s}.alignments.rough_xy = align_rough_xy(secs{s});
 %     
 %     % Export rough xy check
 %     imwrite_section_plot(secs{s}, 'rough_xy', 'rough_xy');
-%     
+
     % Overview rough alignment
     fprintf('Rough z alignment for %s_Sec%d\n', secs{s}.wafer, secs{s}.num);
     if s==1
@@ -44,11 +46,11 @@ for s = list
         alignment.data = struct();
         secs{s}.overview.alignments.rough_z = alignment;
     else
-        secs{s} = align_overview_rough_z(secs{s-1}, secs{s}, 1);
+        secs{s} = align_overview_rough_z(secs{s-1}, secs{s});
         imwrite_overview_pair(secs{s-1}, secs{s}, 'initial', 'rough_z', 'overview_rough_z');
         secs{s-1} = imclear_sec(secs{s-1});
     end
-%     
+    
 %     fprintf('xy alignment for %s_Sec%d\n', secs{s}.wafer, secs{s}.num);
 %     
 %     % Detect XY features
@@ -58,7 +60,7 @@ for s = list
 %     secs{s}.xy_matches = match_xy(secs{s}, 'xy', xy_params.matching);
 
     try
-        % Align XY
+%         % Align XY
 %         secs{s}.alignments.xy = align_xy(secs{s}, xy_params.align);
 %         secs = clean_xy_matches(secs, s, 200);
 %         secs = clean_xy_matches(secs, s, 100);
@@ -75,12 +77,12 @@ for s = list
         imwrite_error_message(secs{s}, 'xy', 'xy');
     end
 
-    secs = update_sec_tforms(secs, s);
+%     secs = update_sec_tforms(secs, s);
     
     % Clear XY features to save memory
-%     secs{s}.features.xy.tiles = []; 
-%     
-%     secs{s}.runtime.xy.timestamp = datestr(now);
+    secs{s}.features.xy.tiles = []; 
+    
+    secs{s}.runtime.xy.timestamp = datestr(now);
 end
 
 secs{finish} = imclear_sec(secs{finish});
@@ -88,6 +90,6 @@ secs{finish} = imclear_sec(secs{finish});
 disp('==== <strong>Finished rough xy, xy, & rough z alignment</strong>.')
 
 % Save secs
-filename = 'wafers_piriform/150611_S2-W001-W003_affine_double_check.mat';
-save(filename, 'secs', '-v7.3');
-disp('==== <strong>Saved secs</strong>.')
+% filename = 'wafers_piriform/150611_S2-W001-W003_affine_double_check.mat';
+% save(filename, 'secs', '-v7.3');
+% disp('==== <strong>Saved secs</strong>.')
