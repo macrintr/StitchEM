@@ -13,7 +13,7 @@ function secs = update_sec_tforms(secs, s, rough_z_tform_type, lambda)
 % secs = update_sec_tforms(secs, s, rough_z_tform_type, z_tform_type)
 
 if nargin < 3
-    rough_z_tform_type = 'affine';
+    rough_z_tform_type = 'rigid';
     if isfield(secs{s}.alignments.z.meta, 'lambda')
         lambda = secs{s}.alignments.z.meta.lambda;
     else
@@ -21,17 +21,17 @@ if nargin < 3
     end
 end
 
-% % Transform xy matches into rough_xy, if necessary
-% tforms = secs{s}.alignments.rough_xy.tforms;
-% secs{s}.xy_matches = transform_matches(secs{s}.xy_matches, tforms, tforms);
-% 
-% % Update xy alignment
-% if isfield(secs{s}.alignments.xy, 'manual')
-%     rel_tforms = secs{s}.alignments.xy.rel_tforms;
-%     secs{s}.alignments.xy.tforms = cellfun(@(rough, rel) compose_tforms(rough, rel), tforms, rel_tforms, 'UniformOutput', false);
-% else
-%     secs{s}.alignments.xy = align_xy(secs{s});
-% end
+% Transform xy matches into rough_xy, if necessary
+tforms = secs{s}.alignments.rough_xy.tforms;
+secs{s}.xy_matches = transform_local_matches(secs{s}.xy_matches, tforms, tforms);
+
+% Update xy alignment
+if isfield(secs{s}.alignments.xy, 'manual')
+    rel_tforms = secs{s}.alignments.xy.rel_tforms;
+    secs{s}.alignments.xy.tforms = cellfun(@(rough, rel) compose_tforms(rough, rel), tforms, rel_tforms, 'UniformOutput', false);
+else
+    secs{s}.alignments.xy = align_xy(secs{s});
+end
 
 % Update tform type of overview rough_z
 secs{s}.overview.alignments.rough_z = realign_overview_rough_z(secs{s}, rough_z_tform_type);

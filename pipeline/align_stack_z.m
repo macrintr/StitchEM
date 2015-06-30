@@ -2,9 +2,9 @@
 if ~exist('secs', 'var'); error('The ''secs'' variable does not exist. Run XY alignment or load a saved stack before doing Z alignment.'); end
 disp('==== <strong>Starting z alignment</strong>.')
 
-wafer_list = find_wafer_in_secs(secs, 'S2-W006');
+wafer_list = find_wafer_in_secs(secs, 'S2-W008');
 wafer_start = wafer_list(1) - 1;
-list = [77, 78];
+list = [1];
 
 % Align section pairs
 for i = list
@@ -93,7 +93,7 @@ end
 secs{list(end) + wafer_start} = imclear_sec(secs{list(end) + wafer_start});
 
 % Propagate transforms through remaining stack
-secs = propagate_tforms_through_secs(secs, list(end) + wafer_start);
+% secs = propagate_tforms_through_secs(secs, list(end) + wafer_start);
 
 disp('==== <strong>Finished z alignment</strong>.')
 

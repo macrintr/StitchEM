@@ -10,7 +10,7 @@ import csv
 from java.awt.geom import AffineTransform
 
 # Wafer
-wafers = [u'S2-W001', u'S2-W002', u'S2-W003', u'S2-W004', u'S2-W005', u'S2-W006']
+wafers = [u'S2-W001', u'S2-W002', u'S2-W003', u'S2-W004', u'S2-W005', u'S2-W006', u'S2-W007', u'S2-W008']
 bucket = '/mnt/bucket/labs/seung/research/'
 # project_folder = bucket + 'tommy/150528_zfish/'
 project_folder = bucket + 'tommy/150502_piriform/'
@@ -24,7 +24,7 @@ project = Project.getProject('stack_import.xml')
 layerset = project.getRootLayerSet()
 
 # Cycle through all layers
-for layer in layerset.getLayers():
+for layer in layerset.getLayers()[1007:]:
 	# Cycle through all images in that layer
 	for patch in layer.getDisplayables(Patch):
 		# Find corresponding transform file
@@ -63,7 +63,7 @@ for layer in layerset.getLayers():
 			print patch_title
 			# Apply transform
 			patch.setAffineTransform(affine_tform)
-			print patch.getAffineTransform()
+			# print patch.getAffineTransform()
 			# Update internal the internals
 			patch.updateBucket()
 

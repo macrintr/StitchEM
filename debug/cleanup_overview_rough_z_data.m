@@ -1,4 +1,6 @@
+function secs = cleanup_overview_rough_z_data(secs)
 % Clean up sec.overview.alignments.rough_z.data
+
 for s = 2:length(secs)
     % fprintf('%d\n', s);
     d = secs{s}.overview.alignments.rough_z.data;

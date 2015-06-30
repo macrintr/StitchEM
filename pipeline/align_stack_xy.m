@@ -1,11 +1,11 @@
 %% Rough & XY Alignment
 % if ~exist('secs'); secs = cell(length(sec_nums), 1); end
 if ~exist('secs'); secs = cell(length(1005), 1); end
-wafer_list = find_wafer_in_secs(secs, 'S2-W006');
+wafer_list = find_wafer_in_secs(secs, 'S2-W007');
 start = 1;
 finish = length(wafer_list);
 wafer_start = wafer_list(1) - 1;
-list = [78];
+list = [1:length(wafer_list)];
 
 disp('==== <strong>Starting rough xy, xy, & rough z alignment</strong>.')
 for i = list
