@@ -1,9 +1,9 @@
 import os
 import re
 
-wafers = ["S2-W003", "S2-W004", "S2-W005", "S2-W006", "S2-W007", "S2-W008"]
+wafers = ["S2-W001", "S2-W002", "S2-W003", "S2-W004", "S2-W005", "S2-W006", "S2-W007", "S2-W008"]
 # bucket = "/usr/people/tmacrina/seungmount/research/"
-bucket = "/mnt/data0/"
+bucket = "/mnt/data/"
 import_filename_template = "{0}tommy/150502_piriform/S2-W001/S2-W003-W008_import.txt"
 
 folder_name_idx = 11 # 8 for zfish; 11 for piriform

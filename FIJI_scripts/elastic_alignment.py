@@ -1,47 +1,52 @@
 # Thomas Macrina
-# 150224
-# Script to automatically run elastic alignment
 
-from mpicbg.trakem2.align import ElasticLayerAlignment
-from ini.trakem2.display import Display, Patch
-from ini.trakem2.utils import Filter
-
-params = ElasticLayerAlignment.Param() 
-params.layerScale = 0.175
-params.searchRadius = 40
-params.blockRadius = 200
-params.minR = 0.10
-params.maxCurvatureR = 10000
-params.rodR = 0.60
-params.useLocalSmoothnessFilter = True
-params.localRegionSigma = 200
-params.maxLocalEpsilon = 40
-params.maxLocalTrust = 10000000000
-params.resolutionSpringMesh = 128
-
-params.isAligned = True
-params.maxNumNeighbors = 2
+# Reimplementing the elastic layer aligner from TrakEM2
+# Based on source code:
+# https://github.com/trakem2/TrakEM2/blob/master/TrakEM2_/src/main/java/mpicbg/trakem2/align/ElasticLayerAlignment.java
 
 
+import ij.IJ;
+import ij.gui.GenericDialog;
+import ini.trakem2.Project;
+import ini.trakem2.display.Layer;
+import ini.trakem2.display.LayerSet;
+import ini.trakem2.display.Patch;
+import ini.trakem2.display.VectorData;
+import ini.trakem2.parallel.ExecutorProvider;
+import ini.trakem2.utils.AreaUtils;
+import ini.trakem2.utils.Filter;
+import ini.trakem2.utils.Utils;
 
-# params.setup()
+import java.awt.Rectangle;
+import java.awt.geom.Area;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
-# Get the project
-project = Project.getProject('import.xml')
-# Get layerset
-layerset = project.getRootLayerSet()
-fixed_layer = set([layerset.getLayers()[0]])
-moving_layers = layerset.getLayers()[1:]
-empty_layers = set()
-box = layerset.get2DBounds()
-propagateTransformBefore = False
-propagateTransformAfter = False
-
-# print fixed_layer
-# print moving_layers
-
-elasticAligner = ElasticLayerAlignment()
-# elasticAligner.exec(params, project, moving_layers, fixed_layer, empty_layers, box, propagateTransformBefore, propagateTransformAfter, Filter)
-elasticAligner.exec(layerset, 0, 10, 0, propagateTransformBefore, propagateTransformAfter, box, Filter.accept)
-
-
+import mpicbg.imagefeatures.Feature;
+import mpicbg.imagefeatures.FloatArray2DSIFT;
+import mpicbg.models.AbstractModel;
+import mpicbg.models.AffineModel2D;
+import mpicbg.models.HomographyModel2D;
+import mpicbg.models.NotEnoughDataPointsException;
+import mpicbg.models.Point;
+import mpicbg.models.PointMatch;
+import mpicbg.models.RigidModel2D;
+import mpicbg.models.SimilarityModel2D;
+import mpicbg.models.Spring;
+import mpicbg.models.SpringMesh;
+import mpicbg.models.Tile;
+import mpicbg.models.TileConfiguration;
+import mpicbg.models.Transforms;
+import mpicbg.models.TranslationModel2D;
+import mpicbg.models.Vertex;
+import mpicbg.trakem2.align.concurrent.BlockMatchPairCallable;
+import mpicbg.trakem2.transform.MovingLeastSquaresTransform2;
+import mpicbg.trakem2.util.Triple;

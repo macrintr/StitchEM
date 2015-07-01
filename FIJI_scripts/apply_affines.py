@@ -24,7 +24,7 @@ project = Project.getProject('stack_import.xml')
 layerset = project.getRootLayerSet()
 
 # Cycle through all layers
-for layer in layerset.getLayers()[1007:]:
+for layer in layerset.getLayers():
 	# Cycle through all images in that layer
 	for patch in layer.getDisplayables(Patch):
 		# Find corresponding transform file
@@ -52,20 +52,24 @@ for layer in layerset.getLayers()[1007:]:
 		# The Java function inputs are ordered as the rows of the transpose
 		if title_split[-2] in wafers:
 			affine_inputs = []
-			tform_csv = open(tform_fn)
-			tform_matrix = csv.reader(tform_csv)
-			for row in tform_matrix:
-			 	affine_inputs.extend(map(float, row)[:2]) # extend not append
-		 	tform_csv.close()
+			if os.path.isfile(tform_fn):
+				tform_csv = open(tform_fn)
+				tform_matrix = csv.reader(tform_csv)
+				for row in tform_matrix:
+				 	affine_inputs.extend(map(float, row)[:2]) # extend not append
+			 	tform_csv.close()
 
-			affine_tform = AffineTransform(*affine_inputs) # expands the elements of the list
+				affine_tform = AffineTransform(*affine_inputs) # expands the elements of the list
 
-			print patch_title
-			# Apply transform
-			patch.setAffineTransform(affine_tform)
-			# print patch.getAffineTransform()
-			# Update internal the internals
-			patch.updateBucket()
+				print patch_title
+				# Apply transform
+				patch.setAffineTransform(affine_tform)
+				# print patch.getAffineTransform()
+				# Update internal the internals
+				patch.updateBucket()
+			else:
+				patch.remove(True)
+
 
 Display.repaint()
 # Display.getFront().getProject().save()
