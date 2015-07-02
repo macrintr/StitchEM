@@ -1,8 +1,9 @@
-function stats = calculate_z_residuals(secs, sec_num)
+function stats = calculate_z_residuals(secs, s)
 % Calculate xy_match stats
 %
 % Inputs:
 %   sec: the section with xy matches & alignment
+%   s: section number
 %
 % Outputs:
 %   stats: table of transformed matches and their displacements
@@ -13,6 +14,7 @@ function stats = calculate_z_residuals(secs, sec_num)
 %
 % stats = calculate_xy_matches_stats(sec)
 
-tformsA = secs{sec_num-1}.alignments.z.tforms;
-tformsB = secs{sec_num}.alignments.z.tforms;
-stats = calculate_matches_stats(secs{sec_num}.z_matches, tformsA, tformsB);
+k = secs{s}.params.z.rel_to;
+tformsA = secs{s+k}.alignments.z.tforms;
+tformsB = secs{s}.alignments.z.tforms;
+stats = calculate_matches_stats(secs{s}.z_matches, tformsA, tformsB);

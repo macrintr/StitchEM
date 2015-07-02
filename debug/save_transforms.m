@@ -14,6 +14,6 @@ for i = start:finish
         % filename = ['affine_transform_' secs{i}.wafer '_section_' sprintf('%03d', secs{i}.num) '_name_' tile_name '.csv'];
         filename = [tile_name '.csv'];
         dlmwrite([folder filename], secs{i}.alignments.z.tforms{j}.T);
-        % disp(filename);
+        disp(filename);
     end
 end

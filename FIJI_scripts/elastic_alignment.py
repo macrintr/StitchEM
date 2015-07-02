@@ -4,6 +4,7 @@
 # Based on source code:
 # https://github.com/trakem2/TrakEM2/blob/master/TrakEM2_/src/main/java/mpicbg/trakem2/align/ElasticLayerAlignment.java
 
+import os
 
 import ij.IJ;
 import ij.gui.GenericDialog;
@@ -50,3 +51,14 @@ import mpicbg.models.Vertex;
 import mpicbg.trakem2.align.concurrent.BlockMatchPairCallable;
 import mpicbg.trakem2.transform.MovingLeastSquaresTransform2;
 import mpicbg.trakem2.util.Triple;
+
+def adjust_mesh_from_correspondences_file(filename, mesh, spring_constant):
+	if os.path.isfile(filename):
+		pts_file = open(filename)
+		pts_reader = csv.reader(pts_file, delimiter='\t')
+		for row in pts_reader:
+			p1 = Vertex([row[0]], [row[1]])
+			p2 = Vertex([row[2]], [row[3]])
+			p1.addSpring(p2, Spring(0, spring_constant))
+			mesh.addPassiveVertex(p2)
+	 	pts_reader.close()

@@ -2,9 +2,9 @@
 if ~exist('secs', 'var'); error('The ''secs'' variable does not exist. Run XY alignment or load a saved stack before doing Z alignment.'); end
 disp('==== <strong>Starting z alignment</strong>.')
 
-wafer_list = find_wafer_in_secs(secs, 'S2-W008');
+wafer_list = find_wafer_in_secs(secs, 'S2-W007');
 wafer_start = wafer_list(1) - 1;
-list = [1];
+list = [51];
 
 % Align section pairs
 for i = list

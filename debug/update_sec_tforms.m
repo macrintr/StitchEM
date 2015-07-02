@@ -52,7 +52,8 @@ if s == 1
     secs{s}.alignments.prev_z = fixed_alignment(secs{s}, 'rough_z');
     secs{s}.alignments.z = fixed_alignment(secs{s}, 'rough_z');
 else
-    secs{s}.alignments.prev_z = compose_alignments(secs{s-1}, {'rough_z', 'prev_z', 'z'}, secs{s}, 'rough_z');   
+    k = secs{s}.params.z.rel_to;
+    secs{s}.alignments.prev_z = compose_alignments(secs{s+k}, {'rough_z', 'prev_z', 'z'}, secs{s}, 'rough_z');   
     
     base_alignment = 'xy';
     use_intermediaries = true;
@@ -60,21 +61,21 @@ else
         use_intermediaries = false;
     end
     
-    missing_tile_numbers = find(~secs{s-1}.grid);
+    missing_tile_numbers = find(~secs{s+k}.grid);
     index_of_missing_tile = secs{s}.grid(missing_tile_numbers);
     if index_of_missing_tile
         fprintf('Missing tile %d\n', index_of_missing_tile);
-        secs{s} = propagate_z_for_missing_tiles(secs{s-1}, secs{s}, use_intermediaries);
+        secs{s} = propagate_z_for_missing_tiles(secs{s+k}, secs{s}, use_intermediaries);
     end    
     
-    secs{s}.z_matches = transform_local_matches(secs{s}.z_matches, secs{s-1}.alignments.z.tforms, secs{s}.alignments.(base_alignment).tforms);
+    secs{s}.z_matches = transform_local_matches(secs{s}.z_matches, secs{s+k}.alignments.z.tforms, secs{s}.alignments.(base_alignment).tforms);
     secs{s}.alignments.z = align_z_pair_lsq(secs{s}, base_alignment, lambda);
     
-    missing_tile_numbers = find(~secs{s-1}.grid);
+    missing_tile_numbers = find(~secs{s+k}.grid);
     index_of_missing_tile = secs{s}.grid(missing_tile_numbers);
     if index_of_missing_tile
         fprintf('Missing tile %d\n', index_of_missing_tile);
-        secs{s} = propagate_z_for_missing_tiles(secs{s-1}, secs{s}, use_intermediaries);
+        secs{s} = propagate_z_for_missing_tiles(secs{s+k}, secs{s}, use_intermediaries);
     end   
     
 end

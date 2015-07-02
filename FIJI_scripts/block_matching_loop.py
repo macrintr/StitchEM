@@ -298,7 +298,7 @@ class BlockMatcher(Callable):
 							img, 
 							NearestNeighborSearchOnKDTree(kdtreeMatches),
 							NearestNeighborSearchOnKDTree(kdtreeMask))
-				scaled_img = self.scaleIntImagePlus(img, 0.05)
+				scaled_img = self.scaleIntImagePlus(img, 0.03)
 				if self.params.save_data:
 					fs = FileSaver(scaled_img)
 					fs.saveAsTiff(self.params.output_folder + str(imp2.getTitle())[:-4] + "_" + str(imp1.getTitle()))
@@ -335,12 +335,26 @@ def shutdownAndAwaitTermination(pool, timeout):
 		# Preserve interrupt status
 		Thread.currentThread().interrupt()
 
+def make_image_pairs(start, finish, neighbors):
+	image_pairs = []
+	for j in range(neighbors):
+		k = j + 1
+		image_pairs += [(i-k, i) for i in range(start+j,finish)]
+		image_pairs += [(i, i-k) for i in range(start+j,finish)]
+	return image_pairs
+
 def runBlockMatchingAll(wafer_title):
 	MAX_CONCURRENT = 20
 	params = BlockMatcherParameters(wafer_title=wafer_title)
 	start = 1
 	finish = len(os.listdir(params.input_folder))
-	image_pairs = [(i-1, i) for i in range(start,finish)]
+	a = [(i-1, i) for i in range(start,finish)]
+	b = [(i, i-1) for i in range(start,finish)]
+	c = [(i-2, i) for i in range(start+1,finish)]
+	d = [(i, i-2) for i in range(start+1,finish)]
+
+	image_pairs = make_image_pairs(start, finish, neighbors)
+
 
 	# Log file
 	t = time.localtime()
