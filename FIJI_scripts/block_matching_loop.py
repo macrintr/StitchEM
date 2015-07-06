@@ -47,8 +47,8 @@ from script.imglib.algorithm import Scale2D
 class BlockMatcherParameters():
 	def __init__(self,
 			wafer_title = "stack",
-			export_point_roi = True,
-			export_displacement_vectors = True,
+			export_point_roi = False,
+			export_displacement_vectors = False,
 			scale = 1.00,
 			search_radius = 35,
 			block_radius = 35,
@@ -63,12 +63,12 @@ class BlockMatcherParameters():
 			point_distance = 180,
 			save_data = True):
 		# bucket = "/usr/people/tmacrina/seungmount/research/"
-		bucket = "/mnt/data/"
+		bucket = "/mnt/bucket/labs/seung/research/"
 		project_folder = bucket + "tommy/150502_piriform/"
-		self.input_folder = project_folder + "affine_renders_0175x/" + wafer_title + "/"
+		self.input_folder = project_folder + "affine_renders_0175x/"
 		# input_folder = "/home/seunglab/tommy/" + wafer_title + "/affine_renders_0175x/"
 		# input_folder = "/mnt/data0/tommy/tests/150409_elastic_solver_sensitivity/elastic_images/"
-		self.output_folder = project_folder + "affine_block_matching/" + wafer_title + "/"
+		self.output_folder = project_folder + "affine_block_matching/all_points/"
 		# output_folder = "/home/seunglab/tommy/" + wafer_title + "/150324_block_match_vector_plots/"
 		# output_folder = "/mnt/data0/tommy/tests/150409_elastic_solver_sensitivity/elastic_block_matching/"	
 
@@ -176,11 +176,18 @@ class BlockMatcher(Callable):
 	def writePointsFile(self, points, filename):
 		fn = open(filename, 'w')
 		for match in points:
-			x1 = match.getP1().getL()[0]
-			y1 = match.getP1().getL()[1]
-			x2 = match.getP2().getW()[0]
-			y2 = match.getP2().getW()[1]
-			fn.write(str(x1) + "\t" + str(y1) + "\t" + str(x2) + "\t" + str(y2) + "\n")		
+			xl1 = match.getP1().getL()[0]
+			yl1 = match.getP1().getL()[1]
+			xw1 = match.getP1().getW()[0]
+			yw1 = match.getP1().getW()[1]			
+			xl2 = match.getP2().getL()[0]
+			yl2 = match.getP2().getL()[1]			
+			xw2 = match.getP2().getW()[0]
+			yw2 = match.getP2().getW()[1]
+			fn.write(str(xl1) + "," + str(yl1) + "," +
+					str(xw1) + "," + str(yw1) + "," + 
+					str(xl2) + "," + str(yl2) + "," +
+					str(xw2) + "," + str(yw2) + "\n")	
 
 	def call(self, save_images=False):
 		self.thread_used = threading.currentThread().getName()
@@ -215,7 +222,6 @@ class BlockMatcher(Callable):
 			ip2Mask = self.createMask(imp2.getProcessor().convertToRGB())
 
 			ct = TranslationModel2D()
-
 
 			BlockMatching.matchByMaximalPMCC(
 							ip1,
@@ -333,27 +339,30 @@ def shutdownAndAwaitTermination(pool, timeout):
 		# (Re-)Cancel if current thread also interrupted
 		pool.shutdownNow()
 		# Preserve interrupt status
-		Thread.currentThread().interrupt()
+		threading.currentThread().interrupt()
 
 def make_image_pairs(start, finish, neighbors):
 	image_pairs = []
-	for j in range(neighbors):
-		k = j + 1
-		image_pairs += [(i-k, i) for i in range(start+j,finish)]
-		image_pairs += [(i, i-k) for i in range(start+j,finish)]
+	for i in range(start, finish):
+		r = min(finish, i + neighbors + 1)
+		for j in range(i+1, r):
+			image_pairs += [(i, j), (j, i)]
 	return image_pairs
 
 def runBlockMatchingAll(wafer_title):
-	MAX_CONCURRENT = 20
+	MAX_CONCURRENT = 40
 	params = BlockMatcherParameters(wafer_title=wafer_title)
-	start = 1
+	start = 0
 	finish = len(os.listdir(params.input_folder))
-	a = [(i-1, i) for i in range(start,finish)]
-	b = [(i, i-1) for i in range(start,finish)]
-	c = [(i-2, i) for i in range(start+1,finish)]
-	d = [(i, i-2) for i in range(start+1,finish)]
-
-	image_pairs = make_image_pairs(start, finish, neighbors)
+	neighbors = 2
+	image_pairs = make_image_pairs(start, finish, neighbors)[:1200]
+	# neighbors = 2
+	# 1200, 2400, 3600, 4500, .. 
+	# neighbors = 4
+	# 1210 - 1213
+	# 1267 - 1270
+	# neighbors = 3
+	# 1334 - 1336
 
 
 	# Log file
