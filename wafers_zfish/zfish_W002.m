@@ -1,14 +1,14 @@
-%% Configuration
+%% Configuartion
 
 % renderpath
 renderpath('/mnt/bucket/labs/seung/research/dodam/150528_zfish/affine_reviews/');
 
 % Wafer and sections
-waferpath('/mnt/bucket/labs/seung/research/GABA/data/atlas/MasterUTSLdirectory/10122012-1/W004/HighResImages_Fine_5nm_120apa_W004/')
+waferpath('/mnt/bucket/labs/seung/research/GABA/data/atlas/MasterUTSLdirectory/10122012-1/W002/HighResImages_Fine_5nm_120apa/');
 info = get_path_info(waferpath);
 wafer = info.wafer;
 sec_nums = info.sec_nums;
-sec_nums(122) = []; % skip
+%sec_nums(122) = []; % skip
 
 % Load default parameters
 default_params
@@ -30,4 +30,4 @@ default_params
 
 % params(54).xy.skip_tiles = [1];
 % params(56).xy.skip_tiles = [1];
-params(149).xy.skip_tiles = [3];
+params(27).xy.skip_tiles = [15, 16];

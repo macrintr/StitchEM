@@ -12,14 +12,14 @@ params.xy.skip_tiles = [];
 params.rough_xy.rel_to = 'initial';
 params.rough_xy.align_to_overview = true;
 % ratio of pixel actual dimensions
-params.rough_xy.overview_to_tile_resolution_ratio = 0.07; % piriform
-% params.rough_xy.overview_to_tile_resolution_ratio = 0.05; % zfish
+% params.rough_xy.overview_to_tile_resolution_ratio = 0.07; % piriform
+params.rough_xy.overview_to_tile_resolution_ratio = 0.05; % zfish
 params.rough_xy.tile_prescale = 1;
 params.rough_xy.overview_prescale = 1;
 params.rough_xy.overview_scale = 0.78;
 params.rough_xy.expected_overlap = 0.06;
-params.rough_xy.overview_cropping = [0.25 0.25 0.5 0.5]; % piriform
-% params.rough_xy.overview_cropping = [0.38 0.25 0.40 0.66]; % zfish
+% params.rough_xy.overview_cropping = [0.25 0.25 0.5 0.5]; % piriform
+params.rough_xy.overview_cropping = [0.34 0.25 0.40 0.66]; % zfish
 params.rough_xy.median_filter_radius = 0;
 
 % Tile to overview SURF parameters (no good justification)

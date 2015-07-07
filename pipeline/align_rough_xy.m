@@ -27,8 +27,6 @@ if params.align_to_overview
     intermediate_tforms = cell(sec.num_tiles, 1);
     tform_warnings('off');
     
-    tile = tiles{1};
-    
     parfor t = 1:sec.num_tiles
         registration_time = tic;
         try            

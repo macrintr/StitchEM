@@ -17,6 +17,7 @@ if nargin > 0
     
     disp('Set render path.')
     
+    check_path_and_create_directory_if_necessary(ProgramPaths.base);
     check_path_and_create_directory_if_necessary(ProgramPaths.rough_xy);
     check_path_and_create_directory_if_necessary(ProgramPaths.xy);
     check_path_and_create_directory_if_necessary(ProgramPaths.rough_z);

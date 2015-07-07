@@ -37,10 +37,10 @@ if reg_scale > 1.5 || reg_translation(1) > size(overview, 2) || reg_translation(
 end
 
 % Calculate the scaling transforms
-tform_resolution_down = make_tform('scale', params.overivew_to_tile_resolution_ratio);
+tform_resolution_down = make_tform('scale', params.overview_to_tile_resolution_ratio);
 tform_scale_down = make_tform('scale', params.overview_scale);
 tform_scale_up = make_tform('scale', 1 / params.overview_scale);
-tform_resolution_up = make_tform('scale', 1 / params.overivew_to_tile_resolution_ratio);
+tform_resolution_up = make_tform('scale', 1 / params.overview_to_tile_resolution_ratio);
 
 % Calculate the translation transform
 tx = size(overview_img, 2) * params.overview_cropping(1);

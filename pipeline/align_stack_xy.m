@@ -1,40 +1,40 @@
-%% Rough & XY Alignment
-% if ~exist('secs'); secs = cell(length(sec_nums), 1); end
-if ~exist('secs'); secs = cell(length(1005), 1); end
-wafer_list = find_wafer_in_secs(secs, 'S2-W007');
+%% Rough& XY Alignment
+if ~exist('secs'); secs = cell(length(sec_nums), 1); end
+% if ~exist('secs'); secs = cell(length(1005), 1); end
+% wafer_list = find_wafer_in_secs(secs, 'S2-W007');
 start = 1;
-finish = length(wafer_list);
-wafer_start = wafer_list(1) - 1;
-list = [1:length(wafer_list)];
+finish = length(sec_nums);
+wafer_start = 0;
+list = start:finish;
 
 disp('==== <strong>Starting rough xy, xy, & rough z alignment</strong>.')
 for i = list
     s = i + wafer_start;
-    fprintf('=== Aligning %s (<strong>%d/%d</strong>) in XY\n', get_path_info(get_section_path(sec_nums(i)), 'name'), s, length(wafer_list))
+    fprintf('=== Aligning %s (<strong>%d/%d</strong>) in XY\n', get_path_info(get_section_path(sec_nums(i)), 'name'), s, length(sec_nums))
     
-%     % Section structure & parameters
-%     % Check for params
-%     if ~exist('params'); error('The ''params'' variable does not exist. Load parameters before doing alignment.'); end
-%     xy_params = params(sec_nums(i)).xy;
-%     
-%     % Create a new section structure
-%     secs{s} = load_section(sec_nums(i), 'skip_tiles', xy_params.skip_tiles, 'wafer_path', waferpath());
-%     
-%     % Save params
-%     secs{s}.params = params(sec_nums(i));
-%     
-%     % Load images
-%     if ~isfield(secs{s}.tiles, 'full'); secs{s} = load_tileset(secs{s}, 'full', 1.0); end
-%     
-%     if isempty(secs{s}.overview) || ~isfield(secs{s}.overview, 'img') || isempty(secs{s}.overview.img)
-%         secs{s} = load_overview(secs{s});
-%     end
-%     
-%     % Rough alignment
-%     secs{s}.alignments.rough_xy = align_rough_xy(secs{s});
-%     
-%     % Export rough xy check
-%     imwrite_section_plot(secs{s}, 'rough_xy', 'rough_xy');
+    % Section structure & parameters
+    % Check for params
+    if ~exist('params'); error('The ''params'' variable does not exist. Load parameters before doing alignment.'); end
+    xy_params = params(sec_nums(i)).xy;
+    
+    % Create a new section structure
+    secs{s} = load_section(sec_nums(i), 'skip_tiles', xy_params.skip_tiles, 'wafer_path', waferpath());
+    
+    % Save params
+    secs{s}.params = params(sec_nums(i));
+    
+    % Load images
+    if ~isfield(secs{s}.tiles, 'full'); secs{s} = load_tileset(secs{s}, 'full', 1.0); end
+    
+    if isempty(secs{s}.overview) || ~isfield(secs{s}.overview, 'img') || isempty(secs{s}.overview.img)
+        secs{s} = load_overview(secs{s});
+    end
+    
+    % Rough alignment
+    secs{s}.alignments.rough_xy = align_rough_xy(secs{s});
+    
+    % Export rough xy check
+    imwrite_section_plot(secs{s}, 'rough_xy', 'rough_xy');
 
     % Overview rough alignment
     fprintf('Rough z alignment for %s_Sec%d\n', secs{s}.wafer, secs{s}.num);
@@ -51,25 +51,25 @@ for i = list
         secs{s-1} = imclear_sec(secs{s-1});
     end
     
-%     fprintf('xy alignment for %s_Sec%d\n', secs{s}.wafer, secs{s}.num);
-%     
-%     % Detect XY features
-%     secs{s}.features.xy = detect_features(secs{s}, 'alignment', 'rough_xy', 'regions', 'xy', xy_params.features);
-%     
-%     % Match XY features
-%     secs{s}.xy_matches = match_xy(secs{s}, 'xy', xy_params.matching);
+    fprintf('xy alignment for %s_Sec%d\n', secs{s}.wafer, secs{s}.num);
+    
+    % Detect XY features
+    secs{s}.features.xy = detect_features(secs{s}, 'alignment', 'rough_xy', 'regions', 'xy', xy_params.features);
+    
+    % Match XY features
+    secs{s}.xy_matches = match_xy(secs{s}, 'xy', xy_params.matching);
 
     try
-%         % Align XY
-%         secs{s}.alignments.xy = align_xy(secs{s}, xy_params.align);
-%         secs = clean_xy_matches(secs, s, 200);
-%         secs = clean_xy_matches(secs, s, 100);
-%         secs = clean_xy_matches(secs, s, 50);
-%         secs = clean_xy_matches(secs, s, 25);
-%         secs = clean_xy_matches(secs, s, 15);
-%         % Export xy check
-%         imwrite_section_plot(secs{s}, 'xy', 'xy');
-%         imwrite_xy_residuals(secs{s}, 'xy');
+        % Align XY
+        secs{s}.alignments.xy = align_xy(secs{s}, xy_params.align);
+        secs = clean_xy_matches(secs, s, 200);
+        secs = clean_xy_matches(secs, s, 100);
+        secs = clean_xy_matches(secs, s, 50);
+        secs = clean_xy_matches(secs, s, 25);
+        secs = clean_xy_matches(secs, s, 15);
+        % Export xy check
+        imwrite_section_plot(secs{s}, 'xy', 'xy');
+        imwrite_xy_residuals(secs{s}, 'xy');
         
         secs{s} = align_rough_z(secs{s});
     catch
@@ -77,7 +77,6 @@ for i = list
         imwrite_error_message(secs{s}, 'xy', 'xy');
     end
 
-%     secs = update_sec_tforms(secs, s);
     
     % Clear XY features to save memory
     secs{s}.features.xy.tiles = []; 
@@ -90,6 +89,6 @@ secs{finish} = imclear_sec(secs{finish});
 disp('==== <strong>Finished rough xy, xy, & rough z alignment</strong>.')
 
 % Save secs
-% filename = 'wafers_piriform/150611_S2-W001-W003_affine_double_check.mat';
-% save(filename, 'secs', '-v7.3');
-% disp('==== <strong>Saved secs</strong>.')
+filename = ['wafers_zfish/' secs{1}.wafer '.mat'];
+save(filename, 'secs', '-v7.3');
+disp('==== <strong>Saved secs</strong>.')
