@@ -1,7 +1,6 @@
 # Thomas Macrina
-# 150323
-# Jython conversion of BlockMatching_ExtractPoinRoi (sic)
-# http://fiji.sc/git/?p=fiji.git;a=blob;f=src-plugins/blockmatching_/mpicbg/ij/plugin/BlockMatching_ExtractPoinRoi.java;h=2e9daf810b81110ee899e12c236c3864ab09ed89;hb=1861dafff1162f64051393a7e5ef71f0426f5bf6
+# 150710
+# Jython conversion of ElasticMontage
 
 import os
 from ij import IJ
@@ -23,7 +22,15 @@ from mpicbg.ij.util.Util import colorVector
 from mpicbg.models import ErrorStatistic
 from mpicbg.models import SpringMesh
 from mpicbg.models import TranslationModel2D
+from mpicbg.models import SimilarityModel2D
+from mpicbg.models import CoordinateTransformList
 from mpicbg.trakem2.align import Util
+from mpicbg.trakem2.align import ElasticMontage
+from mpicbg.trakem2.align.Align import ParamOptimize
+from mpicbg.trakem2.align import Align
+from mpicbg.trakem2.align import RigidTile2D
+from mpicbg.trakem2.align import AbstractAffineTile2D
+from mpicbg.ij import TransformMapping
 
 from net.imglib2 import RealPoint
 from net.imglib2.collection import KDTree
@@ -46,31 +53,28 @@ from script.imglib.algorithm import Scale2D
 
 class BlockMatcherParameters():
 	def __init__(self,
-			wafer_title = "stack",
 			export_point_roi = False,
 			export_displacement_vectors = False,
 			scale = 1.00,
 			search_radius = 35,
 			block_radius = 35,
-			min_R = 0.2,
+			min_R = 0.4,
 			max_curvature_R = 10,
 			rod_R = 1.0,
-			use_local_smoothness_filter = True,
+			use_local_smoothness_filter = False,
 			local_model_index = 3,
 			local_region_sigma = 240,
 			max_local_epsilon = 6,
 			max_local_trust = 999999,
-			point_distance = 180,
+			point_distance = 100,
 			save_data = True):
 		# bucket = "/usr/people/tmacrina/seungmount/research/"
 		bucket = "/mnt/bucket/labs/seung/research/"
 		project_folder = bucket + "tommy/150502_piriform/"
-		self.input_folder = project_folder + "affine_renders_0175x/"
-		# input_folder = "/home/seunglab/tommy/" + wafer_title + "/affine_renders_0175x/"
-		# input_folder = "/mnt/data0/tommy/tests/150409_elastic_solver_sensitivity/elastic_images/"
-		self.output_folder = project_folder + "affine_block_matching/all_points/"
-		# output_folder = "/home/seunglab/tommy/" + wafer_title + "/150324_block_match_vector_plots/"
-		# output_folder = "/mnt/data0/tommy/tests/150409_elastic_solver_sensitivity/elastic_block_matching/"	
+		# project_folder = bucket + "tommy/trakem_tests/150709_rough_xy_montage/"
+		# self.input_folder = project_folder + "affine_renders_0175x/"
+		# self.output_folder = project_folder + "affine_block_matching/all_points/"
+		self.output_folder = project_folder + "affine_block_matching/tiles/"
 
 		self.export_point_roi = export_point_roi
 		self.export_displacement_vectors = export_displacement_vectors
@@ -90,12 +94,14 @@ class BlockMatcherParameters():
 
 		self.save_data = save_data
 
-class BlockMatcher(Callable):
-	def __init__(self, imgA, imgB, params, wf=None):
-		self.imgA = imgA
-		self.imgB = imgB
+class BlockMatcher():
+	def __init__(self, tileA, tileB, params, wf=None):
+		self.tileA = tileA
+		self.tileB = tileB
 		self.params = params
 		self.wf = wf
+		self.patchA = self.tileA.getPatch()
+		self.patchB = self.tileB.getPatch()
 
 		self.started = None
 		self.completed = None
@@ -193,21 +199,35 @@ class BlockMatcher(Callable):
 		self.thread_used = threading.currentThread().getName()
 		self.started = time.time()
 		try:
-			filenames = os.listdir(self.params.input_folder)
-			filenames.sort()
-
-			imp1 = IJ.openImage(os.path.join(self.params.input_folder, filenames[self.imgA]))
-			imp2 = IJ.openImage(os.path.join(self.params.input_folder, filenames[self.imgB]))
 			IJ.log(time.asctime())
-			IJ.log(str(self.imgA) + ": " + str(imp1))
-			IJ.log(str(self.imgB) + ": " + str(imp2))			
-			print str(self.imgA) + ": " + str(imp1)
-			print str(self.imgB) + ": " + str(imp2)
+			IJ.log(str(self.patchA))
+			IJ.log(str(self.patchB))			
+			print str(self.patchA)
+			print str(self.patchB)
 
-			mesh_resolution = int(imp1.getWidth() / self.params.point_distance)
-			effective_point_distance = imp1.getWidth() / mesh_resolution
+			# Adapted from ElasticMontage.java
+			# https://github.com/trakem2/TrakEM2/blob/master/TrakEM2_/src/main/java/mpicbg/trakem2/align/ElasticMontage.java
+			pi1 = self.patchA.createTransformedImage()
+			pi2 = self.patchB.createTransformedImage()
 
-			mesh = SpringMesh(mesh_resolution, imp1.getWidth(), imp1.getHeight(), 1, 1000, 0.9)
+			fp1 = pi1.target.convertToFloat()
+			mask1 = pi1.getMask()
+			if mask1 is None:
+				fpMask1 = None
+			else:
+				fpMask1 = scaleByte(mask1)
+
+			fp2 = pi2.target.convertToFloat()
+			mask2 = pi2.getMask()
+			if mask2 is None:
+				fpMask2 = None
+			else:
+				fpMask2 = scaleByte(mask1)
+
+			mesh_resolution = int(self.tileA.getWidth() / self.params.point_distance)
+			effective_point_distance = self.tileA.getWidth() / mesh_resolution
+
+			mesh = SpringMesh(mesh_resolution, self.tileA.getWidth(), self.tileA.getHeight(), 1, 1000, 0.9)
 			vertices = mesh.getVertices()
 			maskSamples = RealPointSampleList(2)
 			for vertex in vertices:
@@ -215,21 +235,16 @@ class BlockMatcher(Callable):
 			pm12 = ArrayList()
 			v1 = mesh.getVertices()
 
-			ip1 = imp1.getProcessor().convertToFloat().duplicate()
-			ip2 = imp2.getProcessor().convertToFloat().duplicate()
-
-			ip1Mask = self.createMask(imp1.getProcessor().convertToRGB())
-			ip2Mask = self.createMask(imp2.getProcessor().convertToRGB())
-
-			ct = TranslationModel2D()
+			t = self.tileB.getModel().createInverse()
+			t.concatenate(self.tileA.getModel())
 
 			BlockMatching.matchByMaximalPMCC(
-							ip1,
-							ip2,
-							ip1Mask,
-							ip2Mask,
+							fp1,
+							fp2,
+							fpMask1,
+							fpMask2,
 							self.params.scale,
-							ct,
+							t,
 							self.params.block_radius,
 							self.params.block_radius,
 							self.params.search_radius,
@@ -243,7 +258,7 @@ class BlockMatcher(Callable):
 
 			pre_smooth_block_matches = len(pm12)
 			if self.params.save_data:
-				pre_smooth_filename = self.params.output_folder + str(imp2.getTitle())[:-4] + "_" + str(imp1.getTitle())[:-4] + "_pre_smooth_pts.txt"
+				pre_smooth_filename = self.params.output_folder + str(self.patchB) + "_" + str(self.patchA) + "_pre_smooth_pts.txt"
 				self.writePointsFile(pm12, pre_smooth_filename)
 
 			if self.params.use_local_smoothness_filter:
@@ -251,7 +266,7 @@ class BlockMatcher(Callable):
 				try:
 					model.localSmoothnessFilter(pm12, pm12, self.params.local_region_sigma, self.params.max_local_epsilon, self.params.max_local_trust)
 					if self.params.save_data:
-						post_smooth_filename = self.params.output_folder + str(imp2.getTitle())[:-4] + "_" + str(imp1.getTitle())[:-4] + "_post_smooth_pts.txt"
+						post_smooth_filename = self.params.output_folder + str(self.patchB) + "_" + str(self.patchA) + "_post_smooth_pts.txt"
 						self.writePointsFile(pm12, post_smooth_filename)
 				except:
 					pm12.clear()
@@ -260,14 +275,12 @@ class BlockMatcher(Callable):
 			post_smooth_block_matches = len(pm12)
 				
 			print time.asctime()
-			print str(self.imgB) + "_" + str(self.imgA) + "\tblock_matches\t" + str(pre_smooth_block_matches) + "\tsmooth_filtered\t" + str(pre_smooth_block_matches - post_smooth_block_matches) + "\tmax_displacement\t" + str(max_displacement) + "\trelaxed_length\t" + str(effective_point_distance) + "\tsigma\t" + str(self.params.local_region_sigma)
+			print str(self.patchB) + "_" + str(self.patchA) + "\tblock_matches\t" + str(pre_smooth_block_matches) + "\tsmooth_filtered\t" + str(pre_smooth_block_matches - post_smooth_block_matches) + "\tmax_displacement\t" + str(max_displacement) + "\trelaxed_length\t" + str(effective_point_distance) + "\tsigma\t" + str(self.params.local_region_sigma)
 			IJ.log(time.asctime())
-			IJ.log(str(self.imgB) + "_" + str(self.imgA) + ": block_matches " + str(pre_smooth_block_matches) + ", smooth_filtered " + str(pre_smooth_block_matches - post_smooth_block_matches) + ", max_displacement " + str(max_displacement) + ", relaxed_length " + str(effective_point_distance) + ", sigma " + str(self.params.local_region_sigma))
+			IJ.log(str(self.patchB) + "_" + str(self.patchA) + ": block_matches " + str(pre_smooth_block_matches) + ", smooth_filtered " + str(pre_smooth_block_matches - post_smooth_block_matches) + ", max_displacement " + str(max_displacement) + ", relaxed_length " + str(effective_point_distance) + ", sigma " + str(self.params.local_region_sigma))
 			if self.params.save_data and self.wf:
-				self.wf.write(str(self.imgB) + 
-					"\t" + str(self.imgA) + 
-					"\t" + str(imp2.getTitle())[:-4] + 
-					"\t" + str(imp1.getTitle())[:-4] + 
+				self.wf.write(str(self.patchB) + 
+					"\t" + str(self.patchA) + 
 					"\t" + str(pre_smooth_block_matches) + 
 					"\t" + str(pre_smooth_block_matches - post_smooth_block_matches) + 
 					"\t" + str(max_displacement) + 
@@ -285,6 +298,31 @@ class BlockMatcher(Callable):
 				roi1 = pointsToPointRoi(pm12Sources)
 				roi2 = pointsToPointRoi(pm12Targets)
 
+				# # Adapted from BlockMatching.java
+				# # https://github.com/axtimwalde/mpicbg/blob/master/mpicbg/src/main/java/mpicbg/ij/blockmatching/BlockMatching.java
+				# tTarget = TranslationModel2D()
+				# sTarget = SimilarityModel2D()
+				# tTarget.set(-self.params.search_radius, -self.params.search_radius)
+				# sTarget.set(1.0/self.params.scale, 0, 0, 0)
+				# lTarget = CoordinateTransformList()
+				# lTarget.add(sTarget)
+				# lTarget.add(tTarget)
+				# lTarget.add(t)
+				# targetMapping = TransformMapping(lTarget)
+
+				# mappedScaledTarget = FloatProcessor(fp1.getWidth() + 2*search_radius, fp1.getHeight() + 2*search_radius)
+
+				# targetMapping.mapInverseInterpolated(fp2, mappedScaledTarget)
+				# imp1 = tileImagePlus("imp1", fp1)
+				# imp1.show()				
+				# imp2 = ImagePlus("imp2", mappedScaledTarget)
+				# imp2.show()
+
+				imp1 = ImagePlus("imp1", fp1)
+				imp1.show()				
+				imp2 = ImagePlus("imp2", fp2)
+				imp2.show()				
+
 				imp1.setRoi(roi1)
 				imp2.setRoi(roi2)
 
@@ -299,7 +337,7 @@ class BlockMatcher(Callable):
 				kdtreeMatches = KDTree(color_samples)
 				kdtreeMask = KDTree(maskSamples)
 				
-				img = factory.create([imp1.getWidth(), imp1.getHeight()], ARGBType())
+				img = factory.create([fp1.getWidth(), fp1.getHeight()], ARGBType())
 				self.drawNearestNeighbor(
 							img, 
 							NearestNeighborSearchOnKDTree(kdtreeMatches),
@@ -307,15 +345,13 @@ class BlockMatcher(Callable):
 				scaled_img = self.scaleIntImagePlus(img, 0.03)
 				if self.params.save_data:
 					fs = FileSaver(scaled_img)
-					fs.saveAsTiff(self.params.output_folder + str(imp2.getTitle())[:-4] + "_" + str(imp1.getTitle()))
+					fs.saveAsTiff(self.params.output_folder + str(self.patchB) + "_" + str(self.patchA) + ".tif")
 				else:
 					scaled_img.show()
 				print time.asctime()
-				print str(self.imgB) + "_" + str(self.imgA) + "\tsaved\t" + filenames[self.imgB]
+				print str(self.patchB) + "_" + str(self.patchA) + "\tsaved"
 				IJ.log(time.asctime())
-				IJ.log(str(self.imgB) + "_" + str(self.imgA) + ": saved " + filenames[self.imgB])
-			imp1.close()
-			imp2.close()
+				IJ.log(str(self.patchB) + "_" + str(self.patchA) + ": saved")
 		except Exception, ex:
 			self.exception = ex
 			print str(ex)
@@ -326,7 +362,6 @@ class BlockMatcher(Callable):
 		return self
 		# return pm12, vertices, maskSamples
 		# return pm12Sources, pm12Targets
-
 
 def shutdownAndAwaitTermination(pool, timeout):
 	pool.shutdown()
@@ -341,34 +376,32 @@ def shutdownAndAwaitTermination(pool, timeout):
 		# Preserve interrupt status
 		threading.currentThread().interrupt()
 
-def make_image_pairs(start, finish, neighbors):
-	image_pairs = []
-	for i in range(start, finish):
-		r = min(finish, i + neighbors + 1)
-		for j in range(i+1, r):
-			image_pairs += [(i, j), (j, i)]
-	return image_pairs
+def get_tile_pairs(layer):
+	po = ParamOptimize()
+	po.maxEpsilon = 25.0
+	po.minInlierRatio = 0.0
+	po.minNumInliers = 12
+	po.expectedModelIndex = 1
+	po.desiredModelIndex = 1
+	po.rejectIdentity = True
+	po.identityTolerance = 5.0
+	patches = layer.getDisplayables(Patch)
+	tiles = []
+	fixed_tiles = []
+	fixed_patches = []
+	Align.tilesFromPatches(po, patches, fixed_patches, tiles, fixed_tiles)
+	tile_pairs = []
+	AbstractAffineTile2D.pairOverlappingTiles(tiles, tile_pairs)
+	return tile_pairs
 
-def runBlockMatchingAll(wafer_title):
+def run_block_matching(tile_pairs):
 	MAX_CONCURRENT = 40
-	params = BlockMatcherParameters(wafer_title=wafer_title)
-	start = 0
-	finish = len(os.listdir(params.input_folder))
-	neighbors = 2
-	image_pairs = make_image_pairs(start, finish, neighbors)[:1200]
-	# neighbors = 2
-	# 1200, 2400, 3600, 4500, .. 
-	# neighbors = 4
-	# 1210 - 1213
-	# 1267 - 1270
-	# neighbors = 3
-	# 1334 - 1336
-
+	params = BlockMatcherParameters()
 
 	# Log file
 	t = time.localtime()
 	ts = str(t[0]) + str(t[1]) + str(t[2]) + str(t[3]) + str(t[4]) + str(t[5])
-	writefile = params.output_folder + ts + "_block_matching_loop_log.txt"
+	writefile = params.output_folder + ts + "_block_matching_montage_log.txt"
 	wf = open(writefile, 'w')
 	wf.write(time.asctime() + "\n")
 	wf.write(writefile + "\n")
@@ -386,41 +419,29 @@ def runBlockMatchingAll(wafer_title):
 			"eff_sigma\t" +
 			"mesh\n")
 
-	pool = Executors.newFixedThreadPool(MAX_CONCURRENT)
-	block_matchers = [BlockMatcher(pair[0], pair[1], params, wf) for pair in image_pairs]
-	futures = pool.invokeAll(block_matchers)
+	for pair in tile_pairs:
+		bm = BlockMatcher(pair[0], pair[1], params, wf)
+		bm.call()
 
-	for future in futures:
-		print future.get(5, TimeUnit.SECONDS)
+	# pool = Executors.newFixedThreadPool(MAX_CONCURRENT)
+	# block_matchers = [BlockMatcher(pair[0], pair[1], params, wf) for pair in tile_pairs]
+	# futures = pool.invokeAll(block_matchers)
+
+	# for future in futures:
+	# 	print future.get(5, TimeUnit.SECONDS)
 
 	wf.write(time.asctime() + "\n")
 	wf.close()
-	shutdownAndAwaitTermination(pool, 5)
+	# shutdownAndAwaitTermination(pool, 5)
 
-def runBlockMatching(params_list, image_pairs):
-	MAX_CONCURRENT = 12
-	
-	block_matching_inputs = zip(image_pairs, params_list)
+def main():
+	# Get the first open project
+	project = Project.getProject('stack_import.xml')
 
-	pool = Executors.newFixedThreadPool(MAX_CONCURRENT)
-	block_matchers = [BlockMatcher(pair[0], pair[1], params) for (pair, params) in block_matching_inputs]
-	futures = pool.invokeAll(block_matchers)
-
-	for future in futures:
-		print future.get(5, TimeUnit.SECONDS)
-
-	shutdownAndAwaitTermination(pool, 5)
-
-# runBlockMatching('')
-
-# Cycle through images
-# wafer_title = "S2-W004"
-# runBlockMatching(wafer_title)
-# wafer_title = "S2-W001"
-# params_list = [BlockMatcherParameters(wafer_title=wafer_title, save_data=False, local_region_sigma=i) for i in [35, 105, 210, 350, 420, 560, 700, 906]]
-# image_pairs = [(1, 2) for p in params_list]
-# runBlockMatching(params_list, image_pairs)
-
-wafer_titles = ["stack"]
-for wafer in wafer_titles:
-	runBlockMatchingAll(wafer)
+	# Get layerset
+	layerset = project.getRootLayerSet()
+	layers = layerset.getLayers()
+	tile_pairs = []
+	for layer in layers:
+		tile_pairs += get_tile_pairs(layer)
+	run_block_matching(tile_pairs)

@@ -48,6 +48,7 @@ from mpicbg.models import TileConfiguration
 from mpicbg.models import Transforms
 from mpicbg.models import TranslationModel2D
 from mpicbg.models import Vertex
+from mpicbg.models import CoordinateTransform
 from mpicbg.trakem2.transform import MovingLeastSquaresTransform2
 from mpicbg.trakem2.util import Triple
 from mpicbg.trakem2.align.Util import applyLayerTransformToPatch
@@ -56,20 +57,20 @@ from java.util.concurrent import Callable
 from java.util.concurrent import Executors, TimeUnit
 
 # See line 77 of ElasticLayerAlignment.java
-layer_scale = 1.0
-resolution = 32
-stiffness = 0.1
-damp = 0.9
-max_stretch = 2000.0
-max_iterations = 10 #1000
-max_plateau_width = 200
-max_epsilon = 6
-min_num_matches = 2
+LAYER_SCALE = 1.0
+RESOLUTION = 32
+STIFFNES = 0.1
+DAMP = 0.9
+MAX_STRETCH = 2000.0
+MAX_ITERATIONS = 1000 #1000
+MAX_PLATEAU_WIDTH = 200
+MAX_EPSILON = 6
+MIN_NUM_MATCHES = 1 # minimum for TranslationModel2D()
 MAX_NUM_THREADS = 40
 # use_legacy_optimizer = True
 # desired_model_index = 1 # 0: Translation, 1: Rigid, 2: Similarity, 3: Affine
 
-class PatchAndTransform(Callable):
+class PatchTransform(Callable):
 	def __init__(self, patch, transform):
 		self.patch = patch
 		self.transform = transform
@@ -83,6 +84,7 @@ class PatchAndTransform(Callable):
 		self.started = time.time()
 		try:
 			applyLayerTransformToPatch(self.patch, self.transform)
+			print self.patch.getTitle() + " patch transformed\n"
 		except Exception, ex:
 			self.exception = ex
 			print str(ex)
@@ -145,33 +147,45 @@ def create_tile_collection(layers):
 		tiles.add(Tile(RigidModel2D()))
 	return tiles
 
-def create_meshes(layers, box):
-	mesh_width = int(Math.ceil(box.width * layer_scale))
-	mesh_height = int(Math.ceil(box.height * layer_scale))
+def test():
+	pts_reader = [[1.0,2.0,2.0,3.5],
+		[0.5,2.0,1.0,3.5],
+		[1.5,4.0,0.3,2.4],
+		[2.0,4.5,2.0,4.5],
+		[3.5,4.0,1.0,2.5]]
 	meshes = ArrayList()
 	for layer in layers:
-		meshes.add(SpringMesh(resolution,
+		meshes.add(SpringMesh(2, 2, 4, 4, 0.9, 10, 0.6))
+	return meshes, pts_reader
+
+def create_meshes(layers, box):
+	mesh_width = 16 #int(Math.ceil(box.width * LAYER_SCALE))
+	mesh_height = 16 #int(Math.ceil(box.height * LAYER_SCALE))
+	meshes = ArrayList()
+	for layer in layers:
+		meshes.add(SpringMesh(RESOLUTION,
 								mesh_width,
 								mesh_height,
-								stiffness,
-								max_stretch * layer_scale,
-								damp))
+								STIFFNES,
+								MAX_STRETCH * LAYER_SCALE,
+								DAMP))
 	return meshes
 
 # def main(project, directory):
 
+# project = Project.getProject('stack_import.xml')
 project = Project.getProject('turtle_rigid.xml')
 # directory = '~/seungmount/research/tommy/150502_piriform/affine_block_matching/'
 directory = '/usr/people/tmacrina/seungmount/research/tommy/trakem_tests/150703_elastic_redux/block_matching/'
-
 
 layerset = project.getRootLayerSet()
 layers = layerset.getLayers()
 tiles = create_tile_collection(layers)
 box = get_bounding_box(layers)
-meshes = create_meshes(layers, box)
+# meshes = create_meshes(layers, box)
+meshes, pts_reader = test()
 init_meshes = TileConfiguration()
-init_meshes.fixTile(tiles.get(0))
+init_meshes.fixTile(tiles[0])
 
 # Cycle through points files to apply forces to meshes
 for file in os.listdir(directory):
@@ -183,7 +197,7 @@ for file in os.listdir(directory):
 		pts_list = ArrayList()
 
 		pts_file = open(directory + file)
-		pts_reader = csv.reader(pts_file, delimiter=',')
+		pts_reader = csv.reader(pts_file, delimiter=',', lineterminator='\n')
 		for row in pts_reader:
 			row = [float(i) for i in row]
 			v1 = Vertex(row[:2], row[2:4]) # local coords, global coords
@@ -193,7 +207,7 @@ for file in os.listdir(directory):
 			add_sucess = pts_list.add(PointMatch(v1, v2))
 	 	pts_file.close()
 
-	 	if len(pts_list) > min_num_matches:
+	 	if len(pts_list) > MIN_NUM_MATCHES:
 			tileA = tiles.get(secA)
 			tileB = tiles.get(secB)
 			init_meshes.addTile(tileA)
@@ -201,9 +215,9 @@ for file in os.listdir(directory):
 			tileB.connect(tileA, pts_list)	
 
 # Use helper meshes to prealign
-init_meshes.optimize(max_epsilon * layer_scale,
-					max_iterations,
-					max_plateau_width)
+init_meshes.optimize(MAX_EPSILON * LAYER_SCALE,
+					MAX_ITERATIONS,
+					MAX_PLATEAU_WIDTH)
 
 # Apply that prealign to meshes, then optimize it
 for mesh, tile in zip(meshes, tiles):
@@ -212,10 +226,9 @@ try:
 	t0 = System.currentTimeMillis()
 	Utils.log( "Optimizing spring meshes..." )
 	SpringMesh.optimizeMeshes2(meshes,
-								max_epsilon * layer_scale,
-								max_iterations,
-								max_plateau_width,
-								False) # visualize = False
+								MAX_EPSILON * LAYER_SCALE,
+								MAX_ITERATIONS,
+								MAX_PLATEAU_WIDTH)
 	Utils.log("Done optimizing spring meshes. Took " + 
 					str(System.currentTimeMillis()-t0) + " ms")
 except:
@@ -229,10 +242,10 @@ for mesh in meshes:
 		l = p1.getL()
 		w = p2.getW()
 		# Not sure these will act as pointers
-		l[0] = l[0] / layer_scale + box.x
-		l[1] = l[1] / layer_scale + box.y
-		w[0] = w[0] / layer_scale + box.x
-		w[1] = w[1] / layer_scale + box.y
+		l[0] = l[0] / LAYER_SCALE + box.x
+		l[1] = l[1] / LAYER_SCALE + box.y
+		w[0] = w[0] / LAYER_SCALE + box.x
+		w[1] = w[1] / LAYER_SCALE + box.y
 
 # Free memory
 project.getLoader().releaseAll()
@@ -241,10 +254,10 @@ project.getLoader().releaseAll()
 inf_area = infinite_area()
 vector_data = ArrayList()
 for layer in layers:
-	add_sucess = vector_data.addAll(
+	vector_data.addAll(
 			cast_collection(layer.getDisplayables(VectorData, False, True),
 			VectorData, True))
-add_sucess = vector_data.addAll(
+vector_data.addAll(
 		cast_collection(layerset.getZDisplayables(VectorData, True),
 		VectorData, True))
 
@@ -267,12 +280,12 @@ for mesh, layer in zip(meshes, layers):
 	patch_transforms = []
 	patches = layer.getDisplayables(Patch)
 	for patch in patches:
-		pt = PatchTransform(patch, mlt)
+		pt = PatchTransform(patch, mlt.copy())
 		patch_transforms.append(pt)
 	futures = pool.invokeAll(patch_transforms)
 	for future in futures:
 		print future.get(5, TimeUnit.SECONDS)
-	shutdownAndAwaitTermination(pool, 5)
+	shutdown_and_await_termination(pool, 5)
 
 	for vd in vector_data:
 		vd.apply(layer, inf_area, mlt)
@@ -284,9 +297,6 @@ for layer in layers:
 	patches = layer.getDisplayables(Patch)
 	for patch in patches:
 		patch.updateMipMaps()
-
-
-# Update mipmaps
 
 
 # if __name__ == '__main__':

@@ -2,7 +2,7 @@
 % load('S2-W001_clean_matches_working.mat');
 % W001;
 
-folder = ['/usr/people/tmacrina/seungmount/research/tommy/150502_piriform/affine_transforms/'];
+folder = ['/usr/people/tmacrina/seungmount/research/tommy/trakem_tests/150709_rough_xy_montage/affine_transforms/'];
 
 start = 1;
 finish = length(secs);
@@ -13,7 +13,7 @@ for i = start:finish
         tile_name = tile_path(n:end-4);
         % filename = ['affine_transform_' secs{i}.wafer '_section_' sprintf('%03d', secs{i}.num) '_name_' tile_name '.csv'];
         filename = [tile_name '.csv'];
-        dlmwrite([folder filename], secs{i}.alignments.z.tforms{j}.T);
+        dlmwrite([folder filename], secs{i}.alignments.rough_xy.tforms{j}.T);
         disp(filename);
     end
 end
