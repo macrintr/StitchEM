@@ -56,9 +56,9 @@ class BlockMatcherParameters():
 			export_point_roi = False,
 			export_displacement_vectors = False,
 			scale = 1.00,
-			search_radius = 35,
-			block_radius = 35,
-			min_R = 0.4,
+			search_radius = 40,
+			block_radius = 70,
+			min_R = 0.2,
 			max_curvature_R = 10,
 			rod_R = 1.0,
 			use_local_smoothness_filter = False,
@@ -66,15 +66,18 @@ class BlockMatcherParameters():
 			local_region_sigma = 240,
 			max_local_epsilon = 6,
 			max_local_trust = 999999,
-			point_distance = 100,
+			spring_length = 100,
+			stiffness = 0.1,
+			max_stretch = 2000.0,
+			damp = 0.9,
 			save_data = True):
-		# bucket = "/usr/people/tmacrina/seungmount/research/"
-		bucket = "/mnt/bucket/labs/seung/research/"
-		project_folder = bucket + "tommy/150502_piriform/"
-		# project_folder = bucket + "tommy/trakem_tests/150709_rough_xy_montage/"
+		bucket = "/usr/people/tmacrina/seungmount/research/"
+		# bucket = "/mnt/bucket/labs/seung/research/"
+		# project_folder = bucket + "tommy/150502_piriform/"
+		project_folder = bucket + "tommy/trakem_tests/150709_elastic_montage/"
 		# self.input_folder = project_folder + "affine_renders_0175x/"
 		# self.output_folder = project_folder + "affine_block_matching/all_points/"
-		self.output_folder = project_folder + "affine_block_matching/tiles/"
+		self.output_folder = project_folder + "affine_block_matching/points/"
 
 		self.export_point_roi = export_point_roi
 		self.export_displacement_vectors = export_displacement_vectors
@@ -90,7 +93,11 @@ class BlockMatcherParameters():
 		self.local_region_sigma = local_region_sigma
 		self.max_local_epsilon = max_local_epsilon
 		self.max_local_trust = max_local_trust
-		self.point_distance = point_distance
+		self.spring_length = spring_length
+		self.spring_triangle_height_twice = 2 * Math.sqrt(0.75*spring_length*spring_length)
+		self.stiffness = stiffness
+		self.max_stretch = max_stretch
+		self.damp = damp
 
 		self.save_data = save_data
 
@@ -224,10 +231,21 @@ class BlockMatcher():
 			else:
 				fpMask2 = scaleByte(mask1)
 
-			mesh_resolution = int(self.tileA.getWidth() / self.params.point_distance)
-			effective_point_distance = self.tileA.getWidth() / mesh_resolution
+			w = self.tileA.getWidth()
+			h = self.tileA.getHeight()
+			num_x = Math.max(2, int(Math.ceil(w / self.params.spring_length) + 1))
+			num_y = Math.max(2, int(Math.ceil(h / self.params.spring_triangle_height_twice) + 1))
+			w_mesh = (num_x - 1) * self.params.spring_length
+			h_mesh = (num_y - 1) * self.params.spring_triangle_height_twice
 
-			mesh = SpringMesh(mesh_resolution, self.tileA.getWidth(), self.tileA.getHeight(), 1, 1000, 0.9)
+			mesh = SpringMesh(num_x,
+								num_y,
+								w_mesh,
+								h_mesh,
+								self.params.stiffness,
+								self.params.max_stretch * self.params.scale,
+								self.params.damp)
+
 			vertices = mesh.getVertices()
 			maskSamples = RealPointSampleList(2)
 			for vertex in vertices:
@@ -275,18 +293,18 @@ class BlockMatcher():
 			post_smooth_block_matches = len(pm12)
 				
 			print time.asctime()
-			print str(self.patchB) + "_" + str(self.patchA) + "\tblock_matches\t" + str(pre_smooth_block_matches) + "\tsmooth_filtered\t" + str(pre_smooth_block_matches - post_smooth_block_matches) + "\tmax_displacement\t" + str(max_displacement) + "\trelaxed_length\t" + str(effective_point_distance) + "\tsigma\t" + str(self.params.local_region_sigma)
+			print str(self.patchB) + "_" + str(self.patchA) + "\tblock_matches\t" + str(pre_smooth_block_matches) + "\tsmooth_filtered\t" + str(pre_smooth_block_matches - post_smooth_block_matches) + "\tmax_displacement\t" + str(max_displacement) + "\trelaxed_length\t" + str(self.params.spring_length) + "\tsigma\t" + str(self.params.local_region_sigma)
 			IJ.log(time.asctime())
-			IJ.log(str(self.patchB) + "_" + str(self.patchA) + ": block_matches " + str(pre_smooth_block_matches) + ", smooth_filtered " + str(pre_smooth_block_matches - post_smooth_block_matches) + ", max_displacement " + str(max_displacement) + ", relaxed_length " + str(effective_point_distance) + ", sigma " + str(self.params.local_region_sigma))
+			IJ.log(str(self.patchB) + "_" + str(self.patchA) + ": block_matches " + str(pre_smooth_block_matches) + ", smooth_filtered " + str(pre_smooth_block_matches - post_smooth_block_matches) + ", max_displacement " + str(max_displacement) + ", relaxed_length " + str(self.params.spring_length) + ", sigma " + str(self.params.local_region_sigma))
 			if self.params.save_data and self.wf:
 				self.wf.write(str(self.patchB) + 
 					"\t" + str(self.patchA) + 
 					"\t" + str(pre_smooth_block_matches) + 
 					"\t" + str(pre_smooth_block_matches - post_smooth_block_matches) + 
 					"\t" + str(max_displacement) + 
-					"\t" + str(effective_point_distance) + 
+					"\t" + str(self.params.spring_length) + 
 					"\t" + str(self.params.local_region_sigma) + 
-					"\t" + str(mesh_resolution) + "\n")
+					"\t" + str(num_x) + "\n")
 
 			if self.params.export_point_roi:
 				pm12Sources = ArrayList()
@@ -392,7 +410,7 @@ def get_tile_pairs(layer):
 	Align.tilesFromPatches(po, patches, fixed_patches, tiles, fixed_tiles)
 	tile_pairs = []
 	AbstractAffineTile2D.pairOverlappingTiles(tiles, tile_pairs)
-	return tile_pairs
+	return tile_pairs + [tp[::-1] for tp in tile_pairs]
 
 def run_block_matching(tile_pairs):
 	MAX_CONCURRENT = 40
@@ -419,8 +437,8 @@ def run_block_matching(tile_pairs):
 			"eff_sigma\t" +
 			"mesh\n")
 
-	for pair in tile_pairs:
-		bm = BlockMatcher(pair[0], pair[1], params, wf)
+	for (tileA, tileB) in tile_pairs:
+		bm = BlockMatcher(tileA, tileB, params, wf)
 		bm.call()
 
 	# pool = Executors.newFixedThreadPool(MAX_CONCURRENT)
@@ -436,12 +454,12 @@ def run_block_matching(tile_pairs):
 
 def main():
 	# Get the first open project
-	project = Project.getProject('stack_import.xml')
+	project = Project.getProject('control_no_align.xml')
 
 	# Get layerset
 	layerset = project.getRootLayerSet()
 	layers = layerset.getLayers()
-	tile_pairs = []
-	for layer in layers:
-		tile_pairs += get_tile_pairs(layer)
-	run_block_matching(tile_pairs)
+	all_tile_pairs = []
+	for layer in layers[-1:]:
+		all_tile_pairs += get_tile_pairs(layer)
+	run_block_matching(all_tile_pairs)

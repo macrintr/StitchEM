@@ -12,17 +12,17 @@ from java.awt.geom import AffineTransform
 # Wafer
 # wafers = [u'S2-W001', u'S2-W002', u'S2-W003', u'S2-W004', u'S2-W005', u'S2-W006', u'S2-W007', u'S2-W008']
 wafers = [u'S2-W001']
-bucket = '/mnt/bucket/labs/seung/research/'
-# bucket = "/usr/people/tmacrina/seungmount/research/"
+# bucket = '/mnt/bucket/labs/seung/research/'
+bucket = "/usr/people/tmacrina/seungmount/research/"
 # project_folder = bucket + 'tommy/150528_zfish/'
 # project_folder = bucket + 'tommy/150502_piriform/'
 # project_folder = bucket + 'tommy/150502_piriform/'
-project_folder = bucket + 'tommy/trakem_tests/150709_rough_xy_montage/'
+project_folder = bucket + 'tommy/trakem_tests/150709_elastic_montage/'
 tform_folder = project_folder + 'affine_transforms/'
 
 # Get the first open project
 # project = Project.getProject('stack_import.xml')
-project = Project.getProject('rough_xy_montage.xml')
+project = Project.getProject('control_no_align.xml')
 
 # Get layerset
 layerset = project.getRootLayerSet()
