@@ -41,18 +41,22 @@ for row in reader:
   target_roi = Roi(target_roi_x, target_roi_y, original_roi_width, original_roi_height)
   # getRoiManager().addRoi(target_roi)
 
-  ip = Patch.makeFlatImage(
-             ImagePlus.GRAY8,
-             layer,
-             target_roi.getBounds(), #roi,
-             scale,
-             tiles,
-             backgroundColor,
-             True)  # use the min and max of each tile
-   
-  imp = ImagePlus("Flat montage", ip)
-  fs = FileSaver(imp)
-  filepath = new_filename + str(target_roi_x) + "_" + str(target_roi_y) + "_" + str(original_roi_width) + "_" + str(original_roi_height) + ".tif"
-  fs.saveAsTiff(filepath)
+  try:
+    ip = Patch.makeFlatImage(
+               ImagePlus.GRAY8,
+               layer,
+               target_roi.getBounds(), #roi,
+               scale,
+               tiles,
+               backgroundColor,
+               True)  # use the min and max of each tile
+     
+    imp = ImagePlus("Flat montage", ip)
+    fs = FileSaver(imp)
+    filepath = new_filename + str(target_roi_x) + "_" + str(target_roi_y) + "_" + str(original_roi_width) + "_" + str(original_roi_height) + ".tif"
+    fs.saveAsTiff(filepath)
+  except Exception, value:
+    print value
+
 
 roi_file.close()
